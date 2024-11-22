@@ -1,4 +1,4 @@
-## Merge outputs (with random mixing of different samples)
+## Set the environment and processing samples
 
 
 1. Setting up the correct LCG environmen to acess python, C++ compilers, ROOT, etc..
@@ -33,7 +33,7 @@ mv ${MERGEDIR}/ntuple_merged_[.0-8.].root ${TESTDIR}/
 mv ${MERGEDIR}/ntuple_merged_*.root ${TRAINDIR}/
 ```
 
-## Convert `ROOT` files to `HDF5` files using `uproot`
+# Convert `ROOT` files to `HDF5` files using `uproot`
 
 This step requires a more recent version of CMSSW.
 
