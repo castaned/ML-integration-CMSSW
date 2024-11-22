@@ -1,19 +1,7 @@
 ## Merge outputs (with random mixing of different samples)
 
-1. First create the file list (in this case we only take up to 3 output ROOT files for each QCD or Hbb sample).
 
-```bash
-cd DeepNTuples/NtupleAK8/run
-export OUTDIR=/path/to/files/
-ls $OUTDIR > samples.txt
-for i in `cat samples.txt`; 
- do cd ${OUTDIR}/${i}; 
- ls */*/*/output_*.root | head -3 > ${i}_max3files.txt;
- cd -; 
-done
-```
-
-2. Merge the samples (with random mixing)
+1. Merge the samples (with random mixing)
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
@@ -24,7 +12,7 @@ export MERGEDIR=/path/to/files/merged_max3files/
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/QCD_Pt_*/QCD_Pt_*max3files.txt ${OUTDIR}/Bulk*/Bulk*max3files.txt
 ```
 
-3. Split into training and testing samples
+2. Split into training and testing samples
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
