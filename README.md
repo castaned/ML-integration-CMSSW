@@ -12,7 +12,7 @@ cmsenv
 2. Clone the repository  and compile 
 
 ```bash
-git clone https://github.com/castaned/ML-integration-CMSSW
+git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
 scram b -j 4
 ```
 
