@@ -1,0 +1,7 @@
+<use   name="DeepNTuples/Utilities"/>
+<use   name="root"/>
+<use   name="rootgraphics"/>
+
+<bin name="createMergeList" file="createMergeList.cc" />
+<bin name="merge" file="merge.cc" />
+

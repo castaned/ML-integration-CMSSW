@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 
 from argparse import ArgumentParser
@@ -21,7 +21,7 @@ args = parser.parse_args()
 tmpfiles = glob.glob('/tmp/mergeParallel_*')
 if len(tmpfiles):
     for f in tmpfiles:
-        print 'Removing old temp file: %s' % f
+        print('Removing old temp file: %s' % f)
         os.remove(f)
 
 if not os.path.isdir(args.outdir):
@@ -57,21 +57,21 @@ def _run(jobid):
     out = p.communicate()[0]
 #     print out
     if p.returncode == 0:
-        print 'Job %d: Success!' % jobid
+        print('Job %d: Success!' % jobid)
         return True
     else:
-        print 'Job %d: Failed!' % jobid
+        print('Job %d: Failed!' % jobid)
         return False
 
 
 n_threads = int(multiprocessing.cpu_count() / 2)
-print "n_threads =", n_threads
+print("n_threads =", n_threads)
 n_threads = 2
-print "n_threads =", n_threads
+print("n_threads =", n_threads)
 pool = multiprocessing.Pool(n_threads)
 results = pool.map(_run, listtoberun)
 
-print 'Finished! %d/%d jobs succeeded!' % (sum(results), len(listtoberun))
+print('Finished! %d/%d jobs succeeded!' % (sum(results), len(listtoberun)))
 
 
 
