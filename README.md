@@ -1,18 +1,27 @@
 ## Set the environment and processing samples
 
 
-1. Setting up the correct LCG environmen to acess python, C++ compilers, ROOT, etc..
-
+1. Set the CMSSW version
 
 ```bash
-source /cvmfs/sft.cern.ch/lcg/views/LCG_103cuda/x86_64-centos9-gcc11-opt/setup.sh
+cmsrel CMSSW_13_3_0
+cd CMSSW_13_3_0/src
+cmsenv
 
 ```
 
 
+2. Clone the repository  and compile 
 
+```bash
 
-1. Merge the samples (with random mixing)
+git clone https://github.com/castaned/ML-integration-CMSSW
+
+scram b -j 4
+
+```
+
+3. Merge the samples (with random mixing)
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
@@ -35,13 +44,10 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${TRAINDIR}/
 
 ### Convert `ROOT` files to `HDF5` files using `uproot`
 
-This step requires a more recent version of CMSSW.
 
 ```bash
-cmsrel CMSSW_10_4_0
-cd CMSSW_10_4_0/src/
-cmsenv
-wget https://raw.githubusercontent.com/cms-opendata-analyses/HiggsToBBNtupleProducerToo/opendata_80X/NtupleAK8/scripts/convert-uproot-opendata.py
+wget https://raw.githubusercontent.com/cms-opendata-analyses/HiggsToBBNtupleProducerTool/refs/heads/opendata_80X/NtupleAK8/scripts/convert-uproot-opendata.py
+
 ```
 
 Then you can run
@@ -52,4 +58,5 @@ e.g.,
 ```
 python convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_10.root ${TRAINDIR}/ntuple_merged_10.h5
 ```
-which produces `HDF5` files with different arrays for each output variable. Note that during this conversion, only the information for up to 100 particle candidates, 60 tracks, and 5 secondary vertices are saved in flattened, zero-padded, fixed-length arrays.
+which produces `HDF5` files with different arrays for each output variable.
+
