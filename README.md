@@ -23,8 +23,8 @@ mergeSamples.py [events per output file] [output dir] [path to the filelist prod
 ```
 e.g.,
 ```bash
-export OUTDIR=/path/to/datasets 
-export MERGEDIR=/path/to/files-merged
+export OUTDIR=$PWD/datasets 
+export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
