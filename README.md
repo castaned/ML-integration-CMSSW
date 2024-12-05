@@ -23,12 +23,12 @@ mergeSamples.py [events per output file] [output dir] [path to the filelist prod
 ```
 e.g.,
 ```bash
-export OUTDIR=/path/to/files/tobemerged/
+export SAMPLEDIR=/path/to/datasets 
 export MERGEDIR=/path/to/files/merged/
-mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
+mergeSamples.py 200000 ${MERGEDIR} ${SAMPLEDIR}/signal.txt ${SAMPLEDIR}/bkg.txt
 ```
 
-2. Split into training and testing samples
+2. Split into training and testing samples (e.g. separate from 10 files, 8 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
