@@ -35,8 +35,8 @@ mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 export TRAINDIR=${MERGEDIR}/train
 export TESTDIR=${MERGEDIR}/test
 mkdir -p $TRAINDIR $TESTDIR
-mv ${MERGEDIR}/ntuple_merged_[.0-7.].root ${TESTDIR}/
-mv ${MERGEDIR}/ntuple_merged_*.root ${TRAINDIR}/
+mv ${MERGEDIR}/ntuple_merged_[.0-7.].root ${TRAINDIR}/
+mv ${MERGEDIR}/ntuple_merged_*.root ${TESTDIR}/
 ```
 
 
