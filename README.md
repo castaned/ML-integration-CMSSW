@@ -1,4 +1,4 @@
-### Mixing of datasets and processing files from ROOT to HD5 format
+### Mixing of datasets and converting from ROOT to HD5 (arrays) format
 
 
 1. Set a recent CMSSW version
