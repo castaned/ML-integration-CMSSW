@@ -48,7 +48,7 @@ convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
 ```
 e.g.,
 ```
-python convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
+convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
 ```
 which produces `HDF5` files with different arrays for each output variable.
 
