@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import uproot
 import pandas
 import numpy as np

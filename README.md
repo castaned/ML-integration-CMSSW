@@ -23,9 +23,9 @@ mergeSamples.py [events per output file] [output dir] [path to the filelist prod
 ```
 e.g.,
 ```bash
-export SAMPLEDIR=/path/to/datasets 
-export MERGEDIR=/path/to/files/merged/
-mergeSamples.py 200000 ${MERGEDIR} ${SAMPLEDIR}/signal.txt ${SAMPLEDIR}/bkg.txt
+export OUTDIR=/path/to/datasets 
+export MERGEDIR=/path/to/files-merged
+mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
 2. Split into training and testing samples (e.g. separate from 10 files, 8 for training and the rest for test)
@@ -41,15 +41,9 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${TRAINDIR}/
 
 ### Convert `ROOT` files to `HDF5` files using `uproot`
 
-
-```bash
-wget https://raw.githubusercontent.com/cms-opendata-analyses/HiggsToBBNtupleProducerTool/refs/heads/opendata_80X/NtupleAK8/scripts/convert-uproot-opendata.py
-
-```
-
 Then you can run
 ```bash
-python convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
+convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
 ```
 e.g.,
 ```
