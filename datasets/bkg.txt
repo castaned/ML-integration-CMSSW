@@ -1,4 +1,2 @@
 /eos/cms/store/mc/RunIISummer20UL18NanoAODv9/WZTo3LNu_5f_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/40000/047AB83C-4480-024B-B1F5-27E8D2C9CCED.root
-/eos/cms/store/mc/RunIISummer20UL18NanoAODv9/WZTo3LNu_5f_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/40000/07339ED7-DD58-024A-AC9B-EB83B70FE6DC.root
-/eos/cms/store/mc/RunIISummer20UL18NanoAODv9/WZTo3LNu_5f_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/40000/0BB19D5D-5C8C-9544-B7C5-CA57F76BA09D.root
 
