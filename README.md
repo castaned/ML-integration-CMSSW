@@ -29,13 +29,13 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
-2. Split into training and testing samples (e.g. separate from 10 files, 8 for training and the rest for test)
+2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
 export TESTDIR=${MERGEDIR}/test
 mkdir -p $TRAINDIR $TESTDIR
-mv ${MERGEDIR}/ntuple_merged_[.0-8.].root ${TESTDIR}/
+mv ${MERGEDIR}/ntuple_merged_[.0-7.].root ${TESTDIR}/
 mv ${MERGEDIR}/ntuple_merged_*.root ${TRAINDIR}/
 ```
 
@@ -48,7 +48,7 @@ convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
 ```
 e.g.,
 ```
-python convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_10.root ${TRAINDIR}/ntuple_merged_10.h5
+python convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
 ```
 which produces `HDF5` files with different arrays for each output variable.
 
