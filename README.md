@@ -40,7 +40,8 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${TESTDIR}/
 ```
 
 
-### Convert `ROOT` files to `HDF5` files using `uproot`
+### Convert `ROOT` files to `HDF5` files using `uproot`  (up to maximum 100 particles) 
+
 
 Then you can run
 ```bash
