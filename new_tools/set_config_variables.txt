@@ -1,0 +1,71 @@
+################ Data variables #################################
+#
+#
+# The format to follow is the variables inside single quotes ('),
+# and brackets ([]). If there is more than one value for a variable,
+# as in features, then each one has to be in a new line ending in a
+# coma (,). The first value has the opening bracket ([) and the 
+# last one the closing one (]).
+#
+
+# Train data file path
+train_path = ['.data/ntuple_merged_10.h5']
+
+# Test data file path
+test_path = ['.data/ntuple_merged_11.h5']
+
+# Output file path
+output_path = ['output']
+
+# Set number of instances (events, particles, jets, etc..)
+num_instances = ['fj_jetNTracks']
+
+# Features
+features = ['fj_jetNTracks',
+            'fj_nSV',
+            'fj_tau0_trackEtaRel_0',
+            'fj_tau0_trackEtaRel_1',
+            'fj_tau0_trackEtaRel_2',
+            'fj_tau1_trackEtaRel_0',
+            'fj_tau1_trackEtaRel_1',
+            'fj_tau1_trackEtaRel_2',
+            'fj_tau_flightDistance2dSig_0',
+            'fj_tau_flightDistance2dSig_1',
+            'fj_tau_vertexDeltaR_0',
+            'fj_tau_vertexEnergyRatio_0',
+            'fj_tau_vertexEnergyRatio_1',
+            'fj_tau_vertexMass_0',
+            'fj_tau_vertexMass_1',
+            'fj_trackSip2dSigAboveBottom_0',
+            'fj_trackSip2dSigAboveBottom_1',
+            'fj_trackSip2dSigAboveCharm_0',
+            'fj_trackSipdSig_0',
+            'fj_trackSipdSig_0_0',
+            'fj_trackSipdSig_0_1',
+            'fj_trackSipdSig_1',
+            'fj_trackSipdSig_1_0',
+            'fj_trackSipdSig_1_1',
+            'fj_trackSipdSig_2',
+            'fj_trackSipdSig_3',
+            'fj_z_ratio']
+
+# Spectators
+spectators = ['fj_sdmass',
+              'fj_pt']
+
+# Labels
+labels = ['fj_isQCD*sample_isQCD',
+          'fj_isH*fj_isBB']
+
+
+
+##### IA model variables #################################
+
+# IA model
+ia_model = ['mlp']
+
+# Ideal accuracy
+ideal_accuracy = ['90.246']
+
+# How many models to generate
+num_models = ['1']
