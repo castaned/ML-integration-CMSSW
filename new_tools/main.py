@@ -3,7 +3,7 @@ import sys
 from utilities.prepare_data import get_features_labels
 from utilities.read_config_variables import read_variables
 from models.models import MLPmodel 
-from src.optimize_model import train_optim
+from src.optimize_model import train_model
 from src.test_results import test_results 
  
 
@@ -37,7 +37,8 @@ def main(file_vars):
         
         # Train and optimize model
         print("Training and optimizing model...", flush=True)
-        train_optim(base_model, X_train, y_train, output_dir)
+        ideal_acc = read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
+        train_model(base_model, X_train, y_train, ideal_acc, output_dir)
         print("Training and optimization completed.\n", flush=True)
 
         # test model

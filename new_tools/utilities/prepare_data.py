@@ -1,8 +1,26 @@
 # Script to prepare data to train IA models
-
 import tables
 import numpy as np
 from utilities.read_config_variables import read_variables
+from sklearn.model_selection import train_test_split
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+def train_data_to_pytorch(X, y, val_split, batch_size):
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=val_split, shuffle=True)
+
+    X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
+    y_train_tensor = torch.argmax(torch.tensor(y_train, dtype=torch.long), dim=1)
+    X_val_tensor = torch.tensor(X_val, dtype=torch.float32)
+    y_val_tensor = torch.argmax(torch.tensor(y_val, dtype=torch.long), dim=1)
+
+    train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+    val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, val_loader
 
 def get_features_labels(file_vars, remove_mass_pt_window=True, test=False):
 
