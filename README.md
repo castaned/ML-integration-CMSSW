@@ -2,6 +2,7 @@
 
 1. Log into LXPLUS server
 
+
 ```bash
 ssh username@lxplus.cern.ch
 ```
