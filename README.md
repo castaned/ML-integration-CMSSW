@@ -1,7 +1,14 @@
 ### Mixing of datasets and converting from ROOT to HD5 (arrays) format
 
+1. Log into LXPLUS server
 
-1. Set a recent CMSSW version
+
+```bash
+ssh username@lxplus.cern.ch
+```
+
+
+2. Set a recent CMSSW version
 
 ```bash
 cmsrel CMSSW_13_3_0
@@ -9,14 +16,14 @@ cd CMSSW_13_3_0/src
 cmsenv
 ```
 
-2. Clone the repository  and compile 
+3. Clone the repository  and compile 
 
 ```bash
 git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
 scram b -j 4
 ```
 
-3. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
+4. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
@@ -29,7 +36,7 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
-2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
+5. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
