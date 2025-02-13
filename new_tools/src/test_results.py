@@ -2,9 +2,21 @@
 import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
+from models.models import MLPmodel
 
-def test_results(model, X, y, output_class, output_dir):
-    model.load_state_dict(torch.load(f"{output_dir}/pytorch_model_best.pth", weights_only=False)) 
+def test_results(X, y, output_class, output_dir):
+    
+    param_model = torch.load(f"{output_dir}/pytorch_best_model.pth", weights_only=True)
+    hyperparam = param_model["hyperparam"]
+    model = MLPmodel(
+    input_size=X.shape[1],
+    output_size=y.shape[1],
+    hidden_input_size=hyperparam["hidden_input_size"],
+    hidden_output_size=hyperparam["hidden_output_size"],
+    num_layers=hyperparam["num_layers"])
+
+    model.load_state_dict(param_model["model_state"])
+    print(model)
     model.eval()
     X_test_tensor = torch.tensor(X, dtype=torch.float32)
     

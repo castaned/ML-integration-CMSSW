@@ -15,7 +15,7 @@ train_path = ['.data/ntuple_merged_10.h5']
 test_path = ['.data/ntuple_merged_11.h5']
 
 # Output file path
-output_path = ['output']
+output_path = ['.output']
 
 # Set number of instances (events, particles, jets, etc..)
 num_instances = ['fj_jetNTracks']
@@ -65,7 +65,7 @@ labels = ['fj_isQCD*sample_isQCD',
 ia_model = ['mlp']
 
 # Ideal accuracy
-ideal_accuracy = ['90.246']
+ideal_accuracy = ['95']
 
 # How many models to generate
-num_models = ['1']
+num_models = ['3']
