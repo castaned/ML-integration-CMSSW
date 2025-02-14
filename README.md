@@ -33,10 +33,8 @@ voms-proxy-init -voms cms -valid 192:00
 5. Test the filter script locally
 
 ```bash
-python reduce_nanoaod.py root://cms-xrd-global.cern.ch//store/data/Run2022D/NanoAOD.root reduced.root
+reduce_nanoaod.py root://cms-xrd-global.cern.ch//store/data/Run2022D/NanoAOD.root reduced.root
 ```
-
-
 
 
 6. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
