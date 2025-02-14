@@ -2,3 +2,5 @@
 *~
 .*
 slurm*
+*.log
+__pycache__/
