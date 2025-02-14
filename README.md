@@ -1,4 +1,4 @@
-### Mixing of datasets and converting from ROOT to HD5 (arrays) format
+### Filtering, Mixing of datasets (nanoAOD) and converting from ROOT to HD5 (arrays) format for use in ML training
 
 1. Log into LXPLUS server
 
@@ -23,7 +23,23 @@ git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
 scram b -j 4
 ```
 
-4. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
+4. Set up the proxy (to use samples stored in the GRID):
+
+```bash
+voms-proxy-init -voms cms -valid 192:00
+```
+
+
+5. Test the filter script locally
+
+```bash
+python reduce_nanoaod.py root://cms-xrd-global.cern.ch//store/data/Run2022D/NanoAOD.root reduced.root
+```
+
+
+
+
+6. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
@@ -36,7 +52,7 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
-5. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
+7. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
