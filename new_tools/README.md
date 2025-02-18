@@ -44,7 +44,7 @@ The outputs will also be in the `output_path` directory. Output directory conten
 * Other results
 
 ### 4. MLOps
-MLflow is used as the MLOps platform. To launch the UI, execute:
+MLflow is used as the MLOps platform. To launch the UI, make sure you are in the environment, then execute:
 
 ```bash
 mlflow ui --backend-store-uri output_path/mlruns/ --host IP_host --port some_port
