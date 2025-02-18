@@ -95,16 +95,28 @@ which produces `HDF5` files with different arrays for each output variable.
 
 ### Inference
 
+## Ensure to have the requied packages
 
+- onnxruntime: For running the ONNX model.
+- uproot: To read NanoAOD files in pure Python.
+- numpy: For handling input arrays.
+
+```bash
+pip install onnxruntime uproot numpy
+```
+
+## Execute script 
+
+```bash
+python test_onnx_nanoaod.py
+```
+
+The functionalities are: 
 - Opens a NanoAOD ROOT file using uproot.
 - Extracts electron kinematic variables (pt, eta, phi, mass).
 - Loops over each event and selects the first electron.
 - Formats the data as an input array for the ONNX model.
 - Runs the ONNX model on each event and prints the output.
-
-```bash
-python test_onnx_nanoaod.py
-```
 
 
 
