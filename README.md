@@ -93,9 +93,9 @@ which produces `HDF5` files with different arrays for each output variable.
 
 
 
-### Inference
+## Inference
 
-## Ensure to have the requied packages
+### Ensure to have the requied packages
 
 - onnxruntime: For running the ONNX model.
 - uproot: To read NanoAOD files in pure Python.
@@ -105,7 +105,7 @@ which produces `HDF5` files with different arrays for each output variable.
 pip install onnxruntime uproot numpy
 ```
 
-## Execute script 
+### Execute script 
 
 ```bash
 python test_onnx_nanoaod.py
