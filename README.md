@@ -74,6 +74,8 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${TESTDIR}/
 
 
 Then you can run
+
+
 ```bash
 convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
 ```
@@ -82,4 +84,27 @@ e.g.,
 convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
 ```
 which produces `HDF5` files with different arrays for each output variable.
+
+
+
+### Training
+
+
+
+
+
+### Inference
+
+
+- Opens a NanoAOD ROOT file using uproot.
+- Extracts electron kinematic variables (pt, eta, phi, mass).
+- Loops over each event and selects the first electron.
+- Formats the data as an input array for the ONNX model.
+- Runs the ONNX model on each event and prints the output.
+
+```bash
+python test_onnx_nanoaod.py
+```
+
+
 
