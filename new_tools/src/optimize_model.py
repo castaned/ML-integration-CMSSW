@@ -8,6 +8,8 @@ from models.models import MLPmodel
 import ray
 from ray import tune
 from ray.tune.schedulers import ASHAScheduler
+from ray.air.integrations.mlflow import MLflowLoggerCallback
+import mlflow
 
 def compute_accuracy(outputs, y):
     _, predicted = torch.max(outputs, dim=1)
@@ -126,12 +128,19 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
         reduction_factor=2)
     
     # Tuning process
+    
     ray.init()    
     trainable = tune.with_resources(
         tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir),
         resources={"cpu": 20, "gpu": 0} 
     )
-
+    
+    # Define the MLflow callback
+    mlflow_callback = MLflowLoggerCallback(tracking_uri=f"{output_dir}/mlruns",
+                                           experiment_name="test_mlp",
+                                           tags={"project": "ML_CMSSW_integration", "model": "mlp"},
+                                           save_artifact=True
+                                           )
     tuner = tune.Tuner(
         trainable,
         param_space=hyperparam_space,  
@@ -139,7 +148,9 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
             num_samples=num_models,
             scheduler=scheduler,
         ),
-        run_config=tune.RunConfig(name="tune_results", storage_path=output_dir)
+        run_config=tune.RunConfig(storage_path=f"{output_dir}/tune_results",
+                                  callbacks=[mlflow_callback],
+                                  )
     )
     
     results = tuner.fit()
