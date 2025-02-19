@@ -34,6 +34,10 @@ def main(file_vars):
     output_dir = read_variables(file_vars, ['output_path'])['output_path'][0]
     if not os.path.isabs(output_dir):
         output_dir = os.path.abspath(output_dir)
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
     sys.stdout = TimestampedLogger(sys.stdout, f"{output_dir}/stdout.log")
     sys.stderr = TimestampedLogger(sys.stderr, f"{output_dir}/stderr.log")
 
