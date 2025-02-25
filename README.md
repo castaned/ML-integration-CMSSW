@@ -30,13 +30,11 @@ If you dont have a valid grid certificate follow the instructions here:
 [Grid certificate](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
 
 
-Then try the following command
+Then try the following command (This is needed to access files located in xrootd servers)
 
 ```bash
 voms-proxy-init -voms cms -valid 192:00
 ```
-
-
 
 
 5. Test the filter script locally
