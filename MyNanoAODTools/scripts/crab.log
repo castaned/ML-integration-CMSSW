@@ -1,0 +1,118 @@
+DEBUG 2025-02-17 22:22:36.633 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-02-17 22:22:36.634 UTC: 	 Running on: Linux lxplus922.cern.ch 5.14.0-503.23.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Jan 20 10:19:28 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-02-17 22:22:36.634 UTC: 	 Not using Singularity
+DEBUG 2025-02-17 22:22:36.634 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-02-17 22:22:36.634 UTC: 	 Executing command: 'checkwrite'
+DEBUG 2025-02-17 22:22:36.634 UTC: 	 Found CRAB cache file /afs/cern.ch/user/c/castaned/.crab3
+DEBUG 2025-02-17 22:22:36.644 UTC: 	 Checking credentials
+DEBUG 2025-02-17 22:22:36.644 UTC: 	 Found proxy file /tmp/x509up_u29575
+DEBUG 2025-02-17 22:22:36.644 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2025-02-17 22:22:36.644 UTC: 	 Executing command :
+ voms-proxy-info --vo --file /tmp/x509up_u29575
+DEBUG 2025-02-17 22:22:37.069 UTC: 	 output : cms
+
+ error: 
+ retcode : 0
+DEBUG 2025-02-17 22:22:37.069 UTC: 	 Getting proxy life time left
+DEBUG 2025-02-17 22:22:37.069 UTC: 	 Executing command :
+ voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u29575
+DEBUG 2025-02-17 22:22:37.419 UTC: 	 output : 686043
+686043
+
+ error: 
+ retcode : 0
+DEBUG 2025-02-17 22:22:37.419 UTC: 	 Proxy valid for 190:34:03 hours
+DEBUG 2025-02-17 22:22:37.419 UTC: 	 Retrieving username ...
+DEBUG 2025-02-17 22:22:37.419 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-02-17 22:22:38.223 UTC: 	 username is castaned
+INFO 2025-02-17 22:22:40.476 UTC: 	 Rucio client intialized for account castaned
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Command use: checkwrite
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Options use: ['--site', 'T3_CH_CERNBOX']
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Instance is None
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Server base url is None
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Retrieving username ...
+DEBUG 2025-02-17 22:22:40.477 UTC: 	 Retrieving username from CRIC...
+DEBUG 2025-02-17 22:22:41.107 UTC: 	 username is castaned
+INFO 2025-02-17 22:22:41.107 UTC: 	 Will check write permission in the default location /store/user/<username>
+INFO 2025-02-17 22:22:41.107 UTC: 	 Validating LFN /store/user/castaned...
+INFO 2025-02-17 22:22:41.107 UTC: 	 LFN /store/user/castaned is valid.
+INFO 2025-02-17 22:22:41.120 UTC: 	 Will use `gfal-copy`, `gfal-rm` commands for checking write permissions
+INFO 2025-02-17 22:22:41.120 UTC: 	 Will check write permission in /store/user/castaned on site T3_CH_CERNBOX
+INFO 2025-02-17 22:22:41.168 UTC: 	 Will use PFN: davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp
+INFO 2025-02-17 22:22:41.168 UTC: 	 
+Attempting to create (dummy) directory crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6 and copy (dummy) file d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp to /store/user/castaned
+
+INFO 2025-02-17 22:22:41.173 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-copy -p -v -t 180 file:///afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src/DeepNTuples/MyNanoAODTools/scripts/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp 'davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp'
+INFO 2025-02-17 22:22:41.173 UTC: 	 Please wait...
+INFO 2025-02-17 22:22:42.549 UTC: 	 
+Successfully created directory crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6 and copied file d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp to /store/user/castaned
+INFO 2025-02-17 22:22:42.550 UTC: 	 
+Attempting to delete file davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp
+
+INFO 2025-02-17 22:22:42.550 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp'
+INFO 2025-02-17 22:22:42.550 UTC: 	 Please wait...
+INFO 2025-02-17 22:22:43.463 UTC: 	 
+Successfully deleted file davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/d9458a5b-ebd4-4f35-9406-c4d9176852b6.tmp
+INFO 2025-02-17 22:22:43.463 UTC: 	 
+Attempting to delete directory davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/
+
+INFO 2025-02-17 22:22:43.463 UTC: 	 Executing command: which scram >/dev/null 2>&1 && eval `scram unsetenv -sh`; gfal-rm -r -v -t 180 'davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/'
+INFO 2025-02-17 22:22:43.463 UTC: 	 Please wait...
+INFO 2025-02-17 22:22:44.558 UTC: 	 
+Successfully deleted directory davs://eosuserhttp.cern.ch:443//eos/user/c/castaned/crab3checkwrite_20250217_232241_d9458a5b-ebd4-4f35-9406-c4d9176852b6/
+INFO 2025-02-17 22:22:44.657 UTC: 	 
+Checkwrite Result:
+INFO 2025-02-17 22:22:44.658 UTC: 	 Success: Able to write in /store/user/castaned on site T3_CH_CERNBOX
+DEBUG 2025-02-17 22:23:15.299 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-02-17 22:23:15.299 UTC: 	 Running on: Linux lxplus922.cern.ch 5.14.0-503.23.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Jan 20 10:19:28 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-02-17 22:23:15.299 UTC: 	 Not using Singularity
+DEBUG 2025-02-17 22:23:15.299 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-02-17 22:23:15.299 UTC: 	 Executing command: 'submit'
+DEBUG 2025-02-17 22:23:15.300 UTC: 	 Found CRAB cache file /afs/cern.ch/user/c/castaned/.crab3
+INFO 2025-02-17 22:23:15.300 UTC: 	 Will use CRAB configuration file crabConfig.py
+DEBUG 2025-02-17 22:23:15.300 UTC: 	 Loading CRAB configuration file.
+ERROR 2025-02-17 22:23:15.361 UTC: 	 Invalid CRAB confgituation: Parameter JobType.sendPythonFolder has been deprecated. Please remove it
+ Reason: Now pythonFolder is always added to sandbox
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+ERROR 2025-02-17 22:23:15.361 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 326, in __init__
+    self.loadConfig(self.options.config, self.args)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 95, in loadConfig
+    raise ConfigurationException(configmsg)
+CRABClient.ClientExceptions.ConfigurationException: Invalid CRAB confgituation: Parameter JobType.sendPythonFolder has been deprecated. Please remove it
+ Reason: Now pythonFolder is always added to sandbox
+The documentation about the CRAB configuration file can be found in https://twiki.cern.ch/twiki/bin/view/CMSPublic/CRAB3ConfigurationFile
+INFO 2025-02-17 22:23:15.363 UTC: 	 Log file is /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src/DeepNTuples/MyNanoAODTools/scripts/crab.log
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 CRAB Client version: v3.241125
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 Running on: Linux lxplus922.cern.ch 5.14.0-503.23.1.el9_5.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Jan 20 10:19:28 EST 2025 x86_64 x86_64 x86_64 GNU/Linux
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 Not using Singularity
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 Operating System: Red Hat Enterprise Linux 9.5 (Plow)
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 Executing command: 'submit'
+DEBUG 2025-02-17 22:26:09.360 UTC: 	 Found CRAB cache file /afs/cern.ch/user/c/castaned/.crab3
+INFO 2025-02-17 22:26:09.361 UTC: 	 Will use CRAB configuration file crabConfig.py
+DEBUG 2025-02-17 22:26:09.361 UTC: 	 Loading CRAB configuration file.
+DEBUG 2025-02-17 22:26:09.362 UTC: 	 Will use CRAB plugin ANALYSIS (i.e. will run an analysis job type).
+ERROR 2025-02-17 22:26:09.362 UTC: 	 Working area '/afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src/DeepNTuples/MyNanoAODTools/scripts/crab_projects/crab_NanoAOD_Reduction' already exists 
+Please change the requestName in the config file
+ERROR 2025-02-17 22:26:09.362 UTC: 	 Caught ClientException exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 157, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/bin/crab.py", line 135, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])  # the crab command to be executed
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/submit.py", line 37, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/Commands/SubCommand.py", line 328, in __init__
+    self.requestarea, self.requestname, self.logfile = createWorkArea(
+  File "/cvmfs/cms.cern.ch/share/cms/crab-prod/v3.241125.00/lib/CRABClient/ClientUtilities.py", line 392, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+CRABClient.ClientExceptions.ConfigException: Working area '/afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src/DeepNTuples/MyNanoAODTools/scripts/crab_projects/crab_NanoAOD_Reduction' already exists 
+Please change the requestName in the config file
+INFO 2025-02-17 22:26:09.364 UTC: 	 Log file is /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src/DeepNTuples/MyNanoAODTools/scripts/crab.log
