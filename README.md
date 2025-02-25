@@ -42,7 +42,7 @@ voms-proxy-init -voms cms -valid 192:00
 5. Test the filter script locally
 
 ```bash
-reduce_nanoaod.py root://cms-xrd-global.cern.ch//store/mc/Run3Summer22EENanoAODv12/DYto2L-4Jets_MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/NANOAODSIM/JMENano12p5_132X_mcRun3_2022_realistic_postEE_v4-v2/2550000/0010fed0-9bf7-4f05-a1f4-e71ae9f1e9a1.root output1.root
+reduce_nanoaod.py  root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/270000/6AB66CC6-59BA-FF43-89AA-FF10B6E170C7.root output2.root
 ```
 
 
