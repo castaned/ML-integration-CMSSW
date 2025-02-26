@@ -1,0 +1,15 @@
+universe = vanilla
+executable = run_filter.sh
+arguments = $(inputFile)
+output = logs/job_$(ClusterId)_$(Process).out
+error = logs/job_$(ClusterId)_$(Process).err
+log = logs/job_$(ClusterId)_$(Process).log
+request_cpus = 1
+request_memory = 2000M
+request_disk = 2GB
+should_transfer_files = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files = filterNanoAOD.py
++JobFlavour = "workday"
+x509userproxy = /afs/cern.ch/user/c/castaned/.globus/x509up_u29575
+queue inputFile from input_files.txt
