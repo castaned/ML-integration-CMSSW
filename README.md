@@ -55,7 +55,11 @@ voms-proxy-info --all
 cd  cd MyNanoAODTools/scripts/
 ```
 
-3. Check that the datasets to be processed are in the datasets.yaml file, the format should be consistent with the one found in the DAS ( https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
+3.
+
+- Check that the datasets to be processed are in the datasets.yaml file, the format should be consistent with the one found in the DAS ( https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
+
+- Check that the list of branches to keep are updated in the branchsel.txt (according to the nanoAOD version the name of the branches may change, so it is always better to check the list of branches in the original file  https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
 
 
 4.
