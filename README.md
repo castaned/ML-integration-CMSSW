@@ -74,6 +74,12 @@ cd MyNanoAODTools/scripts/
   - Adjust the EOS directory for filtered files. (e.g. replace EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}" with  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}"
 
 
+- create local directory for output
+
+```bash
+mkdir filteredNanoAOD
+```
+
 - Create directory in EOS to store output
 
 ```bash
