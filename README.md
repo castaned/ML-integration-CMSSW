@@ -63,12 +63,11 @@ cd  cd MyNanoAODTools/scripts/
 ### Step 4: Update necessary configuration files
 
 - Modify submit_condor.py to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned).
-- update run_filter.sh or.py
 
--Update run_filter.sh or run_filter.py:
+- Update run_filter.sh: 
 
--Change paths to reflect your local environment (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path).
-Adjust the EOS directory for filtered files.
+  - Change paths to reflect your local environment (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path).
+    Adjust the EOS directory for filtered files.
 
 
 ### Step 5: Submit the Condor jobs
