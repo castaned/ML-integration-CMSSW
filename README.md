@@ -30,7 +30,7 @@ scram b -j 4
 ## DATA Processing
 
 
-1. Set up GRID proxy for accessing files
+### Step 1: Set up GRID proxy for accessing files
 
 Ensure you have a valid GRID certificate. If you don’t, follow the instructions [here](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
 
@@ -46,13 +46,13 @@ Verify the certificate is correctly generated:
 voms-proxy-info --all
 ```
 
-Step 2: Navigate to the directory for job submission
+### Step 2: Navigate to the directory for job submission
 
 ```bash
 cd  cd MyNanoAODTools/scripts/
 ```
 
-Step 3: Verify dataset and branch selections
+### Step 3: Verify dataset and branch selections
 
 - Check that the datasets to process are listed in datasets.yaml in the correct format. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
 
@@ -60,7 +60,7 @@ Step 3: Verify dataset and branch selections
 [here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
 
 
-Step 4: Update necessary configuration files
+### Step 4: Update necessary configuration files
 
 - Modify submit_condor.py to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned).
 - update run_filter.sh or.py
@@ -71,19 +71,19 @@ Step 4: Update necessary configuration files
 Adjust the EOS directory for filtered files.
 
 
-Step 5: Submit the Condor jobs
+### Step 5: Submit the Condor jobs
 
 ```bash
 condor_submit condor_submit.jdl
 ```
 
-Step 6: Monitor job progress
+### Step 6: Monitor job progress
 
 ```bash
 condor_q
 ```
 
-Step 7: Verify the output
+### Step 7: Verify the output
 Once the jobs complete, check the EOS directory to confirm the skimmed samples were created successfully.
 
 ### Merge directories (randomly) and produce h5 files
