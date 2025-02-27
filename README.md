@@ -67,7 +67,7 @@ cd MyNanoAODTools/scripts/
 ### Step 4: Update necessary configuration files
 
 - Modify submit_condor.py
-  - change the proxy path  (from x509up_u29575") to x509up_u{id}") where the id change according to the CERN username
+  - change the proxy path  (from x509up_u29575 to x509up_u{id}") where the id change according to the CERN username
   - to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned) according to your CERN username
 
 - Modify run_filter.sh: 
