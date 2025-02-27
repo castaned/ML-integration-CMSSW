@@ -1,7 +1,9 @@
 # Data Processing, Training and Inference famework 
 
+This repository provides a framework for processing, training, and making inferences with machine learning models in the context of CMS experiments. It includes scripts for filtering NanoAOD files, merging data, converting to HDF5 format, and running inference with ONNX models.
 
-## Basic Setup 
+## Setup Instructions
+ 
 
 1. Log into LXPLUS server (CERN computers)
 
@@ -9,7 +11,7 @@
 ssh username@lxplus.cern.ch
 ```
 
-2. Set a recent CMSSW version 
+2. Set up the required CMSSW version
 
 ```bash
 cmsrel CMSSW_13_3_0
@@ -27,65 +29,62 @@ scram b -j 4
 
 ## DATA Processing
 
-### Filter nanoAOD orignal files
 
+1. Set up GRID proxy for accessing files
 
-1. Set up the proxy (to use samples stored in the GRID):
+Ensure you have a valid GRID certificate. If you don’t, follow the instructions [here](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
 
-If you dont have a valid grid certificate follow the instructions here:
+Generate the certificate and store it in the .globus directory:
 
-[Grid certificate](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
-
-
-Then generate the grid certificate file and store in .globus directory (this is needed to access files stored in grid servers)
 
 ```bash
 voms-proxy-init --voms cms --valid 192:00 --out $HOME/.globus/x509up_u$(id -u)
 ```
 
-To check that the certificate was generate correctly and that the file was stored in the .globus directory:
-
+Verify the certificate is correctly generated:
 ```bash
 voms-proxy-info --all
 ```
 
-2. Move to the directory to submit jobs to process nanoAOD orginal files
+Step 2: Navigate to the directory for job submission
 
 ```bash
 cd  cd MyNanoAODTools/scripts/
 ```
 
-3.
+Step 3: Verify dataset and branch selections
 
-- Check that the datasets to be processed are in the datasets.yaml file, the format should be consistent with the one found in the DAS ( https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
+- Check that the datasets to process are listed in datasets.yaml in the correct format. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
 
-- Check that the list of branches to keep are updated in the branchsel.txt (according to the nanoAOD version the name of the branches may change, so it is always better to check the list of branches in the original file  https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
+- Ensure the branchsel.txt file lists the correct branches for the NanoAOD version you're using. You can find branch information
+[here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
 
 
-4.
+Step 4: Update necessary configuration files
 
-- update submit_condor.py   to replace the location where the files will be saved (e.g. change /eos/user/c/castaned by /eos/user/u/username)
+- Modify submit_condor.py to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned).
 - update run_filter.sh or.py
 
-   - to replace the location where the code is located (e.g. change /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src by /afs/cern.ch/user/u/username)
-   - to replace the location where files will be saved (e.g. change EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}"  by  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}" )
+-Update run_filter.sh or run_filter.py:
+
+-Change paths to reflect your local environment (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path).
+Adjust the EOS directory for filtered files.
 
 
-5. Submit the condor jobs
+Step 5: Submit the Condor jobs
 
 ```bash
 condor_submit condor_submit.jdl
 ```
 
-6. Check the progress of the jobs 
-
+Step 6: Monitor job progress
 
 ```bash
 condor_q
 ```
 
-7. After the jobs finished you should look at the EOS directory to verify the skimmed samples were created 
-
+Step 7: Verify the output
+Once the jobs complete, check the EOS directory to confirm the skimmed samples were created successfully.
 
 ### Merge directories (randomly) and produce h5 files
 
