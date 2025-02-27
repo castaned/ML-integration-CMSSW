@@ -46,6 +46,11 @@ Verify the certificate is correctly generated:
 voms-proxy-info --all
 ```
 
+If the certificate is not located in .globus directory, the variable need to be set with the following command
+
+export X509_USER_PROXY=/afs/cern.ch/user/u/username/.globus/x509up_u{id}   el {id} tiene que reemplazarse para cada usuario
+
+
 ### Step 2: Navigate to the directory for job submission
 
 ```bash
