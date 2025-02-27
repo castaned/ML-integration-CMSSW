@@ -85,8 +85,10 @@ condor_q
 ### Step 7: Verify the output
 Once the jobs complete, check the EOS directory to confirm the skimmed samples were created successfully.
 
-### Merge directories (randomly) and produce h5 files
 
+
+
+### Merge directories (randomly) and produce h5 files (STILL NEED TO BE CONNECTED to Filtering)
 1. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
 ```bash
