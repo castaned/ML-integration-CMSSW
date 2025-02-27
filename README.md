@@ -5,13 +5,13 @@ This repository provides a framework for processing, training, and making infere
 ## Setup Instructions
  
 
-1. Log into LXPLUS server (CERN computers)
+### Step 1. Log into LXPLUS server (CERN computers)
 
 ```bash
 ssh username@lxplus.cern.ch
 ```
 
-2. Set up the required CMSSW version
+### Step 2. Set up the required CMSSW version
 
 ```bash
 cmsrel CMSSW_13_3_0
@@ -19,7 +19,7 @@ cd CMSSW_13_3_0/src
 cmsenv
 ```
 
-3. Clone the repository  and compile 
+### Step 3. Clone the repository  and compile 
 
 ```bash
 git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
