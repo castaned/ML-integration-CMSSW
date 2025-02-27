@@ -1,4 +1,4 @@
-# Filtering, Mixing of datasets (nanoAOD) and converting from ROOT to HD5 (arrays) format for use in ML training
+# Data Processing, Training and Inference famework 
 
 
 ## Basic Setup 
