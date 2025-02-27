@@ -69,6 +69,19 @@ cd MyNanoAODTools/scripts/
   - Adjust the EOS directory for filtered files. (e.g. replace EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}" with  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}"
 
 
+- Create directory in EOS to store output
+
+```bash
+mkdir /eos/user/u/username/NanoAOD_Filtered/
+```
+
+
+- Create condor script to submit jobs
+
+```bash
+python3 submit_condor.py
+```
+
 ### Step 5: Submit the Condor jobs
 
 ```bash
