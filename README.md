@@ -76,16 +76,10 @@ mkdir /eos/user/u/username/NanoAOD_Filtered/
 ```
 
 
-- Create condor script to submit jobs
-
-```bash
-python3 submit_condor.py
-```
-
 ### Step 5: Submit the Condor jobs
 
 ```bash
-condor_submit condor_submit.jdl
+python3 submit_condor.py
 ```
 
 ### Step 6: Monitor job progress
