@@ -1,5 +1,8 @@
 ### Filtering, Mixing of datasets (nanoAOD) and converting from ROOT to HD5 (arrays) format for use in ML training
 
+
+### Basic Setup 
+
 1. Log into LXPLUS server (CERN computers)
 
 ```bash
@@ -25,26 +28,37 @@ scram b -j 4
 ### Filter nanoAOD samples
 
 
-4. Set up the proxy (to use samples stored in the GRID):
+1. Set up the proxy (to use samples stored in the GRID):
 
 If you dont have a valid grid certificate follow the instructions here:
 
 [Grid certificate](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
 
 
-Then try the following command (This is needed to access files located in xrootd servers)
+Then generate the grid certificate file and store in .globus directory (this is needed to access files stored in grid servers)
 
 ```bash
-voms-proxy-init -voms cms -valid 192:00
+voms-proxy-init --voms cms --valid 192:00 --out $HOME/.globus/x509up_u$(id -u)
 ```
 
-
-5. Test the filter script locally
+To check that the certificate was generate correctly and that the file was stored in the .globus directory:
 
 ```bash
-reduce_nanoaod.py  root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/270000/6AB66CC6-59BA-FF43-89AA-FF10B6E170C7.root output2.root
+voms-proxy-info --all
 ```
 
+2. Move to the directory to submit jobs to process nanoAOD orginal files
+
+```bash
+cd  cd MyNanoAODTools/scripts/
+```
+
+3. Update the file 
+
+
+
+
+### Merge directories (randomly) and produce h5 files
 
 6. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
