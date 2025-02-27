@@ -1,7 +1,7 @@
 ### Filtering, Mixing of datasets (nanoAOD) and converting from ROOT to HD5 (arrays) format for use in ML training
 
 
-### Basic Setup 
+## Basic Setup 
 
 1. Log into LXPLUS server (CERN computers)
 
@@ -25,7 +25,7 @@ scram b -j 4
 ```
 
 
-### DATA Processing
+## DATA Processing
 
 ### Filter nanoAOD orignal files
 
@@ -100,13 +100,13 @@ which produces `HDF5` files with different arrays for each output variable.
 
 
 
-### Training
+## Training
 
 
 
 
 
-### Inference
+## Inference
 
  Ensure to have the requied packages
 
