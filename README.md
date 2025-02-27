@@ -55,14 +55,37 @@ voms-proxy-info --all
 cd  cd MyNanoAODTools/scripts/
 ```
 
-3. Update the file 
+3. Check that the datasets to be processed are in the datasets.yaml file, the format should be consistent with the one found in the DAS ( https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
 
 
+4.
+
+- update submit_condor.py   to replace the location where the files will be saved (e.g. change /eos/user/c/castaned by /eos/user/u/username)
+- update run_filter.sh or.py
+
+   - to replace the location where the code is located (e.g. change /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src by /afs/cern.ch/user/u/username)
+   - to replace the location where files will be saved (e.g. change EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}"  by  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}" )
+
+
+5. Submit the condor jobs
+
+```bash
+condor_submit condor_submit.jdl
+```
+
+6. Check the progress of the jobs 
+
+
+```bash
+condor_q
+```
+
+7. After the jobs finished you should look at the EOS directory to verify the skimmed samples were created 
 
 
 ### Merge directories (randomly) and produce h5 files
 
-6. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
+1. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
@@ -75,7 +98,7 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
-7. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
+2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
