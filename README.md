@@ -25,7 +25,9 @@ scram b -j 4
 ```
 
 
-### Filter nanoAOD samples
+### DATA Processing
+
+### Filter nanoAOD orignal files
 
 
 1. Set up the proxy (to use samples stored in the GRID):
@@ -84,9 +86,6 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${TESTDIR}/
 ```
 
 
-### Convert `ROOT` files to `HDF5` files using `uproot`  (up to maximum 100 particles) 
-
-
 Then you can run
 
 
@@ -101,15 +100,15 @@ which produces `HDF5` files with different arrays for each output variable.
 
 
 
-## Training
+### Training
 
 
 
 
 
-## Inference
+### Inference
 
-### Ensure to have the requied packages
+ Ensure to have the requied packages
 
 - onnxruntime: For running the ONNX model.
 - uproot: To read NanoAOD files in pure Python.
@@ -119,7 +118,7 @@ which produces `HDF5` files with different arrays for each output variable.
 pip install onnxruntime uproot numpy
 ```
 
-### Execute script 
+ Execute script 
 
 ```bash
 python test_onnx_nanoaod.py
