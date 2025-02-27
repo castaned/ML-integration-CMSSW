@@ -27,7 +27,8 @@ inputFile = sys.argv[1]
 outputDir = "filteredNanoAOD"
 
 
-branchSelFile = "keepBranches.json"  # Specify the JSON file for branch selection
+#branchSelFile = "keepBranches.json"  # Specify the JSON file for branch selection
+branchSelFile = "branchsel.txt"
 
 p = PostProcessor(
     outputDir, [inputFile],
