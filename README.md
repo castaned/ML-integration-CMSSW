@@ -90,7 +90,7 @@ Once the jobs complete, check the EOS directory to confirm the skimmed samples w
 .
 
 
-### Merge directories (randomly) and produce h5 files (STILL NEED TO BE CONNECTED to Filtering)
+### Merge directories (randomly) and produce h5 files (NOT YET READY, NEED TO CONNECT WITH PREVIOUS FILTER PROCESS)
 1. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
 
 ```bash
@@ -132,6 +132,7 @@ which produces `HDF5` files with different arrays for each output variable.
 ## Training
 
 
+NEED TO CONNECT WITH PREVIOUS PROCESS (DATA PROCESSING)
 
 
 
