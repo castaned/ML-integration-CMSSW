@@ -1,14 +1,12 @@
 ### Filtering, Mixing of datasets (nanoAOD) and converting from ROOT to HD5 (arrays) format for use in ML training
 
-1. Log into LXPLUS server
-
+1. Log into LXPLUS server (CERN computers)
 
 ```bash
 ssh username@lxplus.cern.ch
 ```
 
-
-2. Set a recent CMSSW version
+2. Set a recent CMSSW version 
 
 ```bash
 cmsrel CMSSW_13_3_0
@@ -22,6 +20,10 @@ cmsenv
 git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
 scram b -j 4
 ```
+
+
+### Filter nanoAOD samples
+
 
 4. Set up the proxy (to use samples stored in the GRID):
 
