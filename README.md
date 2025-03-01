@@ -34,7 +34,7 @@ scram b -j 4
 
 Ensure you have a valid GRID certificate. If you don’t, follow the instructions [here](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)
 
-Generate the certificate and store it in the .globus directory:
+Generate the certificate and store it in the `.globus` directory:
 
 
 ```bash
@@ -42,41 +42,58 @@ voms-proxy-init --voms cms --valid 192:00 --out $HOME/.globus/x509up_u$(id -u)
 ```
 
 Verify the certificate is correctly generated:
+
 ```bash
 voms-proxy-info --all
 ```
 
-If the certificate is not located in .globus directory, the variable need to be set with the following command
+If the certificate is not located in `.globus` directory, the variable need to be set with the following command
 
-export X509_USER_PROXY=/afs/cern.ch/user/u/username/.globus/x509up_u{id}   el {id} tiene que reemplazarse para cada usuario
+```bash
+export X509_USER_PROXY=/afs/cern.ch/user/u/username/.globus/x509up_u{id}   
+```
+
+The `{id}` has to be replaced with the one generated in the last step.
 
 
 ### Step 2: Navigate to the directory for job submission
 
 ```bash
-cd MyNanoAODTools/scripts/
+cd DeepNTuples/MyNanoAODTools/scripts/
 ```
 
 ### Step 3: Verify dataset and branch selections
 
-- Check that the datasets to process are listed in datasets.yaml in the correct format. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
+- Ensure the datasets to process are listed in datasets.yaml in the correct format. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/)  (e.g., `/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM`).
+  
+  **Note:**
+  
+    - When accessing the DAS tool, the page may display a security warning. Click Advanced Settings and then "Continue to cmsweb.cern.ch (unsafe)" to proceed.
 
-- Ensure the branchsel.txt file lists the correct branches for the NanoAOD skimmed version to be produced. You can find branch information for original nanoAOD files [here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
+    - You will be prompted to authenticate using your GRID certificate, which was generated in Step 1. Refer to the "Obtaining and Installing Your Certificate" section for instructions on how to create the certificate.
+
+    - After generating the certificate, copy it to your local machine and add it to your browser. For guidance on adding certificates in your browser, see this [example for Google Chrome](https://www.wipo.int/pct-eservices/en/support/cert_import_backup_chrome.html).
+
+- Ensure the branchsel.txt file lists the correct branches for the NanoAOD skimmed version to be produced. You can find branch information for original nanoAOD files [here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home).
+
+   **Note:**
+ 
+     - Access to this resource requires a CERN account.
 
 
 ### Step 4: Update necessary configuration files
 
 - Modify submit_condor.py
-  - change the proxy path  (from x509up_u29575 to x509up_u{id}") where the id change according to the CERN username
-  - to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned) according to your CERN username
+  - Change the proxy path (`X509_PROXY` variable) from `x509up_u29575` to `x509up_u{id}`, where the id change according to the CERN username
+  - To specify where the output files will be saved, change the variable `EOS_BASE_DIR` to your EOS directory (e.g., /eos/user/u/username instead of /eos/user/c/castaned)
 
 - Modify run_filter.sh: 
 
-  - Change paths to reflect your local environment (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path, for instance /afs/cern.ch/user/u/username).
-  - Adjust the EOS directory for filtered files. (e.g. replace EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}" with  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}"
+  - Change paths to reflect your local environment (e.g., replace `/afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src` with your path, for instance `/afs/cern.ch/user/u/username`)
+  - Adjust the EOS directory variable (`EOS_DIR`) for filtered files. (e.g., replace `/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}` with `/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}`)
 
 
-- create local directory for output
+- Create local directory for output
 
 ```bash
 mkdir filteredNanoAOD
@@ -124,7 +141,7 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
 ```
 
-2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
+2. Split into training and testing samples (e.g., separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
