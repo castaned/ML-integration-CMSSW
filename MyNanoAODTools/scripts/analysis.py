@@ -1,51 +1,66 @@
+#!/usr/bin/env python3
 
-#!/usr/bin/env python
 import os
 import sys
 import ROOT
+from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
-from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
-from importlib import import_module
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
+class LeptonAnalysis(Module):
+    def __init__(self, outputFile):
+        self.minLeptons = 2
+        self.outputFile = outputFile
+        self.histograms = {}
 
-class ExampleAnalysis(Module):
-    def __init__(self):  # Corrected method name
-        self.writeHistFile = True
-
-    def beginJob(self, histFile=None, histDirName=None):
-        Module.beginJob(self, histFile, histDirName)
-        self.h_vpt = ROOT.TH1F('sumpt', 'sumpt', 100, 0, 1000)
-        self.addObject(self.h_vpt)
+    def beginJob(self):
+        self.outputFile = ROOT.TFile(self.outputFile, "RECREATE")
+        self.histograms["electron_pt"] = ROOT.TH1F("electron_pt", "Electron pT; pT (GeV); Events", 50, 0, 200)
+        self.histograms["muon_pt"] = ROOT.TH1F("muon_pt", "Muon pT; pT (GeV); Events", 50, 0, 200)
 
     def analyze(self, event):
         electrons = Collection(event, "Electron")
         muons = Collection(event, "Muon")
-        jets = Collection(event, "Jet")
-        eventSum = ROOT.TLorentzVector()
+        
+        good_electrons = [ele for ele in electrons if ele.pt > 20 and abs(ele.eta) < 2.4]
+        good_muons = [mu for mu in muons if mu.pt > 20 and abs(mu.eta) < 2.4]
+        
+        for ele in good_electrons:
+            self.histograms["electron_pt"].Fill(ele.pt)
+        for mu in good_muons:
+            self.histograms["muon_pt"].Fill(mu.pt)
+        
+        return len(good_electrons) + len(good_muons) >= self.minLeptons
+    
+    def endJob(self):
+        self.outputFile.cd()
+        for hist in self.histograms.values():
+            hist.Write()
+        self.outputFile.Close()
 
-        # Select events with at least 2 muons
-        if len(muons) >= 2:
-            for lep in muons:
-                eventSum += lep.p4()
-            for lep in electrons:
-                eventSum += lep.p4()
-            for j in jets:
-                eventSum += j.p4()
-            self.h_vpt.Fill(eventSum.Pt())
+# Read input file and Condor job ID arguments
+if len(sys.argv) < 4:
+    print("Usage: filterNanoAOD.py <input.root> <cluster_id> <process_id>")
+    sys.exit(1)
 
-        return True
+inputFile = sys.argv[1]
+cluster_id = sys.argv[2]  # Condor Cluster ID
+process_id = sys.argv[3]  # Condor Process ID
 
-if __name__ == "__main__":  # Corrected name check
-    if len(sys.argv) < 2:
-        print("Usage: python analysis.py <input_root_file>")
-        sys.exit(1)
+outputDir = "filteredNanoAOD"
+os.makedirs(outputDir, exist_ok=True)
 
-    input_file = sys.argv[1]
-    output_dir = os.getcwd()  # Use current directory for Condor job
-    preselection = "Jet_pt[0] > 250"
+# Use Condor job IDs for unique histogram filenames
+histOutputFile = os.path.join(outputDir, f"histograms_{cluster_id}_{process_id}.root")
+branchSelFile = "branchsel.txt"
 
-    p = PostProcessor(output_dir, [input_file], cut=preselection, branchsel=None,
-                      modules=[ExampleAnalysis()], noOut=True, histFileName="histOut.root", histDirName="plots")
-    p.run()
+p = PostProcessor(
+    outputDir, [inputFile],
+    cut=None,
+    branchsel=branchSelFile,
+    modules=[LeptonAnalysis(histOutputFile)],
+    noOut=False,
+    justcount=False
+)
+p.run()
+
