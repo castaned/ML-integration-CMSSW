@@ -63,9 +63,10 @@ cd MyNanoAODTools/scripts/
 
 ### Step 3: Verify dataset and branch selections
 
-- Check that the datasets to process are listed in datasets.yaml in the correct format. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/)  (e.g. /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM)
+- Check input datasets in datasets.yaml. For reference, use the DAS query tool [here](https://cmsweb.cern.ch/das/) 
 
-- Ensure the branchsel.txt file lists the correct branches for the NanoAOD skimmed version to be produced. You can find branch information for original nanoAOD files [here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
+- Ensure the branchsel.txt file lists the desired branches for the NanoAOD skimmed version to be produced.
+  You can find a list of branches in original file [here](https://gitlab.cern.ch/cms-nanoAOD/nanoaod-doc/-/wikis/home)
 
 
 ### Step 4: Update necessary configuration files
