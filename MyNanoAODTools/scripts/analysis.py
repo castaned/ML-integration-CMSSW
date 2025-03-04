@@ -8,18 +8,22 @@ from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import Pos
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
 
+
 class LeptonAnalysis(Module):
     def __init__(self, outputFile):
         self.minLeptons = 2
         self.outputFile = outputFile
         self.histograms = {}
-        self.out_branches = ["invariant_mass"]
 
     def beginJob(self):
         self.outputFile = ROOT.TFile(self.outputFile, "RECREATE")
         self.histograms["electron_pt"] = ROOT.TH1F("electron_pt", "Electron pT; pT (GeV); Events", 50, 0, 200)
         self.histograms["muon_pt"] = ROOT.TH1F("muon_pt", "Muon pT; pT (GeV); Events", 50, 0, 200)
         self.histograms["invariant_mass"] = ROOT.TH1F("invariant_mass", "Invariant Mass of Leading Electrons; Mass (GeV); Events", 50, 0, 200)
+
+    def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        self.out = wrappedOutputTree
+        self.out.branch("invariant_mass", "F")  # Define new branch
 
     def analyze(self, event):
         electrons = Collection(event, "Electron")
@@ -39,8 +43,9 @@ class LeptonAnalysis(Module):
             e1, e2 = good_electrons[:2]
             invariant_mass = self.computeInvariantMass(e1, e2)
             self.histograms["invariant_mass"].Fill(invariant_mass)
+
+        self.out.fillBranch("invariant_mass", invariant_mass)  # Now works correctly
         
-        self.out.fillBranch("invariant_mass", invariant_mass)
         return len(good_electrons) + len(good_muons) >= self.minLeptons
     
     def computeInvariantMass(self, lepton1, lepton2):
@@ -62,6 +67,7 @@ class LeptonAnalysis(Module):
             hist.Write()
         self.outputFile.Close()
 
+
 # Read input file and Condor job ID arguments
 if len(sys.argv) < 4:
     print("Usage: filterNanoAOD.py <input.root> <cluster_id> <process_id>")
@@ -78,15 +84,17 @@ os.makedirs(outputDir, exist_ok=True)
 histOutputFile = os.path.join(outputDir, f"histograms_{cluster_id}_{process_id}.root")
 branchSelFile = "branchsel.txt"
 
+
 p = PostProcessor(
     outputDir, [inputFile],
     cut=None,
-    branchsel=branchSelFile,
+    branchsel=branchSelFile,  # Keeps only selected branches
+    outputbranchsel=None,  # Ensures all new branches are included
     modules=[LeptonAnalysis(histOutputFile)],
     noOut=False,
-    justcount=False,
-    outputbranchsel=None  # Ensures new branches are written
+    justcount=False
 )
+
 p.run()
 
 
