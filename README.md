@@ -71,13 +71,13 @@ cd MyNanoAODTools/scripts/
 ### Step 4: Update necessary configuration files
 
 - Modify submit_condor.py
-  - change the proxy path  (from x509up_u29575 to x509up_u{id}") where the id change according to the CERN username
-  - to specify where the output files will be saved (e.g., /eos/user/u/username instead of /eos/user/c/castaned) according to your CERN username
+  - change the proxy path  (from x509up_u29575 to x509up_u{id}") where the {id} according to the user file
+  - EOS user directory (e.g., /eos/user/u/username instead of /eos/user/c/castaned) according CERN username
 
 - Modify run_filter.sh: 
 
-  - Change paths to reflect your local environment (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path, for instance /afs/cern.ch/user/u/username).
-  - Adjust the EOS directory for filtered files. (e.g. replace EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}" with  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}"
+  - work folder (e.g., replace /afs/cern.ch/work/c/castaned/CMSSW_13_3_0/src with your path, for instance /afs/cern.ch/user/u/username).
+  - EOS directory (e.g. replace EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}" with  EOS_DIR="/eos/user/u/username/NanoAOD_Filtered/${DATASET_FOLDER}"
 
 
 - create local directory for output
