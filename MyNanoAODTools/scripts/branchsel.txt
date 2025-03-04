@@ -12,3 +12,4 @@ keep Electron_charge
 keep run
 keep event
 keep luminosityBlock
+keep invariant_mass
