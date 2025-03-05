@@ -27,7 +27,8 @@ echo "DATASET FOLDER: ${DATASET_FOLDER} "
 EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}"
 echo "EOS DIR: ${EOS_DIR} "
 
-LOCAL_OUTPUT="filteredNanoAOD"
+mkdir filteredNanoAOD/$DATASET_FOLDER
+LOCAL_OUTPUT="filteredNanoAOD/${DATASET_FOLDER}"
 
 
 # Ensure EOS directory exists
@@ -42,6 +43,6 @@ echo "Copying output files to EOS: $EOS_DIR"
 xrdcp -f $LOCAL_OUTPUT/*.root root://eosuser.cern.ch//$EOS_DIR/
 
 # Clean up local files
-#rm $LOCAL_OUTPUT/*.root
+rm $LOCAL_OUTPUT/*.root
 
 echo "Job finished on $(date)"
