@@ -1,0 +1,22 @@
+000 (11879897.002.000) 03/05 23:41:04 Job submitted from host: <137.138.156.150:9618?addrs=137.138.156.150-9618+[2001-1458-d00-14--9a]-9618&alias=bigbird13.cern.ch&noUDP&sock=schedd_2186_fe1e>
+...
+040 (11879897.002.000) 03/05 23:43:11 Entered queue to transfer input files
+	Transferring to host: <188.185.195.160:9618?addrs=188.185.195.160-9618+[2001-1458-303-22--100-9c]-9618&alias=b9p17p5851.cern.ch&noUDP&sock=slot1_5_4581_7a93_103941>
+...
+040 (11879897.002.000) 03/05 23:57:29 Finished transferring input files
+...
+004 (11879897.002.000) 03/05 23:57:30 Job was evicted.
+	(0) CPU times
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :        0        1         1 
+	   Disk (KB)            :       27  2097152   2099937 
+	   GPUs                 :                           0 
+	   Memory (MB)          :              3000      3000 
+...
+009 (11879897.002.000) 03/05 23:57:30 Job was aborted.
+	via condor_rm (by user castaned)
+...
