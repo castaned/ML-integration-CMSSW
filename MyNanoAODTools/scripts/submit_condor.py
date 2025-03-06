@@ -53,7 +53,8 @@ x509userproxy = {X509_PROXY}
 """)
         for file in input_files:
             output_file = f"{output_dir}/filtered_{os.path.basename(file)}"
-            f.write(f'arguments = {file} {output_file}\nqueue\n')
+            dataset_folder = os.path.basename(os.path.dirname(output_file))
+            f.write(f'arguments = {file} {output_file} {dataset_folder}\nqueue\n')
     print(f"Condor JDL `{JDL_FILE}` created!")
 
 def submit_condor():
