@@ -43,6 +43,6 @@ echo "Copying output files to EOS: $EOS_DIR"
 xrdcp -f $LOCAL_OUTPUT/*.root root://eosuser.cern.ch//$EOS_DIR/
 
 # Clean up local files
-#rm $LOCAL_OUTPUT/*.root
+rm $LOCAL_OUTPUT/*.root
 
 echo "Job finished on $(date)"
