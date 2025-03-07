@@ -22,27 +22,39 @@ fi
 # Get dataset name from arguments
 INPUT_FILE=$1
 OUTPUT_FILE=$2
-DATASET_FOLDER=$(dirname "$OUTPUT_FILE" | xargs basename)
-echo "DATASET FOLDER: ${DATASET_FOLDER} "
+DATASET_FOLDER=$3
+PROCESS=$4
+
+echo "DATASET FOLDER: ${DATASET_FOLDER}"
 EOS_DIR="/eos/user/c/castaned/NanoAOD_Filtered/${DATASET_FOLDER}"
-echo "EOS DIR: ${EOS_DIR} "
+echo "EOS DIR: ${EOS_DIR}"
 
-mkdir filteredNanoAOD/$DATASET_FOLDER
-LOCAL_OUTPUT="filteredNanoAOD/${DATASET_FOLDER}"
+# Avoid "File exists" error
+mkdir -p filteredNanoAOD/$DATASET_FOLDER
+mkdir -p filteredNanoAOD/$DATASET_FOLDER/$PROCESS
 
+LOCAL_OUTPUT="filteredNanoAOD/${DATASET_FOLDER}/${PROCESS}"
 
 # Ensure EOS directory exists
 xrdfs eosuser.cern.ch mkdir -p $EOS_DIR
 
+
+echo "XXXXXXXXXXXXXXX"
+echo "XXXXXXXXXXXXXXX"
+echo "XXXXXXXXXXXXXXX"
+echo "Arguments received: $INPUT_FILE $OUTPUT_FILE $DATASET_FOLDER $PROCESS"
+
+
 # Run NanoAOD filtering
-echo "Processing file: $INPUT_FILE"
-python3 filterNanoAOD.py $INPUT_FILE
+#echo "Processing file: $INPUT_FILE"
+python3 filterNanoAOD.py $INPUT_FILE $DATASET_FOLDER $PROCESS
+
 
 # Copy results to EOS
 echo "Copying output files to EOS: $EOS_DIR"
 xrdcp -f $LOCAL_OUTPUT/*.root root://eosuser.cern.ch//$EOS_DIR/
 
 # Clean up local files
-rm $LOCAL_OUTPUT/*.root
+rm -rf $LOCAL_OUTPUT
 
-echo "Job finished on $(date)"
+#echo "Job finished on $(date)"

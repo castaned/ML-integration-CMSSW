@@ -44,17 +44,18 @@ output = logs/job_$(ClusterId)_$(Process).out
 error = logs/job_$(ClusterId)_$(Process).err
 log = logs/job_$(ClusterId)_$(Process).log
 request_cpus = 1
-request_memory = 2000M
-request_disk = 2GB
+request_memory = 1500M
+request_disk = 1GB
 should_transfer_files = YES
 transfer_input_files = filterNanoAOD.py
 +JobFlavour = "workday"
+retry = 5
 x509userproxy = {X509_PROXY}
 """)
         for file in input_files:
             output_file = f"{output_dir}/filtered_{os.path.basename(file)}"
             dataset_folder = os.path.basename(os.path.dirname(output_file))
-            f.write(f'arguments = {file} {output_file} {dataset_folder}\nqueue\n')
+            f.write(f'arguments = {file} {output_file} {dataset_folder} $(Process)\nqueue\n')
     print(f"Condor JDL `{JDL_FILE}` created!")
 
 def submit_condor():

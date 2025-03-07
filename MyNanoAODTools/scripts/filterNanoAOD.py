@@ -19,16 +19,24 @@ class LeptonFilter(Module):
         return len(good_electrons) + len(good_muons) >= self.minLeptons
 
 # Read input file from Condor arguments
-if len(sys.argv) < 3:
-    print("Usage: filterNanoAOD.py <input.root> <local folder>")
-    sys.exit(1)
+
+#if len(sys.argv) < 3:
+#    print("Usage: filterNanoAOD.py <input.root> <local folder> <process>")
+#    sys.exit(1)
 
 
-inputFile = sys.argv[1]
-out_folder = sys.argv[3]
-outputDir = f"filteredNanoAOD/{out_folder}"  # Corrected
+inputFile  = sys.argv[1]
+outfolder  = sys.argv[2]
+process    = sys.argv[3]
+outputDir  = f"filteredNanoAOD/{outfolder}/{process}"  # Corrected
 #outputDir = "filteredNanoAOD"
 
+print("++++++++++++++\n")
+print("++++++++++++++\n")
+print(" input file : ",inputFile)
+print(" output folder : ",outfolder)
+print(" process       : ",process)
+print(" output directory  : ",outputDir)
 
 #branchSelFile = "keepBranches.json"  # Specify the JSON file for branch selection
 branchSelFile = "branchsel.txt"
@@ -42,4 +50,3 @@ p = PostProcessor(
     justcount=False
 )
 p.run()
-
