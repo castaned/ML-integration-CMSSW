@@ -35,9 +35,14 @@ mkdir -p filteredNanoAOD/$DATASET_FOLDER/$PROCESS
 
 LOCAL_OUTPUT="filteredNanoAOD/${DATASET_FOLDER}/${PROCESS}"
 
+
+
 # Ensure EOS directory exists
 xrdfs eosuser.cern.ch mkdir -p $EOS_DIR
 
+
+#delete data from previous run
+rm  $EOS_DIR/*
 
 echo "XXXXXXXXXXXXXXX"
 echo "XXXXXXXXXXXXXXX"
