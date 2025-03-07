@@ -42,7 +42,7 @@ xrdfs eosuser.cern.ch mkdir -p $EOS_DIR
 
 
 #delete data from previous run
-rm  $EOS_DIR/*
+#rm  $EOS_DIR/*
 
 echo "XXXXXXXXXXXXXXX"
 echo "XXXXXXXXXXXXXXX"
