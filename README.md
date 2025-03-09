@@ -113,10 +113,24 @@ condor_q
 ### Step 7: Verify the output
 Once the jobs complete, check the EOS directory to confirm the skimmed samples were created successfully.
 
-.
-.
-.
-.
+
+
+### Step 8: Create .txt files to merge sample 
+
+Back to the main directory 
+
+```bash
+cd ../../
+
+```
+
+Use the SamplesToMerge.sh script to produce .txt in the corresponding EOS directory (change Path accordingly to your EOS area)
+
+
+```bash
+# Set the directory containing the sample folders
+BASE_DIR="/eos/user/c/castaned/NanoAOD_Filtered"
+```
 
 
 ### Merge directories (randomly) and produce h5 files (NOT YET READY, NEED TO CONNECT WITH PREVIOUS FILTER PROCESS)
