@@ -133,18 +133,22 @@ BASE_DIR="/eos/user/c/castaned/NanoAOD_Filtered"
 ```
 
 
-### Merge directories (randomly) and produce h5 files (NOT YET READY, NEED TO CONNECT WITH PREVIOUS FILTER PROCESS)
-1. Samples to merge are located in datasets directory, use mergeSamples script to merge into single root files
+### Step 9: Merge samples (randomly) and produce h5 files 
+
 
 ```bash
 mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
 ```
+
+Make sure the EOS directory for merged samples exist (otherwise create)
+
+```bash
+mkdir /eos/user/c/castaned/MergedSamples
+```
+
 e.g.,
 ```bash
-cd DeepNTuples
-export OUTDIR=$PWD/datasets 
-export MERGEDIR=$PWD/output
-mergeSamples.py 200000 ${MERGEDIR} ${OUTDIR}/signal.txt ${OUTDIR}/bkg.txt
+mergeSamples.py 200000 /eos/user/c/castaned/MergedSamples  /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2_NANOAODSIM.txt /eos/user/c/castaned/NanoAOD_Filtered/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt
 ```
 
 2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
