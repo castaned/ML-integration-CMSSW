@@ -166,11 +166,17 @@ mv ${MERGEDIR}/ntuple_merged_{51..60}.root ${TESTDIR}/
 mv ${MERGEDIR}/ntuple_merged_*.root ${VALDIR}/
 ```
 
-Convert from .root to h5
+Convert from .root to h5 (for all directories)
 
 e.g.,
-```
-convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
+```bash
+for file in "$TRAINDIR"/*.root; do
+    if [ -f "$file" ]; then
+        h5file="${file%.root}.h5"
+        echo "Converting $file to $h5file"
+        convert-uproot-opendata.py "$file" "$h5file"
+    fi
+done
 ```
 which produces `HDF5` files with different arrays for each output variable.
 
