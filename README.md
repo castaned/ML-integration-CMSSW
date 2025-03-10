@@ -135,23 +135,14 @@ BASE_DIR="/eos/user/c/castaned/NanoAOD_Filtered"
 
 ### Step 9: Merge samples (randomly) and produce h5 files 
 
-
-```bash
-mergeSamples.py [events per output file] [output dir] [path to the filelist produced in step 1]
-```
-
-Make sure the EOS directory for merged samples exist (otherwise create)
-
-```bash
-mkdir /eos/user/c/castaned/MergedSamples
-```
-
 e.g.,
 ```bash
-mergeSamples.py 200000 /eos/user/c/castaned/MergedSamples  /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2_NANOAODSIM.txt /eos/user/c/castaned/NanoAOD_Filtered/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt
+export MERGEDIR=$PWD/output
+
+mergeSamples.py 200000 ${MERGEDIR} /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2_NANOAODSIM.txt /eos/user/c/castaned/NanoAOD_Filtered/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt
 ```
 
-2. Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
+Split into training and testing samples (e.g. separate from 10 files, 7 for training and the rest for test)
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
@@ -161,18 +152,15 @@ mv ${MERGEDIR}/ntuple_merged_[.0-7.].root ${TRAINDIR}/
 mv ${MERGEDIR}/ntuple_merged_*.root ${TESTDIR}/
 ```
 
+Convert from .root to h5
 
-Then you can run
-
-
-```bash
-convert-uproot-opendata.py [input file (.root)] [output file (.h5)]
-```
 e.g.,
 ```
 convert-uproot-opendata.py ${TRAINDIR}/ntuple_merged_5.root ${TRAINDIR}/ntuple_merged_5.h5
 ```
 which produces `HDF5` files with different arrays for each output variable.
+
+
 
 
 
