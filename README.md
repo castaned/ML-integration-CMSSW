@@ -185,7 +185,7 @@ for file in "$TRAINDIR"/*.root; do
     fi
 done
 ```
-which produces `HDF5` files with different arrays for each output variable.
+which produces `HDF5` files 
 
 
 
