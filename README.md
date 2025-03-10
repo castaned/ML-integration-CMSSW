@@ -168,13 +168,20 @@ mv ${MERGEDIR}/ntuple_merged_*.root ${VALDIR}/
 
 Convert from .root to h5 (for all directories)
 
+
+```bash
+convert-uproot-opendata_v2.py $TRAINDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
+```
+
+To loop over complete dataset
+
 e.g.,
 ```bash
 for file in "$TRAINDIR"/*.root; do
     if [ -f "$file" ]; then
         h5file="${file%.root}.h5"
         echo "Converting $file to $h5file"
-        convert-uproot-opendata.py "$file" "$h5file"
+        convert-uproot-opendata_v2.py "$file" "$h5file"
     fi
 done
 ```
