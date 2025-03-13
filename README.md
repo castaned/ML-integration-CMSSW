@@ -124,12 +124,18 @@ cd ../../
 
 ```
 
-Use the SamplesToMerge.sh script to produce .txt in the corresponding EOS directory (change Path accordingly to your EOS area)
+Use the `SamplesToMerge.sh` script to produce .txt in the corresponding EOS directory (change Path accordingly to your EOS area)
 
 
 ```bash
 # Set the directory containing the sample folders
 BASE_DIR="/eos/user/c/castaned/NanoAOD_Filtered"
+```
+
+Execute the bash script
+
+```bash
+bash SamplesToMerge.sh
 ```
 
 
@@ -148,7 +154,7 @@ Split into training and testing samples, first find how many merged files were g
 ls output/*.root | wc 
 ```
 
-Try to separate 70% for traning, 15% test, 15% validation
+Try to separate 70% for `traning`, 15% `test`, 15% `validation`
 
 ```bash
 export TRAINDIR=${MERGEDIR}/train
