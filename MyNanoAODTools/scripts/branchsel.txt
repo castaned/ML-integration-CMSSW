@@ -5,8 +5,6 @@ keep Muon_pt
 keep Muon_eta
 keep Muon_phi
 keep Muon_charge
-keep Muon_ip3d
-keep Muon_sip3d
 keep Muon_isGlobal
 keep Muon_highPtId
 keep Electron_pt
@@ -14,8 +12,14 @@ keep Electron_eta
 keep Electron_phi
 keep Electron_charge
 keep Electron_cutBased
-keep Electron_ip3d
-keep Electron_sip3d
+keep A_Zmass
+keep B_Zmass
+keep C_Zmass
+keep D_Zmass
+keep A_Dr_Z
+keep B_Dr_Z
+keep C_Dr_Z
+keep D_Dr_Z
 keep run
 keep event
 keep luminosityBlock

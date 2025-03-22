@@ -6,10 +6,12 @@ import ROOT
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection
+import math
+import itertools
 
 class LeptonFilter(Module):
     def __init__(self):
-        self.minLeptons = 2
+        self.minLeptons = 3
 
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
@@ -22,7 +24,6 @@ class LeptonFilter(Module):
         self.out.branch("B_Dr_Z", "F")  # dR between leptons channel B
         self.out.branch("C_Dr_Z", "F")  # dR between leptons channel C
         self.out.branch("D_Dr_Z", "F")  # dR between leptons channel D
-        self.out.branch("MET","F") # MET in the event
         
         inputTree.SetBranchStatus("Electron_pdgId",1)
         inputTree.SetBranchStatus("Muon_pdgId",1)
@@ -32,12 +33,13 @@ class LeptonFilter(Module):
         muons = Collection(event, "Muon")
         good_electrons = [ele for ele in electrons if ele.pt > 20 and abs(ele.eta) < 2.4]
         good_muons = [mu for mu in muons if mu.pt > 20 and abs(mu.eta) < 2.4]
-        return len(good_electrons) + len(good_muons) >= self.minLeptons
+        if len(good_electrons) + len(good_muons) < self.minLeptons:
+            return False
+
 
         met_pt = event.MET_pt #este tipo de variables no es un vector y no puede manejarse
 
         leptons = list(muons) + list(electrons)
-
 
         
         if len(leptons) >= 3:
@@ -81,6 +83,26 @@ class LeptonFilter(Module):
         
         return True
 
+
+    def etaphiplane(self, lepton1, lepton2):
+        dr_etaphi = ()       
+    
+    def computeInvariantMass(self, lepton1, lepton2):
+        e1, px1, py1, pz1 = self.getLorentzVector(lepton1)
+        e2, px2, py2, pz2 = self.getLorentzVector(lepton2)
+        mass2 = (e1 + e2) ** 2 - (px1 + px2) ** 2 - (py1 + py2) ** 2 - (pz1 + pz2) ** 2
+        return math.sqrt(mass2) if mass2 > 0 else 0
+
+    def getLorentzVector(self, lepton):
+        
+        
+        m_lepton = 0.000511 if abs(lepton.pdgId) == 11 else 0.105  # Electron: 0.511 MeV, Muon: 105 MeV
+        e = math.sqrt(lepton.pt**2 * math.cosh(lepton.eta)**2 + 0.000511**2)  # Electron mass ~0.511 MeV
+        px = lepton.pt * math.cos(lepton.phi)
+        py = lepton.pt * math.sin(lepton.phi)
+        pz = lepton.pt * math.sinh(lepton.eta)
+        return e, px, py, pz
+    
 
     def findBestZCandidate(self, leptons):
         Z_MASS = 91.2  # Z boson mass in GeV
@@ -146,6 +168,7 @@ p = PostProcessor(
     outputDir, [inputFile],
     cut=None,
     branchsel=branchSelFile,  # Use branch selection file
+    outputbranchsel=None,
     modules=[LeptonFilter()],
     noOut=False,
     justcount=False
