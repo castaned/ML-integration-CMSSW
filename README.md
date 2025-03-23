@@ -25,7 +25,7 @@ cd CMSSW_13_3_0/src
 cmsenv  
 ```
 
-IMPORTANT cmsenv need to be executed every time you open new terminal
+IMPORTANT `cmsenv` need to be executed every time you open new terminal
 
 ### Step 3. Clone the repository  and compile 
 
