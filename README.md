@@ -148,42 +148,18 @@ export MERGEDIR=$PWD/output
 mergeSamples.py 200000 ${MERGEDIR} /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2_NANOAODSIM.txt /eos/user/c/castaned/NanoAOD_Filtered/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt
 ```
 
-Split into training and testing samples, first find how many merged files were generated
-
-```bash
-ls output/*.root | wc 
-```
-
-Try to separate 70% for `traning`, 15% `test`, 15% `validation`
-
-```bash
-export TRAINDIR=${MERGEDIR}/train
-export TESTDIR=${MERGEDIR}/test
-export VALDIR=${MERGEDIR}/val
-mkdir -p $TRAINDIR $TESTDIR $VALDIR
-
-# Move files numbered from 0 to 50
-mv ${MERGEDIR}/ntuple_merged_{0..50}.root ${TRAINDIR}/
-
-# Move files numbered from 51 to 60
-mv ${MERGEDIR}/ntuple_merged_{51..60}.root ${TESTDIR}/
-
-# Move the remaining files to validation directory
-mv ${MERGEDIR}/ntuple_merged_*.root ${VALDIR}/
-```
 
 Convert from .root to h5 (for all directories)
 
-
 ```bash
-convert-uproot-opendata_v2.py $TRAINDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
+convert-uproot-opendata_v2.py $MERGEDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
 ```
 
 To loop over complete dataset
 
 e.g.,
 ```bash
-for file in "$TRAINDIR"/*.root; do
+for file in "$MERGEDIR"/*.root; do
     if [ -f "$file" ]; then
         h5file="${file%.root}.h5"
         echo "Converting $file to $h5file"
