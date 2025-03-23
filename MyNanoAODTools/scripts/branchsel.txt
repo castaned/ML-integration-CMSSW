@@ -1,4 +1,9 @@
 drop *
+keep run
+keep event
+keep Dataset_ID
+keep luminosityBlock
+keep MET_pt
 keep nElectron
 keep nMuon
 keep Muon_pt
@@ -20,7 +25,3 @@ keep A_Dr_Z
 keep B_Dr_Z
 keep C_Dr_Z
 keep D_Dr_Z
-keep run
-keep event
-keep luminosityBlock
-keep MET_pt
