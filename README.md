@@ -1,4 +1,3 @@
-# Data Processing, Training and Inference famework 
 
 # CMS Machine Learning Framework
 
