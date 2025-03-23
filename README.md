@@ -147,21 +147,44 @@ bash SamplesToMerge.sh
 
 ### Step 9: Merge samples (randomly) and produce h5 files 
 
+
+
+
 e.g.,
 ```bash
 export MERGEDIR=$PWD/output
+```
 
+Make sure the directory does not exist, otherwise remove it first 
+
+```bash
+rm -rf $MERGEDIR
+```
+
+Run the merge script considering all the .txt files from the samples to be merged
+
+```bash
 mergeSamples.py 200000 ${MERGEDIR} /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_TuneCP5_13p6TeV_powheg-pythia8_Run3Summer22EENanoAODv12-130X_mcRun3_2022_realistic_postEE_v6-v2_NANOAODSIM.txt /eos/user/c/castaned/NanoAOD_Filtered/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt
 ```
 
 
 Convert from .root to h5 (for all directories)
 
+Make sure all the variables are included in the `other_branches` list, if this is not the case udpate the list 
+
+
+```bash
+emacs -nw Utilities/scripts/convert-uproot-opendata_v2.py
+```
+
+check that the script runs in one file
+
+
 ```bash
 convert-uproot-opendata_v2.py $MERGEDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
 ```
 
-To loop over complete dataset
+Loop over complete dataset
 
 e.g.,
 ```bash
