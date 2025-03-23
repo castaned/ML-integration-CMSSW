@@ -171,6 +171,7 @@ mergeSamples.py 200000 ${MERGEDIR} /eos/user/c/castaned/NanoAOD_Filtered/ZZto4L_
 Convert from .root to h5 (for all directories)
 
 Make sure all the variables are included in the `other_branches` list, if this is not the case udpate the list 
+if the list is updated the code need to be recompiled  `scram b -j8`
 
 
 ```bash
