@@ -19,19 +19,19 @@ upfile = uproot.open(infile)
 tree = upfile['deepntuplizer/Events']
 
 # Define branch groups
-other_branches = ['event']
-other_branches = ['Dataset_ID']
-other_branches = ['MET_pt']
-other_branches = ['nElectron']
-other_branches = ['nMuon']
-other_branches = ['A_Zmass']
-other_branches = ['B_Zmass']
-other_branches = ['C_Zmass']
-other_branches = ['D_Zmass']
-other_branches = ['A_Dr_Z']
-other_branches = ['B_Dr_Z']
-other_branches = ['C_Dr_Z']
-other_branches = ['D_Dr_Z']
+other_branches = ['event',
+                  'Dataset_ID',
+                  'MET_pt',
+                  'nElectron',
+                  'nMuon',
+                  'A_Zmass',
+                  'B_Zmass',
+                  'C_Zmass',
+                  'D_Zmass',
+                  'A_Dr_Z',
+                  'B_Dr_Z',
+                  'C_Dr_Z',
+                  'D_Dr_Z']
 electron_branches = []
 muon_branches = []
 
