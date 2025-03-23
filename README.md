@@ -184,17 +184,10 @@ check that the script runs in one file
 convert-uproot-opendata_v2.py $MERGEDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
 ```
 
-Loop over complete dataset
+Loop over complete dataset in the same MERGEDIR directory
 
-e.g.,
 ```bash
-for file in "$MERGEDIR"/*.root; do
-    if [ -f "$file" ]; then
-        h5file="${file%.root}.h5"
-        echo "Converting $file to $h5file"
-        convert-uproot-opendata_v2.py "$file" "$h5file"
-    fi
-done
+bash convert_root_to_h5.sh
 ```
 which produces `HDF5` files 
 
