@@ -1,8 +1,15 @@
 # Data Processing, Training and Inference famework 
 
-This repository provides a framework for processing, training, and making inferences with machine learning models in the context of CMS experiments. It includes scripts for filtering NanoAOD files, merging data, converting to HDF5 format, and running inference with ONNX models.
+# CMS Machine Learning Framework
 
-## Setup Instructions
+This repository provides a framework for processing, training, and making inferences with machine learning models in the context of CMS experiments. The framework facilitates data preparation, model training, and evaluation to support ML-based analyses in high-energy physics.
+
+## Features
+
+- **NanoAOD Filtering**: Scripts for selecting relevant events and producing key physics variables.
+- **Data Preparation**: Merging filtered NanoAOD samples and converting them into HDF5 format for efficient ML model training.
+- **Model Training & Evaluation**: Training machine learning models and performing performance tests to assess their effectiveness in anomaly detection or other tasks.
+
  
 
 ### Step 1. Log into LXPLUS server (CERN computers)
