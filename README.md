@@ -119,6 +119,7 @@ condor_q
 ### Step 7: Verify the output
 Once the jobs complete, check the EOS directory to confirm the skimmed samples were created successfully.
 
+After the jobs are finished a `json` file named `dataset_mapping.json` will be created with a mapping of all datasets to an integer number (this is used later to define labels in the training process)
 
 
 ### Step 8: Create .txt files to merge sample 
