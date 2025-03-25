@@ -202,6 +202,8 @@ which produces `HDF5` files
 
 NEED TO CONNECT WITH PREVIOUS PROCESS (DATA PROCESSING)
 
+An example of how to use the h5 files to train an autoencoder network can be found in `training
+/train_AEs_pytorch.ipynb`
 
 
 ## Inference
