@@ -183,7 +183,7 @@ check that the script runs in one file
 
 
 ```bash
-convert-uproot-opendata_v2.py $MERGEDIR/ntuple_merged_10.root $TRAINDIR/ntuple_merged_10.h5
+convert-uproot-opendata_v2.py $MERGEDIR/ntuple_merged_10.root $MERGEDIR/ntuple_merged_10.h5
 ```
 
 Loop over complete dataset in the same MERGEDIR directory
