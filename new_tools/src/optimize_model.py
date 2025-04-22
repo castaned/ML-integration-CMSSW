@@ -10,6 +10,7 @@ from ray import tune
 from ray.tune.schedulers import ASHAScheduler
 from ray.air.integrations.mlflow import MLflowLoggerCallback
 import mlflow
+import onnx
 
 def compute_accuracy(outputs, y):
     _, predicted = torch.max(outputs, dim=1)
@@ -17,6 +18,27 @@ def compute_accuracy(outputs, y):
     total = y.size(0)
     acc = correct/total
     return acc
+
+def convert_to_onnx(X, model, output_dir):
+    
+    dummy_input = torch.randn(1, X.shape[1], dtype=torch.float32)
+    torch.onnx.export(
+        model,
+        dummy_input,
+        f"{output_dir}/pytorch_best_model.onnx",
+        export_params=True,
+        opset_version=12,
+        input_names=['input'],
+        output_names=['output'],
+        dynamic_axes={
+    'input': {0: 'batch_size'}, 
+    'output': {0: 'batch_size'}
+        }
+    )
+
+    # Verify
+    onnx.checker.check_model(onnx.load(f"{output_dir}/pytorch_best_model.onnx"))
+    return 0
 
 def get_device():
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -164,5 +186,6 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
 
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
-
+    
+    convert_to_onnx(X, best_model, output_dir)
     return 0

@@ -22,7 +22,7 @@ def train_data_to_pytorch(X, y, val_split, batch_size):
 
     return train_loader, val_loader
 
-def get_features_labels(file_vars, remove_mass_pt_window=True, test=False):
+def oldget_features_labels(file_vars, remove_mass_pt_window=True, test=False):
 
     # Get variables
     if test:
@@ -76,3 +76,45 @@ def get_features_labels(file_vars, remove_mass_pt_window=True, test=False):
 
     h5file.close()
     return feature_array, label_array
+
+
+def get_features_labels(file_vars, test=False):
+
+    # Get variables
+    if test:
+        file_path = 'test_path'
+    else:
+        file_path = 'train_path'
+
+    variables = read_variables(file_vars, [file_path, 'features', 'labels'])
+    print(variables)
+    file_name = variables[file_path][0] 
+    features = variables['features']
+    labels = variables['labels']
+    print(file_name)
+    nfeatures = len(features)
+    nlabels = len(labels)
+
+    # load file
+    h5file = tables.open_file(file_name, 'r')
+    njets = getattr(h5file.root,features[0]).shape[0]
+
+    # allocate arrays
+    feature_array = np.zeros((njets,nfeatures))
+    label_array = np.zeros((njets,nlabels))
+
+    # load labels arrays
+    for (i, label) in enumerate(labels):
+        label_array[:,i] = getattr(h5file.root,label)[:]
+        
+    label_array = (label_array == 2).astype(int)
+    if label_array.shape[1] == 1:
+        label_array = np.eye(2)[label_array.flatten()] # Onehot encoder
+
+    # Leave out events that are not either or both
+    feature_array = feature_array[np.sum(label_array,axis=1)==1]
+    label_array = label_array[np.sum(label_array,axis=1)==1]
+
+    h5file.close()
+    return feature_array, label_array
+

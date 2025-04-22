@@ -55,7 +55,7 @@ Then, you can visualize it in your web browser by entering `IP_host:some_port`. 
 ssh -N -L local_machine_port:IP_host:remote_machine_port user@remote_IP
 ```
 
-The `remote_machine_port` and the `some_port` (from the MLflow command) must be the same, as well as the `IP_host`. Additionally, ensure the ports ob both machines are available for use. The `-N` prevents execution of other command in the terminal that creates the tunnel, but it is not obligatory. Finally, as mentioned earlier, enter `IP_host:local_machine_port` in your web browser to access the MLflow plataform.
+The `remote_machine_port` and the `some_port` (from the MLflow command) must be the same, as well as the `IP_host`. Additionally, ensure the ports of both machines are available for use. The `-N` prevents execution of other command in the terminal that creates the tunnel, but it is not obligatory. Finally, as mentioned earlier, enter `IP_host:local_machine_port` in your web browser to access the MLflow plataform.
 
 ## Next implementations:
 1. Template to run it on LXPLUS.

@@ -23,9 +23,11 @@ def test_results(X, y, output_class, output_dir):
     with torch.no_grad():
         outputs_test = model(X_test_tensor)
         
-        match output_class:
-            case "binary":
-                predictions = torch.sigmoid(outputs_test).cpu().numpy()
+        if output_class == "binary":
+            predictions = torch.sigmoid(outputs_test).cpu().numpy()
+        # match output_class:  
+        #     case "binary":
+        #         predictions = torch.sigmoid(outputs_test).cpu().numpy()
 
     fpr, tpr, threshold = roc_curve(y[:, 1], predictions[:, 1])
 

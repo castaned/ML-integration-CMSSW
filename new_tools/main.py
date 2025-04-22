@@ -44,10 +44,15 @@ def main(file_vars):
     try:
         # Get data
         print("Preparing data...")
-        X_train, y_train = get_features_labels(file_vars, remove_mass_pt_window=False)
-        num_X_train = X_train.shape[1]
-        num_y_train = y_train.shape[1]
+        #X_train, y_train = get_features_labels(file_vars, remove_mass_pt_window=False)
+        X_train, y_train = get_features_labels(file_vars)
+        #num_X_train = X_train.shape[1]
+        #num_y_train = y_train.shape[1]
         X_test, y_test = get_features_labels(file_vars, test=True)
+        #print(f"X_test: {X_test}")
+        #print(f"y_test: {y_test}")
+        #print(X_test.shape, y_test.shape)
+        #print(X_train.shape, y_train.shape)
         print("Data prepared.")
 
         # Train and optimize model
