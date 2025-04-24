@@ -2,21 +2,23 @@
 import torch
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
-from models.models import MLPmodel
+import models.models as mdls
 
 def test_results(X, y, output_class, output_dir):
     
     param_model = torch.load(f"{output_dir}/pytorch_best_model.pth", weights_only=True)
     hyperparam = param_model["hyperparam"]
-    model = MLPmodel(
-    input_size=X.shape[1],
-    output_size=y.shape[1],
-    hidden_input_size=hyperparam["hidden_input_size"],
-    hidden_output_size=hyperparam["hidden_output_size"],
-    num_layers=hyperparam["num_layers"])
+    model = mdls.MLPmodel(
+                  input_size=X.shape[1],
+                  output_size=y.shape[1],
+                  hidden_input_size=hyperparam["hidden_input_size"],
+                  hidden_output_size=hyperparam["hidden_output_size"],
+                  num_layers=hyperparam["num_layers"]
+                  )
 
     model.load_state_dict(param_model["model_state"])
     print(model)
+    
     model.eval()
     X_test_tensor = torch.tensor(X, dtype=torch.float32)
     
@@ -25,10 +27,7 @@ def test_results(X, y, output_class, output_dir):
         
         if output_class == "binary":
             predictions = torch.sigmoid(outputs_test).cpu().numpy()
-        # match output_class:  
-        #     case "binary":
-        #         predictions = torch.sigmoid(outputs_test).cpu().numpy()
-
+    
     fpr, tpr, threshold = roc_curve(y[:, 1], predictions[:, 1])
 
     # Plot ROC curve
