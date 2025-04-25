@@ -21,7 +21,7 @@ def compute_accuracy(outputs, y):
 def get_device():
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def train_model(hyperparam_space, X, y, ideal_acc, output_dir):
+def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
     device = get_device()
     print(f"Device: {device}")
 
@@ -51,7 +51,7 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir):
     train_loader, val_loader = preda.train_data_to_pytorch(X, y, val_split, batch_size)
     
     # Define the best model checkpoint filename
-    checkpoint_path = f'{output_dir}/pytorch_best_model.pth'    
+    checkpoint_path = f'{output_dir}/best_model_{model_name}.pth'    
     
     # Training loop
     for epoch in range(num_epochs):
@@ -133,7 +133,7 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
     
     ray.init()    
     trainable = tune.with_resources(
-        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir),
+        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name='mlp'),
         resources={"cpu": 20, "gpu": 0} 
         )
     
@@ -171,6 +171,6 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
     
-    preda.convert_to_onnx(X, best_model, output_dir)
+    preda.convert_to_onnx(X, best_model, output_dir, model_name='mlp')
     
     return 0

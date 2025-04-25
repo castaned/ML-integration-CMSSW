@@ -18,7 +18,7 @@ def read_variables(file_path, var_names):
         'features': [],
         'spectators': [],
         'labels': [],
-        'ia_model': [],
+        'ai_model': [],
         'ideal_accuracy': [],
         'num_models': []
     }

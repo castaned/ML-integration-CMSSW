@@ -23,13 +23,13 @@ def train_data_to_pytorch(X, y, val_split, batch_size):
 
     return train_loader, val_loader
 
-def convert_to_onnx(X, model, output_dir):
+def convert_to_onnx(X, model, output_dir, model_name):
 
     dummy_input = torch.randn(1, X.shape[1], dtype=torch.float32)
     torch.onnx.export(
         model,
         dummy_input,
-        f"{output_dir}/pytorch_best_model.onnx",
+        f"{output_dir}/best_model_{model_name}.onnx",
         export_params=True,
         opset_version=12,
         input_names=['input'],
@@ -41,7 +41,7 @@ def convert_to_onnx(X, model, output_dir):
     )
 
     # Verify
-    onnx.checker.check_model(onnx.load(f"{output_dir}/pytorch_best_model.onnx"))
+    onnx.checker.check_model(onnx.load(f"{output_dir}/best_model_{model_name}.onnx"))
     return 0
 
 def oldget_features_labels(file_vars, remove_mass_pt_window=True, test=False):
@@ -109,11 +109,11 @@ def get_features_labels(file_vars, test=False):
         file_path = 'train_path'
 
     variables = rcv.read_variables(file_vars, [file_path, 'features', 'labels'])
-    print(variables)
+    #print(variables)
     file_name = variables[file_path][0] 
     features = variables['features']
     labels = variables['labels']
-    print(file_name)
+    #print(file_name)
     nfeatures = len(features)
     nlabels = len(labels)
 

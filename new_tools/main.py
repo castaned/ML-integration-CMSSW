@@ -59,13 +59,25 @@ def main(file_vars):
         print("Training and optimizing model...")
         ideal_acc = rcv.read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
         num_models = rcv.read_variables(file_vars, ['num_models'])['num_models']
-        opt.tune_mlp(X_train, y_train, ideal_acc, num_models, output_dir)
-        print("Training and optimization completed.")
+        models_name = rcv.read_variables(file_vars, ['ai_model'])['ai_model']
+        
+        for model_name in models_name:
+            if model_name == 'mlp':
+                opt.tune_mlp(X_train, y_train, ideal_acc, num_models, output_dir)
+                print("MLP training and optimization completed.")
+            else:
+                print(f"The {model_name} is not available.")
+        print("All training and optimization completed.")
 
         # test model
         print("testing model...")
-        tr.test_results(X_test, y_test, 'binary', output_dir)
-        print("Testing completed")
+        for model_name in models_name:
+            if model_name == 'mlp':
+                tr.test_results(X_test, y_test, 'binary', output_dir, model_name='mlp')
+                print("MLP testing completed.")
+            else:
+                print(f"The {model_name} is not available.")
+        print("All testing completed.")
         
         
     except Exception as e:

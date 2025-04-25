@@ -71,7 +71,7 @@ labels = ['Dataset_ID']
 ##### IA model variables #################################
 
 # IA model
-ia_model = ['mlp']
+ai_model = ['mlp']
 
 # Ideal accuracy
 ideal_accuracy = ['95']
