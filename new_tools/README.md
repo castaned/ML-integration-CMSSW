@@ -39,7 +39,7 @@ python main.py -f set_config_variables.txt
 The outputs will also be in the `output_path` directory. Output directory content:
 * MLflow experiments (`mlruns/`)
 * Ray Tune optimization results (`tune_results/`)
-* Weights and baises from the best model (`pytorch_best_model.pth`)
+* Weights and baises from the best models (`best_model_*.pth`)
 * Standard output and error logs (`stdout.log` and `stderr.log`)
 * Other results
 
