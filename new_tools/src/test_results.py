@@ -7,15 +7,17 @@ import models.models as mdls
 def test_results(X, y, output_class, output_dir, model_name):
     
     param_model = torch.load(f"{output_dir}/best_model_{model_name}.pth", weights_only=True)
-    hyperparam = param_model["hyperparam"]
-    model = mdls.MLPmodel(
-                   input_size=X.shape[1],
-                   output_size=y.shape[1],
-                   hidden_input_size=hyperparam["hidden_input_size"],
-                   hidden_output_size=hyperparam["hidden_output_size"],
-                   num_layers=hyperparam["num_layers"]
-                   )
-    model.load_state_dict(param_model["model_state"])
+    # hyperparam = param_model["hyperparam"]
+    # model = mdls.MLPmodel(
+    #                input_size=X.shape[1],
+    #                output_size=y.shape[1],
+    #                hidden_input_size=hyperparam["hidden_input_size"],
+    #                hidden_output_size=hyperparam["hidden_output_size"],
+    #                num_layers=hyperparam["num_layers"]
+    #                )
+    # model.load_state_dict(param_model["model_state"])
+    if model_name == 'mlp':
+        model = mdls.MLPmodel.get_model(X, y, param_model)
     print(model)
     
     model.eval()

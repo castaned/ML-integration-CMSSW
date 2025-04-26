@@ -73,7 +73,7 @@ def main(file_vars):
         print("testing model...")
         for model_name in models_name:
             if model_name == 'mlp':
-                tr.test_results(X_test, y_test, 'binary', output_dir, model_name='mlp')
+                tr.test_results(X_test, y_test, 'binary', output_dir, 'mlp')
                 print("MLP testing completed.")
             else:
                 print(f"The {model_name} is not available.")
