@@ -146,7 +146,7 @@ bash SamplesToMerge.sh
 ```
 
 
-### Step 9: Merge samples (randomly) and produce h5 files 
+### Step 9: Merge samples (randomly) 
 
 
 Follow instructions (README) in mix_samples_condor_package
