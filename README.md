@@ -152,14 +152,13 @@ bash SamplesToMerge.sh
 Follow instructions (README) in mix_samples_condor_package
 
 
-### Step 10: Merge samples (randomly) and produce h5 files 
+### Step 10: Produce h5 files 
 
 
 Convert from .root to h5 (for all directories)
 
 Make sure all the variables are included in the `other_branches` list, if this is not the case udpate the list 
 if the list is updated the code need to be recompiled in `src` directory by the command `scram b -j8`
-
 
 ```bash
 emacs -nw Utilities/scripts/convert-uproot-opendata_v2.py
@@ -178,8 +177,6 @@ Loop over complete dataset in the same MERGEDIR directory
 bash convert_root_to_h5.sh
 ```
 which produces `HDF5` files 
-
-
 
 
 
