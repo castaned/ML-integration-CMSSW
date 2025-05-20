@@ -15,6 +15,7 @@ To run it, modify the `set_config_variables.txt` file. Currently, the variables 
 * Data formatting script (`prepare_data.py`)
 * Required Python libraries (`requirements.txt`)
 * Example output directory (`output/`)
+* SLURM template (`acarus_template.slrm`)
 
 ## How to Use
 You need to set all the necessary configurations in the `set_config_variables.txt` file.
@@ -33,6 +34,11 @@ The standard error and output will be generated in the path specified in the `ou
 
 ```bash
 python main.py -f set_config_variables.txt
+```
+If you are running the tool on ACARUS (Área de cómputo de la Universidad de Sonora), submit the SLURM file. If you are at another center that uses SLURM, make the necessary modifications.
+
+```bash
+sbatch acarus_template.slrm
 ```
 
 ### 3. Outputs
