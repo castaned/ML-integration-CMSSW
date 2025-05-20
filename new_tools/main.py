@@ -44,15 +44,12 @@ def main(file_vars):
     try:
         # Get data
         print("Preparing data...")
-        #X_train, y_train = get_features_labels(file_vars, remove_mass_pt_window=False)
-        X_train, y_train = preda.get_features_labels(file_vars)
-        #num_X_train = X_train.shape[1]
-        #num_y_train = y_train.shape[1]
-        X_test, y_test = preda.get_features_labels(file_vars, test=True)
-        #print(f"X_test: {X_test}")
-        #print(f"y_test: {y_test}")
-        #print(X_test.shape, y_test.shape)
-        #print(X_train.shape, y_train.shape)
+        #X_train, y_train = preda.get_features_labels(file_vars)
+        X_train, y_train = preda.combine_features_labels(file_vars, preda.get_features_labels)
+        #X_test, y_test = preda.get_features_labels(file_vars, test=True)
+        X_test, y_test = preda.combine_features_labels(file_vars, preda.get_features_labels, test=True)
+        print(X_test.shape, y_test.shape)
+        print(X_train.shape, y_train.shape)
         print("Data prepared.")
 
         # Train and optimize model
@@ -60,10 +57,11 @@ def main(file_vars):
         ideal_acc = rcv.read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
         num_models = rcv.read_variables(file_vars, ['num_models'])['num_models']
         models_name = rcv.read_variables(file_vars, ['ai_model'])['ai_model']
-        
+        models_class = rcv.read_variables(file_vars, ['ai_model_class'])['ai_model_class'][0]
+
         for model_name in models_name:
             if model_name == 'mlp':
-                opt.tune_mlp(X_train, y_train, ideal_acc, num_models, output_dir)
+                opt.tune_mlp(models_class, X_train, y_train, ideal_acc, num_models, output_dir)
                 print("MLP training and optimization completed.")
             else:
                 print(f"The {model_name} is not available.")
@@ -73,7 +71,7 @@ def main(file_vars):
         print("testing model...")
         for model_name in models_name:
             if model_name == 'mlp':
-                tr.test_results(X_test, y_test, 'binary', output_dir, 'mlp')
+                tr.test_results(X_test, y_test, models_class, output_dir, 'mlp')
                 print("MLP testing completed.")
             else:
                 print(f"The {model_name} is not available.")

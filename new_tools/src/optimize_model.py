@@ -107,7 +107,7 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
     return 0
 
 
-def tune_mlp(X, y, ideal_acc, num_models, output_dir):
+def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
     # Search space for hyperparameters
     hyperparam_space = {
         "hidden_input_size": tune.choice([64, 128, 256]),
@@ -133,15 +133,15 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
     
     ray.init()    
     trainable = tune.with_resources(
-        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name='mlp'),
+        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}'),
         resources={"cpu": 20, "gpu": 0} 
         )
     
     # Define the MLflow callback
     mlflow_callback = MLflowLoggerCallback(
                             tracking_uri=f"{output_dir}/mlruns",
-                            experiment_name="test_mlp",
-                            tags={"project": "ML_CMSSW_integration", "model": "mlp"},
+                            experiment_name=f"test_mlp_{model_type}",
+                            tags={"project": "ML_CMSSW_integration", "model": "mlp", "class": model_type},
                             save_artifact=True
                             )
     tuner = tune.Tuner(
@@ -171,6 +171,6 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
     
-    preda.convert_to_onnx(X, best_model, output_dir, model_name='mlp')
+    preda.convert_to_onnx(X, best_model, output_dir, model_name=f'mlp_{model_type}')
     
     return 0
