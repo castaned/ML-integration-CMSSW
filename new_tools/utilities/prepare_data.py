@@ -7,7 +7,32 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 import onnx
 
+
+def clean_array_values(array):
+
+    cleaned = []
+    for value in array:
+        if isinstance(value, (np.integer, int)):
+            cleaned.append(int(value))
+        elif isinstance(value, (np.float64, float)) and value.is_integer():
+            cleaned.append(int(value))
+        else:
+            cleaned.append(value)
+
+    return np.array(cleaned, dtype=object)
+
+def onehot(label_array, outdir):
+
+    unique_classes = np.unique(label_array)
+    indices = np.searchsorted(unique_classes, label_array.flatten())
+    onehot_encoder = np.eye(len(unique_classes))[indices]
+
+    np.save(f"{outdir}/label_decoder.npy", unique_classes)        
+    
+    return onehot_encoder
+
 def train_data_to_pytorch(X, y, val_split, batch_size):
+
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=val_split, shuffle=True)
 
     X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
@@ -69,8 +94,9 @@ def combine_features_labels(file_vars, fn, params=None, test=False):
 
 def get_features_labels(file_name, file_vars):
 
-    variables = rcv.read_variables(file_vars, ['features', 'labels'])
+    variables = rcv.read_variables(file_vars, ['features', 'labels', 'output_path'])
     #print(variables)
+    output_dir = variables['output_path'][0]
     features = variables['features']
     labels = variables['labels']
     #print(file_name)
@@ -95,13 +121,11 @@ def get_features_labels(file_name, file_vars):
     ## Leave out events that are not either or both
     #feature_array = feature_array[np.sum(label_array,axis=1)==1]
     #label_array = label_array[np.sum(label_array,axis=1)==1]
-    
-    unique_classes = np.unique(label_array)
-    indices = np.searchsorted(unique_classes, label_array.flatten().astype(int)) 
-    label_array = np.eye(len(unique_classes))[indices]
+
+    onehot_label_array = onehot(label_array, output_dir)
 
     h5file.close()
-    return feature_array, label_array
+    return feature_array, onehot_label_array
 
 
 

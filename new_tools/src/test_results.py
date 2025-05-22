@@ -6,6 +6,7 @@ import models.models as mdls
 from sklearn.preprocessing import label_binarize
 import numpy as np
 from itertools import cycle
+import utilities.prepare_data as preda
 
 def test_results(X, y, output_class, output_dir, model_name):
     
@@ -25,6 +26,9 @@ def test_results(X, y, output_class, output_dir, model_name):
     
     model.eval()
     X_test_tensor = torch.tensor(X, dtype=torch.float32)
+    
+    label_decoder = np.load(f"{output_dir}/label_decoder.npy")
+    clean_label_decoder = preda.clean_array_values(label_decoder)
     
     with torch.no_grad():
         outputs_test = model(X_test_tensor)
@@ -52,7 +56,7 @@ def test_results(X, y, output_class, output_dir, model_name):
                 fpr[i], tpr[i], _ = roc_curve(y_bin[:, i], probabilities[:, i])
                 roc_auc[i] = auc(fpr[i], tpr[i])
                 plt.plot(fpr[i], tpr[i], color=color, lw=2,
-                         label=f'Class {i} (AUC = {roc_auc[i]:.2f})')
+                         label=f'Label {clean_label_decoder[i]} (AUC = {roc_auc[i]:.2f})')
 
     # Plot ROC curve
     # plt.figure()
