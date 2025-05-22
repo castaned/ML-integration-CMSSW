@@ -9,19 +9,24 @@
 #
 
 # Train data file path
-train_path = ['.data/ntuple_merged_10.h5']
+#train_path = ['.data/ntuple_merged_10.h5']
+train_path = ['notebooks/ntuple_merged_97.h5',
+              'notebooks/ntuple_merged_972.h5']
 
 # Test data file path
-test_path = ['.data/ntuple_merged_11.h5']
+#test_path = ['.data/ntuple_merged_11.h5']
+test_path = ['notebooks/ntuple_merged_79.h5', 
+             'notebooks/ntuple_merged_792.h5']
 
 # Output file path
 output_path = ['.output']
 
 # Set number of instances (events, particles, jets, etc..)
-num_instances = ['fj_jetNTracks']
+#num_instances = ['fj_jetNTracks']
+num_instances = ['A_Dr_Z']
 
 # Features
-features = ['fj_jetNTracks',
+#features = ['fj_jetNTracks',
             'fj_nSV',
             'fj_tau0_trackEtaRel_0',
             'fj_tau0_trackEtaRel_1',
@@ -50,19 +55,28 @@ features = ['fj_jetNTracks',
             'fj_z_ratio']
 
 # Spectators
-spectators = ['fj_sdmass',
+#spectators = ['fj_sdmass',
               'fj_pt']
 
 # Labels
-labels = ['fj_isQCD*sample_isQCD',
+#labels = ['fj_isQCD*sample_isQCD',
           'fj_isH*fj_isBB']
 
+features = ['A_Dr_Z',
+            'A_Zmass',
+            'MET_pt',
+            'B_Zmass',
+            'B_Dr_Z']
 
+labels = ['Dataset_ID']
 
 ##### IA model variables #################################
 
 # IA model
-ia_model = ['mlp']
+ai_model = ['mlp']
+
+# Classification type (binary or multiclass)
+ai_model_class = ['multiclass']
 
 # Ideal accuracy
 ideal_accuracy = ['95']

@@ -28,3 +28,16 @@ class MLPmodel(nn.Module):
         
     def forward(self, x):
         return self.net(x)
+    
+    @classmethod
+    def get_model(cls, X, y, param_model):
+        hyperparam = param_model["hyperparam"]
+        model = cls(
+            input_size=X.shape[1],
+            output_size=y.shape[1],
+            hidden_input_size=hyperparam["hidden_input_size"],
+            hidden_output_size=hyperparam["hidden_output_size"],
+            num_layers=hyperparam["num_layers"]
+            )
+        model.load_state_dict(param_model["model_state"])
+        return model
