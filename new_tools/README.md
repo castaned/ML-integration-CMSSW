@@ -26,7 +26,7 @@ Ensure you have all the necessary dependencies within the `requirements.txt` fil
 ```bash
 python -m venv env_path
 source env_path/bin/activate 
-python install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 2. Execute the project
