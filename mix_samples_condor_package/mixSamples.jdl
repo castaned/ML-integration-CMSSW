@@ -1,14 +1,11 @@
 Universe       = vanilla
-Executable     = process_chunk.sh
 ShouldTransferFiles = YES
 WhenToTransferOutput = ON_EXIT
-Transfer_Input_Files = process_chunk.py
+
 request_cpus = 1
 request_memory = 1500M
 request_disk = 1GB
 +JobFlavour = "workday"
-Log            = $(log)
-Output         = $(output)
-Error          = $(error)
-Arguments      = $(arguments)
+
 Queue
+

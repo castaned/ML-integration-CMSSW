@@ -275,9 +275,9 @@ int main(int argc, char *argv[]){
     std::vector<std::vector<TString> > infiles;
 
     // unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
-  //  int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
+    //  int numCPU = sysconf(_SC_NPROCESSORS_ONLN);
 
-   // size_t maxrunning=numCPU;
+    // size_t maxrunning=numCPU;
 
     for(int i=3;i<argc;i++){
         TString samplefile=argv[i];

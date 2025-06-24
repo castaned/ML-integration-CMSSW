@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+export MERGEDIR=/eos/user/c/castaned/NanoAOD_mixed/
 
 for file in "$MERGEDIR"/*.root; do
     if [ -f "$file" ]; then

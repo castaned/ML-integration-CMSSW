@@ -14,7 +14,8 @@ outfile = sys.argv[2]
 entrystop = None
 upfile = uproot.open(infile)
 
-tree = upfile['deepntuplizer/Events']
+#tree = upfile['deepntuplizer/Events']
+tree = upfile['Events']
 
 other_branches = ['event']
 #fj_branches = []

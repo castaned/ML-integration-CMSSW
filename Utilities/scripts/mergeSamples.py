@@ -1,77 +1,80 @@
-#!/usr/bin/env python3
-
-
-from argparse import ArgumentParser
+import ROOT
+import random
+import argparse
 import os
-import subprocess
-import glob
+import math
+import sys
 
-import multiprocessing
+def main():
+    # Raw positional arguments
+    if len(sys.argv) < 4:
+        print("Usage: mixSamples.py <max_events> <output_dir> <txt_file1> [<txt_file2> ...]")
+        sys.exit(1)
 
-print("This script is still experimental and not fully completed")
+    # Parse positional arguments
+    max_events = int(sys.argv[1])
+    output_dir = sys.argv[2]
+    sample_lists = sys.argv[3:]
 
-parser = ArgumentParser('merge samples')
-parser.add_argument('nsamples')
-parser.add_argument('outdir')
-parser.add_argument('infiles', metavar='N', nargs='+',
-                    help='sample list files')
+    # ✅ Ensure output directory exists
+    if not os.path.exists(output_dir):
+        print(f"📁 Output directory does not exist. Creating: {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
 
-args = parser.parse_args()
+    # Enable multithreading
+    ROOT.ROOT.EnableImplicitMT()
 
-tmpfiles = glob.glob('/tmp/mergeParallel_*')
-if len(tmpfiles):
-    for f in tmpfiles:
-        print('Removing old temp file: %s' % f)
-        os.remove(f)
+    # Configuration
+    tree_name = "Events"
+    random_seed = 12345
 
-if not os.path.isdir(args.outdir):
+    # Read all ROOT files from provided .txt files
+    all_root_files = []
+    for txt_file in sample_lists:
+        with open(txt_file, "r") as f:
+            root_files = [line.strip() for line in f if line.strip().endswith(".root")]
+            all_root_files.extend(root_files)
 
-    allins=''
-    for l in args.infiles:
-        allins+=' '+l
-        
-    os.system('createMergeList '+str(args.nsamples)+' '+args.outdir+' '+allins)
-    
-    
-#read number of jobs
-file=open(args.outdir+'/nentries','r')
-nJobs=file.read()
+    if not all_root_files:
+        print("❌ No ROOT files found. Check your .txt input files.")
+        return
 
-listtoberun=[]
-listsucc=[]
+    # Shuffle file list
+    random.seed(random_seed)
+    random.shuffle(all_root_files)
 
-for j in range(int(nJobs)):
-    
-    if os.path.exists(args.outdir+'/'+str(j)+'.succ'):
-        listsucc.append(j)
-        continue
-    
-    listtoberun.append(j)
+    # Load all files into a TChain
+    chain = ROOT.TChain(tree_name)
+    for f in all_root_files:
+        chain.Add(f)
 
-print('successful: ',listsucc)
+    # Load into RDataFrame
+    df = ROOT.RDataFrame(chain)
 
+    # Shuffle events by assigning a random number and sorting
+    df_random = df.Define("rand", "gRandom->Rndm()").Sort("rand")
 
-def _run(jobid):
-    cmd = 'merge %s %d' % (os.path.join(args.outdir, 'mergeconfig'), jobid)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out = p.communicate()[0]
-#     print out
-    if p.returncode == 0:
-        print('Job %d: Success!' % jobid)
-        return True
-    else:
-        print('Job %d: Failed!' % jobid)
-        return False
+    # Count total events after shuffling
+    total_events = df_random.Count().GetValue()
 
+    # Calculate number of chunks
+    n_chunks = math.ceil(total_events / max_events)
 
-n_threads = int(multiprocessing.cpu_count() / 2)
-print("n_threads =", n_threads)
-n_threads = 2
-print("n_threads =", n_threads)
-pool = multiprocessing.Pool(n_threads)
-results = pool.map(_run, listtoberun)
+    print(f"📦 Will write {total_events} mixed events into {n_chunks} output file(s).")
 
-print('Finished! %d/%d jobs succeeded!' % (sum(results), len(listtoberun)))
+    # Write output files
+    for i in range(n_chunks):
+        start = i * max_events
+        end = min(start + max_events, total_events)
+
+        df_chunk = df_random.Range(start, end)
+        output_file = os.path.join(output_dir, f"ntuple_merged_{i+1}.root")
+        df_chunk.Snapshot(tree_name, output_file)
+
+        print(f"✅ Wrote: {output_file} (events {start} to {end - 1})")
+
+if __name__ == "__main__":
+    main()
 
 
 
