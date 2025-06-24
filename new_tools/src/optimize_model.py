@@ -3,11 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.utils
 from sklearn.model_selection import train_test_split
-from utilities.prepare_data import train_data_to_pytorch
-from models.models import MLPmodel
+import utilities.prepare_data as preda
+import models.models as mdls
 import ray
 from ray import tune
 from ray.tune.schedulers import ASHAScheduler
+from ray.air.integrations.mlflow import MLflowLoggerCallback
+import mlflow
 
 def compute_accuracy(outputs, y):
     _, predicted = torch.max(outputs, dim=1)
@@ -19,17 +21,18 @@ def compute_accuracy(outputs, y):
 def get_device():
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def train_model(hyperparam_space, X, y, ideal_acc, output_dir):
+def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
     device = get_device()
     print(f"Device: {device}")
 
     # Init model
-    model = MLPmodel(input_size=X.shape[1], 
-                     output_size=y.shape[1], 
-                     hidden_input_size=hyperparam_space["hidden_input_size"], 
-                     hidden_output_size=hyperparam_space["hidden_output_size"], 
-                     num_layers=hyperparam_space["num_layers"]
-                     ).to(device)
+    model = mdls.MLPmodel(
+                  input_size=X.shape[1], 
+                  output_size=y.shape[1], 
+                  hidden_input_size=hyperparam_space["hidden_input_size"], 
+                  hidden_output_size=hyperparam_space["hidden_output_size"], 
+                  num_layers=hyperparam_space["num_layers"]
+                  ).to(device)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=hyperparam_space["learning_rate"])
     print(model)
@@ -45,10 +48,10 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir):
     val_split = 0.2
 
     # Split data and transform it to pytorch objects
-    train_loader, val_loader = train_data_to_pytorch(X, y, val_split, batch_size)
+    train_loader, val_loader = preda.train_data_to_pytorch(X, y, val_split, batch_size)
     
     # Define the best model checkpoint filename
-    checkpoint_path = f'{output_dir}/pytorch_best_model.pth'    
+    checkpoint_path = f'{output_dir}/best_model_{model_name}.pth'    
     
     # Training loop
     for epoch in range(num_epochs):
@@ -104,7 +107,7 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir):
     return 0
 
 
-def tune_mlp(X, y, ideal_acc, num_models, output_dir):
+def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
     # Search space for hyperparameters
     hyperparam_space = {
         "hidden_input_size": tune.choice([64, 128, 256]),
@@ -123,35 +126,51 @@ def tune_mlp(X, y, ideal_acc, num_models, output_dir):
         mode="min",
         max_t=100,
         grace_period=10,
-        reduction_factor=2)
+        reduction_factor=2
+        )
     
     # Tuning process
+    
     ray.init()    
     trainable = tune.with_resources(
-        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir),
+        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}'),
         resources={"cpu": 20, "gpu": 0} 
-    )
-
+        )
+    
+    # Define the MLflow callback
+    mlflow_callback = MLflowLoggerCallback(
+                            tracking_uri=f"{output_dir}/mlruns",
+                            experiment_name=f"test_mlp_{model_type}",
+                            tags={"project": "ML_CMSSW_integration", "model": "mlp", "class": model_type},
+                            save_artifact=True
+                            )
     tuner = tune.Tuner(
-        trainable,
-        param_space=hyperparam_space,  
-        tune_config=tune.TuneConfig(
-            num_samples=num_models,
-            scheduler=scheduler,
-        ),
-        run_config=tune.RunConfig(name="tune_results", storage_path=output_dir)
-    )
+                 trainable,
+                 param_space=hyperparam_space,  
+                 tune_config=tune.TuneConfig(
+                                  num_samples=num_models,
+                                  scheduler=scheduler,
+                                  ),
+                 run_config=tune.RunConfig(
+                                 storage_path=f"{output_dir}/tune_results",
+                                 callbacks=[mlflow_callback],
+                                 )
+                 )
     
     results = tuner.fit()
 
     best_hyperparam = results.get_best_result(metric="acc", mode="max").config
-    best_model = MLPmodel(input_size=X.shape[1], 
-                          output_size=y.shape[1], 
-                          hidden_input_size=best_hyperparam["hidden_input_size"], 
-                          hidden_output_size=best_hyperparam["hidden_output_size"], 
-                          num_layers=best_hyperparam["num_layers"])
+    best_model = mdls.MLPmodel(
+                       input_size=X.shape[1], 
+                       output_size=y.shape[1], 
+                       hidden_input_size=best_hyperparam["hidden_input_size"], 
+                       hidden_output_size=best_hyperparam["hidden_output_size"], 
+                       num_layers=best_hyperparam["num_layers"]
+                       )
 
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
-
+    
+    preda.convert_to_onnx(X, best_model, output_dir, model_name=f'mlp_{model_type}')
+    
     return 0

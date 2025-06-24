@@ -1,10 +1,9 @@
 import argparse
 import sys
-from utilities.prepare_data import get_features_labels
-from utilities.read_config_variables import read_variables
-from src.optimize_model import train_model
-from src.optimize_model import tune_mlp
-from src.test_results import test_results 
+import utilities.prepare_data as preda
+import utilities.read_config_variables as rcv
+import src.optimize_model as opt
+import src.test_results as tr 
 import datetime
 import traceback
 import os
@@ -29,34 +28,54 @@ class TimestampedLogger:
         # Return the file descriptor of the underlying stream
         return self.stream.fileno() if hasattr(self.stream, 'fileno') else None
 
+
 def main(file_vars):
 
-    output_dir = read_variables(file_vars, ['output_path'])['output_path'][0]
+    output_dir = rcv.read_variables(file_vars, ['output_path'])['output_path'][0]
     if not os.path.isabs(output_dir):
         output_dir = os.path.abspath(output_dir)
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    
     sys.stdout = TimestampedLogger(sys.stdout, f"{output_dir}/stdout.log")
     sys.stderr = TimestampedLogger(sys.stderr, f"{output_dir}/stderr.log")
 
     try:
         # Get data
         print("Preparing data...")
-        X_train, y_train = get_features_labels(file_vars, remove_mass_pt_window=False)
-        num_X_train = X_train.shape[1]
-        num_y_train = y_train.shape[1]
-        X_test, y_test = get_features_labels(file_vars, test=True)
+        #X_train, y_train = preda.get_features_labels(file_vars)
+        X_train, y_train = preda.combine_features_labels(file_vars, preda.get_features_labels)
+        #X_test, y_test = preda.get_features_labels(file_vars, test=True)
+        X_test, y_test = preda.combine_features_labels(file_vars, preda.get_features_labels, test=True)
+        print(X_test.shape, y_test.shape)
+        print(X_train.shape, y_train.shape)
         print("Data prepared.")
 
         # Train and optimize model
         print("Training and optimizing model...")
-        ideal_acc = read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
-        num_models = read_variables(file_vars, ['num_models'])['num_models']
-        tune_mlp(X_train, y_train, ideal_acc, num_models, output_dir)
-        print("Training and optimization completed.")
+        ideal_acc = rcv.read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
+        num_models = rcv.read_variables(file_vars, ['num_models'])['num_models']
+        models_name = rcv.read_variables(file_vars, ['ai_model'])['ai_model']
+        models_class = rcv.read_variables(file_vars, ['ai_model_class'])['ai_model_class'][0]
+
+        for model_name in models_name:
+            if model_name == 'mlp':
+                opt.tune_mlp(models_class, X_train, y_train, ideal_acc, num_models, output_dir)
+                print("MLP training and optimization completed.")
+            else:
+                print(f"The {model_name} is not available.")
+        print("All training and optimization completed.")
 
         # test model
         print("testing model...")
-        test_results(X_test, y_test, 'binary', output_dir)
-        print("Testing completed")
+        for model_name in models_name:
+            if model_name == 'mlp':
+                tr.test_results(X_test, y_test, models_class, output_dir, 'mlp')
+                print("MLP testing completed.")
+            else:
+                print(f"The {model_name} is not available.")
+        print("All testing completed.")
         
         
     except Exception as e:
@@ -68,6 +87,7 @@ def main(file_vars):
         # Reset stdout and stderr, then close the log files
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train IA models")

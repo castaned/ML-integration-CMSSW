@@ -10,6 +10,13 @@
 
 # Activate python environment 
 source .venv/bin/activate
+echo $VIRTUAL_ENV  
+
+#module load conda
+#eval "$(conda shell.bash hook)"
+#conda activate env3.9.21
+#conda activate pytorch_pointnet
+#echo $CONDA_DEFAULT_ENV
 
 # Run tool
 time python main.py -f set_config_variables.txt
