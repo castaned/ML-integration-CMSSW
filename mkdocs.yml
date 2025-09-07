@@ -1,0 +1,25 @@
+site_name: ML integration in CMSSW
+site_url: https://github.com/castaned/ML-integration-CMSS/documentation
+theme:
+    name: material
+
+    palette:
+      # Dark mode
+      - scheme: slate
+        toggle:
+          icon: material/weather-sunny
+          name: Light mode
+        primary: amber
+        accent: indigo
+
+      # Light mode
+      - scheme: default
+        toggle:
+          icon: material/weather-night
+          name: Night mode
+        primary: amber
+        accent: indigo
+
+    font:
+      text: Merriweather Sans
+      code: JetBrains Mono
