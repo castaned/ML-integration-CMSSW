@@ -1,4 +1,4 @@
-# Run tool in Ocotillo cluster at ACARUS
+# Run tool in a cluster at ACARUS
 
 ## How to Use
 You need to set all the necessary configurations in the `set_config_variables.txt` file.

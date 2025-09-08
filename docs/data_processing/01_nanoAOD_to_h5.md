@@ -1,3 +1,5 @@
+# Convert root files (nanoAOD) to h5
+
 ### Step 1: Set up GRID proxy for accessing files
 
 Ensure you have a valid GRID certificate. If you don’t, follow the instructions [here](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert)

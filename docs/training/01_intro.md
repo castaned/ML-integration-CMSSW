@@ -1,4 +1,4 @@
-# Training model
+# Introduction to train model
 
 To run it, modify the `set_config_variables.txt` file. Currently, the variables that can be modified are `train_path`, `test_path`, `output_path`, and `ideal_accuracy`. Follow the specified format in the `set_config_variables.txt` file to set the variables.
 
