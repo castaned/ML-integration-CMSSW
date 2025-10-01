@@ -41,11 +41,11 @@ You will see many of directories inside `CMSSW_13_3_0/`, but you only need to wo
 ### Clone the repository and compile 
 
 ```bash
-git clone https://github.com/castaned/ML-integration-CMSSW tool_name
+git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
 scram b -j N
 ```
 
-You can use any name you prefer instead of `tool_name` for your local directory cotaining the GitHub repository. In the second command, `N` represents the CPUs to use for compiling and building the code inside `src/` directory, which uses dependencies from the CMSSW system. If you are unsure about `N`, simply run `scram b` without the `-j` flag, it will use all the available CPUs.
+Make sure not to change the name `DeepNTuples` for your local directory containing the GitHub repository, otherwise, it will not work. In the second command, `N` represents the CPUs to use for compiling and building the code inside `src/` directory, which uses dependencies from the CMSSW system. If you are unsure about `N`, simply run `scram b` without the `-j` flag, it will use all the available CPUs.
 
 
 !!! note "Resources"
