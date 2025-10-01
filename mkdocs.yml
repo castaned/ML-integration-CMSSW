@@ -23,3 +23,8 @@ theme:
     font:
       text: Merriweather Sans
       code: JetBrains Mono
+
+markdown_extensions:
+   - admonition
+   - pymdownx.details
+   - pymdownx.superfences
