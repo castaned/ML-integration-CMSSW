@@ -35,7 +35,7 @@ cmsenv
 You will see many of directories inside `CMSSW_13_3_0/`, but you only need to work inside `src/` directory.
 
 !!! warning "IMPORTANT"
-    1. `cmsenv` needs to be executed every time you open a new terminal to activate the environment variables.
+    1. `cmsenv` needs to be executed every time you open a new terminal to activate the environment variables. You need to be inside `CMSSW_13_3_0/` directory.
     2. The [Data processing section](data_processing/01_nanoAOD_to_h5.md) has been tested only with the CMSSW_13_3_0 release. The training section is not affected.
 
 ### Clone the repository and compile 
