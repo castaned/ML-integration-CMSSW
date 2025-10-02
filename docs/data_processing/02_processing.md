@@ -1,4 +1,4 @@
-# Retrieve and skim data
+# Retrieve, skim, and convert data
 
 ### Step 4: Update necessary configuration files
 
