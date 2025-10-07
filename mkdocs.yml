@@ -28,3 +28,17 @@ markdown_extensions:
    - admonition
    - pymdownx.details
    - pymdownx.superfences
+
+
+nav:
+  - CMS Machine Learning Framework: index.md
+  - Datasets: 
+      - nanoAOD: datasets/01_nanoaod.md
+  - Data processing:
+      - Config: data_processing/01_set_config.md
+      - Preprocessing: data_processing/02_processing.md
+      - Mixing: data_processing/03_random_sample_optional.md
+  - Training: 
+      - training: training/01_intro.md
+      - lxplus: training/02_lxplus.md
+      - acarus: training/03_acarus.md
