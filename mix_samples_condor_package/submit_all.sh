@@ -6,7 +6,7 @@ INDEX_FILE=shuffled_indices.txt
 OUTPUT_DIR=/eos/user/c/castaned/NanoAOD_mixed
 
 # Space-separated list of .txt files (easy to read and pass as arguments)
-TXT_FILES="WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt,WZTo3LNu_mllmin0p1_TuneCP5_13TeV-powheg-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v2_NANOAODSIM_reduced.txt"
+TXT_FILES="WZ.txt,TT.txt,WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM.txt"
 
 # Count total lines and compute number of chunks
 TOTAL_LINES=$(wc -l < "$INDEX_FILE")
