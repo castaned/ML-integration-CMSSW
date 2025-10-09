@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/data_processing/01_set_config/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/data_processing/02_processing/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/data_processing/03_random_sample_optional/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/datasets/01_nanoaod/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/training/01_intro/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/training/02_lxplus/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+    <url>
+         <loc>https://github.com/castaned/ML-integration-CMSS/documentation/training/03_acarus/</loc>
+         <lastmod>2025-10-09</lastmod>
+    </url>
+</urlset>
