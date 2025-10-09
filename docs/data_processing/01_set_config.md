@@ -1,5 +1,43 @@
 # Setting configuration
 
+Before starting, you need to create the environment and clone the GitHub repository. If you already have all your data prepared, simply clone the repository and proceed to [training section](training/01_intro.md), where you will find two options: running the training in LXPLUS and outside LXPLUS.
+
+### Log into LXPLUS server (CERN computers)
+
+```bash
+ssh username@lxplus.cern.ch
+```
+
+### Set up the required CMSSW version
+
+```bash
+cmsrel CMSSW_13_3_0
+cmsenv
+cd CMSSW_13_3_0/src
+```
+
+You will see many of directories inside `CMSSW_13_3_0/`, but you only need to work inside `src/` directory.
+
+!!! warning "IMPORTANT"
+    1. `cmsenv` needs to be executed every time you open a new terminal to activate the environment variables. You need to be inside `CMSSW_13_3_0/` directory.
+    2. The [Data processing section](data_processing/01_set_config.md) has been tested only with the CMSSW_13_3_0 release. The training section is not affected.
+
+### Clone the repository and compile
+
+```bash
+git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
+scram b -j N
+```
+
+!!! warning "IMPORTANT"
+    Make sure not to change the name `DeepNTuples` for your local directory containing the GitHub repository, otherwise, it will not work.
+
+In the second command, `N` represents the CPUs to use for compiling and building the code inside `src/` directory, which uses dependencies from the CMSSW system. If you are unsure about `N`, simply run `scram b` without the `-j` flag, it will use all the available CPUs.
+
+
+!!! note "Resources"
+    If you want to learn more about the CMSSW system, its structure, and commands, you can explore [Intro to CMSSW](https://cms-opendata-workshop.github.io/workshop2022-lesson-cmssw/) and [CMSSW SCRAM](https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBuildFile).
+    
 ### Set up GRID proxy for accessing files
 
 Ensure you have a valid GRID certificate. This is neccesary to have acces to the GRID, the distributed system used to retrieve the CERN data. If you don’t have a GRID certificate, follow the instructions [here](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#ObtainingCert). You need to generate the certificate and export it to the `~/.globus` directory in your LXPLUS user space, which is the standard location.
@@ -69,5 +107,5 @@ If you need help identifying your samples' FLN, refer again to [Locating Data Sa
 ```bash
 map_DASquery.py /Some/Das/query/NANOAOD1 ... /Some/Das/query/NANOAOD2 datasets_FLN_filename.txt
 ```
-
+The file is located in `DeepNTuples/MyNanoAODTools` directory.
 
