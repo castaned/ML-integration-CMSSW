@@ -1,0 +1,18 @@
+Bootstrap: docker
+From: python:3.12.2-slim
+
+%files
+    requirements.txt /opt/requirements.txt
+
+%post
+    pip install --no-cache-dir -r /opt/requirements.txt
+    
+    mkdir -p /workspace
+    chmod -R 777 /workspace
+
+%environment
+    export PYTHONUNBUFFERED=1
+    export WORKDIR=/workspace
+
+%runscript
+    exec python "$@"

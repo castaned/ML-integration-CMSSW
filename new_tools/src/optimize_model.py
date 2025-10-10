@@ -132,11 +132,11 @@ def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
     # Tuning process
     
     ray.init()    
-    trainable = tune.with_resources(
-        tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}'),
-        resources={"cpu": 20, "gpu": 0} 
-        )
-    
+    # trainable = tune.with_resources(
+    #     tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}'),
+    #     resources={"cpu": 20, "gpu": 0} 
+    #     )
+    trainable = tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}')
     # Define the MLflow callback
     mlflow_callback = MLflowLoggerCallback(
                             tracking_uri=f"{output_dir}/mlruns",

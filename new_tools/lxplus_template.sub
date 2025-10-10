@@ -1,0 +1,18 @@
+# Filename: lxplus_template.sub
+# HTCondor Submission File 
+notify_user             = email@emial.com
+notification            = Complete
+universe                = vanilla
+executable              = apptainer_run_training.sh
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files    = /tool/path/, root://eosuser.cern.ch//eos/user/path/input/data/data.tar.gz
+output                  = job.$(ClusterId).$(ProcId).out
+error                   = job.$(ClusterId).$(ProcId).err
+log                     = job.$(ClusterId).$(ProcId).log
+request_cpus            = 5 
+request_gpus            = 0
+transfer_output_files   = output_directory
+output_destination      = root://eosuser.cern.ch//eos/user/path/output/directory/$(ClusterId)/
+MY.XRDCP_CREATE_DIR     = True
+queue 
