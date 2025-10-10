@@ -54,3 +54,24 @@ markdown_extensions:
    - footnotes
    - attr_list
    - md_in_html
+
+nav:
+  - Getting started:
+    - getting-started/01_overview.md
+    - getting-started/02_architecture.md
+  - CERN Computing Environment:
+    - cern-systems/01_lxplus.md
+    - cern-systems/02_storage.md
+    - cern-systems/03_computing-resources.md
+    - cern-systems/04_CMSSW.md
+    - cern-systems/05_GRID-authentication.md
+    - cern-systems/06-NanoAOD.md
+    - cern-systems/07_dataset-discovery.md
+    - datasets/02_dataset_search.md
+  - Framework:
+    - framework/01_architecture.md
+#    - framework/02_data-processing.md
+#    - framework/03_ml.md
+    - framework/04_framework-setup.md
+  - Example of usage:
+    - usage/01_usage.md
