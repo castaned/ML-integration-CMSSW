@@ -1,6 +1,0 @@
-*.h5
-*~
-.*
-slurm*
-*.log
-__pycache__/
