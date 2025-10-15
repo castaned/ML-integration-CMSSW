@@ -1,0 +1,7 @@
+---
+proxy:
+  generate: 1 # 1 yes, 0 no
+  voms: "cms"
+  proxy_time: "192:00"
+  proxy_path: "$HOME/.globus/x509up_$(id -u)"
+
