@@ -45,6 +45,7 @@ def generate_proxy(proxy_config):
    subprocess.run(['voms-proxy-info', '--all'])
    print(f'\nTo set env varible in current shell execute: export X509_USER_PROXY={proxy_path}')
 
+   
 def das_query_endpoints(redirector, datasets): 
    for dataset in datasets:
       path = dataset['path']
@@ -53,12 +54,13 @@ def das_query_endpoints(redirector, datasets):
 
       cmd = ['dasgoclient', '-query', f'file dataset={path}']
       if amount == -1:
-         files = exe_cmd(cmd).split()
+         files = exe_cmd(cmd).splitlines()
       else:
-         files = exe_cmd(cmd).split()[:amount]
+         files = exe_cmd(cmd).splitlines()[:amount]
       
-      endpoints = [f"root://cms-xrd-global.cern.ch/{f}" for f in files]
-      print(endpoints)
+      endpoints = [f"{redirector}/{f}" for f in files]
+      dataset['endpoints'] = endpoints
+   return datasets
 
 
 
@@ -85,7 +87,8 @@ def main():
     if gen_proxy == 1:
        generate_proxy(proxy_config)
 
-    das_query_endpoints(redirector, datasets)
+    datasets = das_query_endpoints(redirector, datasets)
+    print(datasets)
 
 if __name__ == "__main__":
 
