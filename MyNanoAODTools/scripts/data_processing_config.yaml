@@ -1,7 +1,17 @@
 ---
 proxy:
-  generate: 1 # 1 yes, 0 no
+  generate: 0 # 1 yes, 0 no
   voms: "cms"
   proxy_time: "192:00"
   proxy_path: "$HOME/.globus/x509up_$(id -u)"
 
+filtering:
+  redirector: "cms-xrd-global.cern.ch"
+  datasets:
+    - path: /ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+      ID: 1 
+      amount: 3 # -1 is all root files
+    - path: /WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM
+      ID: 2
+      amount: -1
+    
