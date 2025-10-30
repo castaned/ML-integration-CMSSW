@@ -1,0 +1,27 @@
+---
+proxy:
+  generate: 0 # 1 yes, 0 no
+  voms: "cms"
+  proxy_time: "192:00"
+  proxy_path: "$HOME/.globus/x509up_$(id -u)"
+
+data_processing:
+  condor_params:
+    executable_file: "run_filter.sh"
+    cpus: 1
+    gpus: 0
+    mem: 1.5GB
+    disk: 2GB
+    job_flavour: "espresso"
+  processing_script: "src/DeepNTuples/new_dataproc/example/filterNanoAOD.py"
+  eos_output_dir: "/eos/user/v/vminjare/nanoFiltered"
+  afs_cms_base: "/afs/cern.ch/user/v/vminjare/CMSSW_13_3_0"
+  redirector: "cms-xrd-global.cern.ch"
+  datasets:
+    - FLN: "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
+      ID: 1 
+      amount: 3 # -1 is all root files
+    - FLN: "/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
+      ID: 2
+      amount: -1
+    
