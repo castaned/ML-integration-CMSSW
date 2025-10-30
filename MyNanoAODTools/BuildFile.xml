@@ -1,5 +1,0 @@
-<use name="FWCore/ParameterSet"/>
-<use name="ROOT"/>
-<export>
-    <lib name="1"/>
-</export>

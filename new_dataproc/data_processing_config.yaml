@@ -14,8 +14,8 @@ data_processing:
     disk: 2GB
     job_flavour: "espresso"
   processing_script: "src/DeepNTuples/new_dataproc/example/filterNanoAOD.py"
-  eos_output_dir: "/eos/user/v/vminjare/nanoFiltered"
-  afs_cms_base: "/afs/cern.ch/user/v/vminjare/CMSSW_13_3_0"
+  eos_output_dir: "/eos/user/"
+  afs_cms_base: "/afs/cern.ch/user/"
   redirector: "cms-xrd-global.cern.ch"
   datasets:
     - FLN: "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
