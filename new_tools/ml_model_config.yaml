@@ -1,0 +1,23 @@
+---
+data:
+  train_path:
+    - 
+
+  test_path:
+    -
+
+  output_path:
+
+  features:
+    -
+
+  labels:
+
+model:
+  ai_model: "mlp"
+
+  ai_model_class: "multiclass"
+
+  ideal_accuracy: 95
+
+  num_models: 3
