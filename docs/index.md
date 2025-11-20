@@ -1,52 +1,47 @@
-# CMS Machine Learning Framework
+# CMS Machine Learning Framework Documentation
 
-This repository provides a framework for processing, training, and making inferences with machine learning models in the context of CMS experiments. The framework facilitates data preparation, model training, and evaluation to support ML-based analyses in high-energy physics.
+Welcome to a comprehensive documentation for CMS Machine Learning Framework,  an end-to-end pipeline designed to transform CMS experimental data into trained machine learning (ML) models for high-energy physics (HEP) analysis.
 
-## Features
+This framework automates the full workflow inside CERN's destributed computing ecosystem, minimizing the amount of ML expertise required.
 
-- **NanoAOD Filtering**: Scripts for selecting relevant events and producing key physics variables.
-- **Data Preparation**: Merging filtered NanoAOD samples and converting them into HDF5 format for efficient ML model training.
-- **Model Training & Evaluation**: Training machine learning models and performing performance tests to assess their effectiveness in anomaly detection or other tasks.
+---
 
-## Diagram
+## What this Framework Provides
 
-![System architecture](assets/images/fig01-ML-flow.png)
+The framework enables physicists to:
 
-This diagram illustrates the tool's structure. The data processing section uses the CMSSW and GRID systems, but the training section does not.
+- **Process** NanoAOD datasets from the CMS experiment using distributed computing
+- **Transform** ROOT files into ML-ready HDF5 formats with custom filtering
+- **Train** machine learning models with HEP data
+- **Deploy** trained models for physics analysis inference
 
-## First steps
+All within CERN's computing infrastructure, with minimal prior ML experience required.
 
-Before starting, you need to create the environment and clone the GitHub repository. If you already have all your data prepared, simply clone the repository and proceed to [training section](training/01_intro.md), where you will find two options: running the training in LXPLUS and outside LXPLUS.  
+---
 
-### Log into LXPLUS server (CERN computers)
+## Quick Start Path
 
-```bash
-ssh username@lxplus.cern.ch
-```
+If you are new to CMS computing or ML, follow these steps:
 
-### Set up the required CMSSW version
+1. **[System Overview](getting-started/overview.md)** - Understand the complete workflow and the architecture of the framework.
+2. **[CERN Access Setup](cern-systems/lxplus-access.md)** - Configure LXPLUS access, VOMS/GRID certificates, and environment.
+3. **[Dataset Processing](data-processing/framework-setup.md)** - Process your NanoAOD files.
+4. **[ML Training](ml/conversion.md)** - Train ML models using the prepared datasets.
 
-```bash
-cmsrel CMSSW_13_3_0
-cd CMSSW_13_3_0/src
-cmsenv  
-```
+## Critical Requirements
 
-You will see many of directories inside `CMSSW_13_3_0/`, but you only need to work inside `src/` directory.
+!!! warning "Before You Begin"
+    You **must** have:
 
-!!! warning "IMPORTANT"
-    1. `cmsenv` needs to be executed every time you open a new terminal to activate the environment variables. You need to be inside `CMSSW_13_3_0/` directory.
-    2. The [Data processing section](data_processing/01_set_config.md) has been tested only with the CMSSW_13_3_0 release. The training section is not affected.
+    - Valid CERN computing account with LXPLUS access
+    - Basic familiarity with Linux command line
+    - Understanding of ROOT files
+    - Python knowledge
 
-### Clone the repository and compile 
+## Who is this documentation for?
 
-```bash
-git clone https://github.com/castaned/ML-integration-CMSSW DeepNTuples
-scram b -j N
-```
+- CMS physicists performing ML-based analyses
+- Students new to CMS computing
+- Analysts needing a reproducible ML pipeline
+- Anyone converting CMS datasets into ML-ready formats
 
-Make sure not to change the name `DeepNTuples` for your local directory containing the GitHub repository, otherwise, it will not work. In the second command, `N` represents the CPUs to use for compiling and building the code inside `src/` directory, which uses dependencies from the CMSSW system. If you are unsure about `N`, simply run `scram b` without the `-j` flag, it will use all the available CPUs.
-
-
-!!! note "Resources"
-    If you want to learn more about the CMSSW system, its structure, and commands, you can explore [Intro to CMSSW](https://cms-opendata-workshop.github.io/workshop2022-lesson-cmssw/) and [CMSSW SCRAM](https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideBuildFile).
