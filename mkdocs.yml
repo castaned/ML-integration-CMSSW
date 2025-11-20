@@ -24,21 +24,30 @@ theme:
       text: Merriweather Sans
       code: JetBrains Mono
 
+    features:
+      - navigation.indexes
+
+nav:
+  - Getting started:
+    - getting-started/01_overview.md
+    - getting-started/02_architecture.md
+  - CERN Computing Environment:
+    - cern-systems/01_lxplus.md
+    - cern-systems/02_storage.md
+    - cern-systems/03_computing-resources.md
+    - cern-systems/04_CMSSW.md
+  - Data processing:
+    - data-processing/01_GRID-authentication.md
+    - data-processing/02_dataset-discovery.md
+    - data-processing/03_framework-setup.md
+    - data-processing/04_code-explanation.md
+    - data-processing/05_configuration.md
+    - data-processing/06_execution.md
+  - Machine learning: 
+    - ml/index.md
 markdown_extensions:
    - admonition
    - pymdownx.details
    - pymdownx.superfences
-
-
-nav:
-  - CMS Machine Learning Framework: index.md
-  - Datasets: 
-      - nanoAOD: datasets/01_nanoaod.md
-  - Data processing:
-      - Config: data_processing/01_set_config.md
-      - Preprocessing: data_processing/02_processing.md
-      - Mixing: data_processing/03_random_sample_optional.md
-  - Training: 
-      - training: training/01_intro.md
-      - lxplus: training/02_lxplus.md
-      - acarus: training/03_acarus.md
+   - footnotes
+   
