@@ -1,90 +1,82 @@
 import argparse
 import sys
-import utilities.prepare_data as preda
-import utilities.read_config_variables as rcv
+import utilities.prepare as prepare
+import utilities.utils as utils
+import utilities.learn as learn
 import src.optimize_model as opt
 import src.test_results as tr 
-import datetime
 import traceback
 import os
 
-# Function to add timestamps to logs
-class TimestampedLogger:
-    def __init__(self, stream, log_file):
-        self.stream = stream
-        self.log_file = log_file
+def main(config_path):
 
-    def write(self, message):
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        formatted_message = f"[{timestamp}] {message}"
-        self.stream.write(formatted_message)
-        with open(self.log_file, "a") as f:
-            f.write(formatted_message)
-
-    def flush(self):
-        self.stream.flush() 
+    config = prepare.load_config(config_path)
     
-    def fileno(self):
-        # Return the file descriptor of the underlying stream
-        return self.stream.fileno() if hasattr(self.stream, 'fileno') else None
-
-
-def main(file_vars):
-
-    output_dir = rcv.read_variables(file_vars, ['output_path'])['output_path'][0]
+    output_dir = config["data"]["output_path"]
     if not os.path.isabs(output_dir):
         output_dir = os.path.abspath(output_dir)
     
     if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+        os.makedirs(output_dir, exist_ok=True)
     
-    sys.stdout = TimestampedLogger(sys.stdout, f"{output_dir}/stdout.log")
-    sys.stderr = TimestampedLogger(sys.stderr, f"{output_dir}/stderr.log")
-
+    sys.stdout = utils.TimestampedLogger(sys.stdout, f"{output_dir}/stdout.log")
+    sys.stderr = utils.TimestampedLogger(sys.stderr, f"{output_dir}/stderr.log")
+    
     try:
-        # Get data
-        print("Preparing data...")
-        #X_train, y_train = preda.get_features_labels(file_vars)
-        X_train, y_train = preda.combine_features_labels(file_vars, preda.get_features_labels)
-        #X_test, y_test = preda.get_features_labels(file_vars, test=True)
-        X_test, y_test = preda.combine_features_labels(file_vars, preda.get_features_labels, test=True)
-        print(X_test.shape, y_test.shape)
-        print(X_train.shape, y_train.shape)
-        print("Data prepared.")
 
-        # Train and optimize model
-        print("Training and optimizing model...")
-        ideal_acc = rcv.read_variables(file_vars, ['ideal_accuracy'])['ideal_accuracy']
-        num_models = rcv.read_variables(file_vars, ['num_models'])['num_models']
-        models_name = rcv.read_variables(file_vars, ['ai_model'])['ai_model']
-        models_class = rcv.read_variables(file_vars, ['ai_model_class'])['ai_model_class'][0]
+        input_paths = config["data"]["input_paths"]
+        features = config["data"]["features"]
+        label = config["data"]["label"]
+        num_classes = config["data"]["num_classes"]
 
-        for model_name in models_name:
-            if model_name == 'mlp':
-                opt.tune_mlp(models_class, X_train, y_train, ideal_acc, num_models, output_dir)
-                print("MLP training and optimization completed.")
-            else:
-                print(f"The {model_name} is not available.")
-        print("All training and optimization completed.")
-
-        # test model
-        print("testing model...")
-        for model_name in models_name:
-            if model_name == 'mlp':
-                tr.test_results(X_test, y_test, models_class, output_dir, 'mlp')
-                print("MLP testing completed.")
-            else:
-                print(f"The {model_name} is not available.")
-        print("All testing completed.")
+        print("Collecting data...")
+        full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes)
+        train_idx, test_idx = prepare.split_h5Dataset(full_dataset, 0.2, 16)
+        train_dataset = prepare.h5Dataset(
+                input_paths,
+                features,
+                label,
+                num_classes,
+                transform=prepare.MLPTransform(),
+                indices=[full_dataset.global_ids[i] for i in train_idx]
+            )
         
+        test_dataset = prepare.h5Dataset(
+                input_paths,
+                features,
+                label,
+                num_classes,
+                transform=prepare.MLPTransform(),
+                indices=[full_dataset.global_ids[i] for i in test_idx]
+            )
+        
+        print("Data collected.")
+        
+        ideal_acc = config["model"]["ideal_accuracy"]
+        num_models = config["model"]["num_models"]
+        model_name = config["model"]["name"]
+        model_type = config["model"]["type"]
+        
+        print("Training and optimizing model...")
+        if model_type == 'mlp':
+            opt.tune_mlp(model_name, model_type, train_dataset, ideal_acc, num_models, output_dir)
+            print("MLP training and optimization completed.")
+        else:
+            print(f"The {model_type} is not available.")
+            
+        
+        print("testing model...")
+        if model_type == 'mlp':
+            tr.test_results(model_name, model_type, test_dataset, output_dir)
+            print("MLP testing completed.")
+        else:
+            print(f"The {model_type} is not available.")
         
     except Exception as e:
-        #print("Error:", e, file=sys.stderr)
         error_message = traceback.format_exc()
         sys.stderr.write(f"[ERROR] {error_message}")
 
     finally:
-        # Reset stdout and stderr, then close the log files
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 

@@ -1,0 +1,21 @@
+# HTCondor Submission File 
+
+environment = \
+    EOS_DIR=/eos/user/dir/$(ClusterId); \
+    REDIRECTOR=root://eosuser.cern.ch; \
+    RESULTS_DIR=results/
+
+#notify_user             = email@email.com
+notification            = Complete
+universe                = vanilla
+executable              = run_training_apptainer.sh
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files    = ./
+output                  = job.$(ClusterId).$(ProcId).out
+error                   = job.$(ClusterId).$(ProcId).err
+log                     = job.$(ClusterId).$(ProcId).log
+request_cpus            = 5
+request_gpus            = 0
++JobFlavour = "microcentury" # 1 hour
+queue
