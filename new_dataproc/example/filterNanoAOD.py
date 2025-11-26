@@ -47,7 +47,7 @@ def get_dataset_id(dataset_folder):
 
     # Assign a new ID if dataset is not in mapping
     if dataset_folder not in dataset_mapping:
-        dataset_id = len(dataset_mapping) + 1  # Incremental unique ID
+        dataset_id = len(dataset_mapping) # Incremental unique ID, starting from 0
         dataset_mapping[dataset_folder] = dataset_id
 
         # Save updated mapping
