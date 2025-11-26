@@ -7,7 +7,6 @@ import json
 def load_config(config_path):
    with open(config_path) as f:
        return yaml.safe_load(f)
-
     
 def exe_cmd(cmd, allow_tty_mode=False):
    if isinstance(cmd, str):
@@ -65,7 +64,7 @@ def path_to_dir_name(path):
    return path.strip("/").replace("/", "_")
 
 # This function sets env variables that will be transferred to
-# worker nodes using `getenv = True` in the condor file.
+# worker nodes using `getenv` in the condor file.
 # This reduces the number of arguments for the executable file.
 def set_env_vars(proxy_path, eos_output_dir, afs_cms_base, processing_script):
    os.environ['X509_USER_PROXY'] = proxy_path
@@ -84,7 +83,7 @@ def create_condor_file(condor_params):
       f.write(f"""universe = vanilla
 executable = {exe}
 arguments = "$(INPUT_FILE) $(FLN) $(DATASET_DIR)"
-getenv = True
+getenv = X509_USER_PROXY, EOS_OUTPUT_DIR, AFS_CMS_BASE, PROCESSING_SCRIPT
 output = logs/job_$(ClusterId)_$(ProcId).out
 error = logs/job_$(ClusterId)_$(ProcId).err
 log = logs/job_$(ClusterId)_$(ProcId).log
