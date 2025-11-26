@@ -45,6 +45,7 @@ graphql-relay==3.2.0
 greenlet==3.1.1
 gunicorn==23.0.0
 h11==0.14.0
+h5py==3.13.0
 httpcore==1.0.7
 httpx==0.28.1
 idna==3.10
@@ -108,6 +109,7 @@ nvidia-nccl-cu12==2.21.5
 nvidia-nvjitlink-cu12==12.4.127
 nvidia-nvtx-cu12==12.4.127
 onnx==1.17.0
+onnxruntime==1.22.0
 opentelemetry-api==1.30.0
 opentelemetry-sdk==1.30.0
 opentelemetry-semantic-conventions==0.51b0

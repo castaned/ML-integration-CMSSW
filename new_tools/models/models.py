@@ -30,11 +30,11 @@ class MLPmodel(nn.Module):
         return self.net(x)
     
     @classmethod
-    def get_model(cls, X, y, param_model):
+    def get_model(cls, input_size, output_size, param_model):
         hyperparam = param_model["hyperparam"]
         model = cls(
-            input_size=X.shape[1],
-            output_size=y.shape[1],
+            input_size=input_size,
+            output_size=output_size,
             hidden_input_size=hyperparam["hidden_input_size"],
             hidden_output_size=hyperparam["hidden_output_size"],
             num_layers=hyperparam["num_layers"]

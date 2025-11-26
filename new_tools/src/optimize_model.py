@@ -3,32 +3,23 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.utils
 from sklearn.model_selection import train_test_split
-import utilities.prepare_data as preda
-import models.models as mdls
+import utilities.prepare as prepare
+import utilities.learn as learn
+import models.models as models
 import ray
 from ray import tune
 from ray.tune.schedulers import ASHAScheduler
 from ray.air.integrations.mlflow import MLflowLoggerCallback
-import mlflow
+from torch.utils.data import DataLoader
 
-def compute_accuracy(outputs, y):
-    _, predicted = torch.max(outputs, dim=1)
-    correct = (predicted == y).sum().item()
-    total = y.size(0)
-    acc = correct/total
-    return acc
 
-def get_device():
-    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
-    device = get_device()
+def train_model(hyperparam_space, dataset, ideal_acc, output_dir, model_name):
+    device = learn.get_device()
     print(f"Device: {device}")
 
-    # Init model
-    model = mdls.MLPmodel(
-                  input_size=X.shape[1], 
-                  output_size=y.shape[1], 
+    model = models.MLPmodel(
+                  input_size=dataset.num_features, 
+                  output_size=dataset.num_classes, 
                   hidden_input_size=hyperparam_space["hidden_input_size"], 
                   hidden_output_size=hyperparam_space["hidden_output_size"], 
                   num_layers=hyperparam_space["num_layers"]
@@ -37,53 +28,48 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
     optimizer = optim.Adam(model.parameters(), lr=hyperparam_space["learning_rate"])
     print(model)
 
-    # Early stopping parameters
+
     patience = hyperparam_space["patience"]
     best_val_loss = float('inf')
     epochs_without_improvement = hyperparam_space["epochs_without_improvement"]
 
-    # Training loop parameters
     num_epochs = hyperparam_space["num_epochs"]
     batch_size = hyperparam_space["batch_size"]
     val_split = 0.2
 
-    # Split data and transform it to pytorch objects
-    train_loader, val_loader = preda.train_data_to_pytorch(X, y, val_split, batch_size)
-    
-    # Define the best model checkpoint filename
     checkpoint_path = f'{output_dir}/best_model_{model_name}.pth'    
+
     
-    # Training loop
+    train_dataloader, val_dataloader = prepare.split_and_transform_pythorch(dataset, val_split, batch_size)
+
     for epoch in range(num_epochs):
         model.train()
         
-        for X_batch, y_batch in train_loader:
+        for X_batch, y_batch in train_dataloader:
             X_batch, y_batch = X_batch.to(device), y_batch.to(device)
             optimizer.zero_grad()
             
-            # Forward pass
             outputs = model(X_batch)
             loss = criterion(outputs, y_batch)
-            acc = compute_accuracy(outputs, y_batch)
+            acc = learn.compute_accuracy(outputs, y_batch)
 
-            # Backward pass
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # Gradient clipping
             optimizer.step()
             
-        # Validate the model
+
         val_loss = 0.0
         val_acc = 0.0
         model.eval()
         with torch.no_grad():
-            for X_batch, y_batch in val_loader:
+            for X_batch, y_batch in val_dataloader:
                 X_batch, y_batch = X_batch.to(device), y_batch.to(device)
                 outputs = model(X_batch)
                 val_loss += criterion(outputs, y_batch).item()
-                val_acc += compute_accuracy(outputs, y_batch)
+                val_acc += learn.compute_accuracy(outputs, y_batch)
                 
-        val_loss /= len(val_loader)
-        val_acc /= len(val_loader)
+        val_loss /= len(val_dataloader)
+        val_acc /= len(val_dataloader)
 
         print(f"Epoch {epoch + 1}/{num_epochs}, Train acc: {acc:.4f}, Train loss: {loss.item():.4f}, Val acc: {val_acc:.4f}, Val loss: {val_loss:.4f}")
         tune.report({"loss": val_loss, "acc": val_acc, "val_loss": val_loss, "val_acc": val_acc})
@@ -107,8 +93,8 @@ def train_model(hyperparam_space, X, y, ideal_acc, output_dir, model_name):
     return 0
 
 
-def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
-    # Search space for hyperparameters
+def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir):
+
     hyperparam_space = {
         "hidden_input_size": tune.choice([64, 128, 256]),
         "hidden_output_size": tune.choice([16, 32, 64]),
@@ -129,19 +115,22 @@ def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
         reduction_factor=2
         )
     
-    # Tuning process
     
-    ray.init()    
-    # trainable = tune.with_resources(
-    #     tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}'),
-    #     resources={"cpu": 20, "gpu": 0} 
-    #     )
-    trainable = tune.with_parameters(train_model, X=X, y=y, ideal_acc=ideal_acc, output_dir=output_dir, model_name=f'mlp_{model_type}')
-    # Define the MLflow callback
+    ray.init()
+    resources = ray.available_resources()
+    num_cpus = int(resources.get("CPU", 1))
+    num_gpus = int(resources.get("GPU", 0))
+    print(f"CPUs avail: {num_cpus}, GPUs avail: {num_gpus}")
+    trainable = tune.with_resources(
+         tune.with_parameters(train_model, dataset=dataset, ideal_acc=ideal_acc, output_dir=output_dir, model_name=model_name),
+         resources={"cpu": num_cpus, "gpu": num_gpus} 
+         )
+    #trainable = tune.with_parameters(train_model, dataset=dataset, ideal_acc=ideal_acc, output_dir=output_dir, model_name=model_name)
+
     mlflow_callback = MLflowLoggerCallback(
                             tracking_uri=f"{output_dir}/mlruns",
-                            experiment_name=f"test_mlp_{model_type}",
-                            tags={"project": "ML_CMSSW_integration", "model": "mlp", "class": model_type},
+                            experiment_name=f"{model_name}",
+                            tags={"project": "ML_CMSSW_integration", "model": model_type},
                             save_artifact=True
                             )
     tuner = tune.Tuner(
@@ -160,9 +149,9 @@ def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
     results = tuner.fit()
 
     best_hyperparam = results.get_best_result(metric="acc", mode="max").config
-    best_model = mdls.MLPmodel(
-                       input_size=X.shape[1], 
-                       output_size=y.shape[1], 
+    best_model = models.MLPmodel(
+                       input_size=dataset.num_features, 
+                       output_size=dataset.num_classes,
                        hidden_input_size=best_hyperparam["hidden_input_size"], 
                        hidden_output_size=best_hyperparam["hidden_output_size"], 
                        num_layers=best_hyperparam["num_layers"]
@@ -171,6 +160,6 @@ def tune_mlp(model_type, X, y, ideal_acc, num_models, output_dir):
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
     
-    preda.convert_to_onnx(X, best_model, output_dir, model_name=f'mlp_{model_type}')
+    learn.convert_to_onnx(dataset.num_features, best_model, output_dir, model_name=f'{model_name}')
     
     return 0
