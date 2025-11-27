@@ -1,3 +1,4 @@
+import argparse
 import uproot
 import awkward as ak
 import numpy as np
@@ -6,7 +7,12 @@ import sys
 import os
 import yaml 
 
- 
+
+def require_key(config, key):
+   if key not in config:
+      raise KeyError(f"Missing required key in yaml config: '{key}'")
+   return config[key]
+                
 def load_config(config_path):
    with open(config_path) as f:
        return yaml.safe_load(f)
@@ -46,20 +52,21 @@ def process_dirs(input_dirs, tree_name, branches, output_dir):
          root_to_h5(input_path, tree_name, branches, output_path)
 
 
-def main():
-   if len(sys.argv) != 2:
-      print("Usage: python(3) convert_root_to_h5.py <config.yaml>")
-      sys.exti(1)
+def main(config_path):
 
-   config_path = sys.argv[1]
-   config = load_config(config_path)['convertion']
+   config = load_config(config_path)
+   convertion = require_key(config, 'convertion')
 
-   input_dirs = config['input_dirs']
-   tree_name = config['tree_name']
-   branches = config['branches']
-   output_dir = config['output_dir']
+   input_dirs = require_key(convertion, 'input_dirs')
+   tree_name = require_key(convertion,'tree_name')
+   branches = require_key(convertion,'branches')
+   output_dir = require_key(convertion,'output_dir')
 
    process_dirs(input_dirs, tree_name, branches, output_dir)
 
 if __name__ == "__main__":
-   main()
+   parser = argparse.ArgumentParser(description="Convert NanoAOD root file to h5 file")
+   parser.add_argument('-f', '--file', type=str, help="Path to the configuration file.", required=True)
+   args = parser.parse_args()
+   
+   main(args.file)
