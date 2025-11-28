@@ -18,7 +18,6 @@ class h5Dataset(Dataset):
     def __init__(self, dir_paths, features, label, num_classes, indices=None, transform=None):
         
         self.features = features
-        self.num_features = len(features)
         self.label = label
         self.num_classes = num_classes
         self.transform = transform
@@ -34,9 +33,12 @@ class h5Dataset(Dataset):
                     
                     # All features must have same number of events
                     with h5py.File(file_path, "r") as file_h5:
-                        n_events = file_h5[features[0]].shape[0]
+                        if features == "all" or features == ["all"]:
+                            self.features = [key for key in file_h5.keys() if key != label]
+                        n_events = file_h5[self.features[0]].shape[0]
                     self.file_event_counts.append(n_events)
-                        
+
+        self.num_features = len(self.features)
         self.files = [None] * len(self.file_paths) # Lazy open, one handle per worker
         
         self.global_ids = []
@@ -62,7 +64,6 @@ class h5Dataset(Dataset):
         x = {f: torch.tensor(x[i], dtype=torch.float32) for i, f in enumerate(self.features)}
         
         y = torch.tensor(file_h5[self.label][event_id], dtype=torch.long)
-        y = (y - 1).long()
         
         if self.transform:
             x = self.transform(x)
