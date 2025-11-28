@@ -21,15 +21,9 @@ def main(config_path):
 
     proxy_path = utils.require_key(proxy_config, 'proxy_path')
     proxy_path = lxplus.expand_proxy_path(proxy_path)
-    
-    lxplus.set_env_vars(proxy_path, eos_output_dir, afs_cms_base, processing_script)
-    
+        
     datasets = lxplus.das_query_endpoints(redirector, datasets)
-    
-    utils.exe_cmd(['bash', 'set_env.sh'], allow_tty_mode=True)
-    
-
-    name_file = lxplus.create_condor_file(condor_params)
+        
     args_dat = []
     mapping = {}
     for dataset in datasets:
@@ -47,8 +41,14 @@ def main(config_path):
 
     utils.write_args_file("args.dat", args_dat)
 
-    utils.write_json_file("mapping.json", mapping)
+    utils.write_map_file("mapping.json", mapping)
 
+    lxplus.set_env_vars_processing(proxy_path, eos_output_dir, afs_cms_base, processing_script)
+
+    utils.exe_cmd(['bash', 'set_env.sh'], allow_tty_mode=True)
+
+    name_file = lxplus.create_condor_processing_file(condor_params)
+    
     utils.submit_condor(name_file)
        
 

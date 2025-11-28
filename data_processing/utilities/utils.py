@@ -34,7 +34,7 @@ def write_args_file(dat_name, arguments):
    with open(dat_name , "w") as dat_file:
       dat_file.write("\n".join(arguments))
 
-def write_json_file(json_name, data, indent=2):
+def write_map_file(json_name, data, indent=2):
    with open(json_name , "w") as json_file:
       json.dump(data, json_file, indent=indent)
       

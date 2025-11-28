@@ -42,7 +42,7 @@ def das_query_endpoints(redirector, datasets):
 # This function sets env variables that will be transferred to
 # worker nodes using `getenv` in the condor file.
 # This reduces the number of arguments for the executable file.
-def set_env_vars(proxy_path, eos_output_dir, afs_cms_base, processing_script):
+def set_env_vars_processing(proxy_path, eos_output_dir, afs_cms_base, processing_script):
    os.environ['X509_USER_PROXY'] = proxy_path
    os.environ['EOS_OUTPUT_DIR'] = eos_output_dir
    os.environ['AFS_CMS_BASE'] = afs_cms_base
@@ -53,7 +53,7 @@ def set_env_vars_conversion(tree_name, branches, max_jagged_len):
    os.environ['BRANCHES'] = ",".join(branches) if isinstance(branches, list) else str(branches)
    os.environ['MAX_JAGGED_LEN'] = str(max_jagged_len)
 
-def create_condor_file(condor_params):
+def create_condor_processing_file(condor_params):
    name_file = "processing.jdl"
    exe = utils.require_key(condor_params, "executable_file")
    cpus, gpus, mem, disk = (utils.require_key(condor_params, k) for k in ("cpus","gpus","mem", "disk"))
