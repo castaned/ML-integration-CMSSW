@@ -11,8 +11,10 @@ import os
 def main(config_path):
 
     config = prepare.load_config(config_path)
+
+    data_config = utils.require_key(config, 'data')
+    output_dir = utils.require_key(data_config, 'output_path')
     
-    output_dir = config["data"]["output_path"]
     if not os.path.isabs(output_dir):
         output_dir = os.path.abspath(output_dir)
     
@@ -24,10 +26,10 @@ def main(config_path):
     
     try:
 
-        input_paths = config["data"]["input_paths"]
-        features = config["data"]["features"]
-        label = config["data"]["label"]
-        num_classes = config["data"]["num_classes"]
+        input_paths = utils.require_key(data_config, 'input_paths')
+        features = utils.require_key(data_config, 'features')
+        label = utils.require_key(data_config, 'label')
+        num_classes = utils.require_key(data_config, 'num_classes')
 
         print("Collecting data...")
         full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes)
@@ -51,11 +53,12 @@ def main(config_path):
             )
         
         print("Data collected.")
-        
-        ideal_acc = config["model"]["ideal_accuracy"]
-        num_models = config["model"]["num_models"]
-        model_name = config["model"]["name"]
-        model_type = config["model"]["type"]
+
+        model_config = utils.require_key(config, 'model')
+        ideal_acc = utils.require_key(model_config, 'ideal_accuracy')
+        num_models = utils.require_key(model_config, 'num_models')
+        model_name = utils.require_key(model_config, 'name')
+        model_type = utils.require_key(model_config, 'type')
         
         print("Training and optimizing model...")
         if model_type == 'mlp':

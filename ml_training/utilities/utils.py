@@ -1,5 +1,10 @@
 import datetime
 
+def require_key(config, key):
+    if key not in config:
+        raise KeyError(f"Missing required key in yaml config: '{key}'")
+    return config[key]
+
 # Class to add timestamps to logs
 class TimestampedLogger:
     def __init__(self, stream, log_file):
