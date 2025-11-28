@@ -16,8 +16,10 @@ def pad_or_truncate(jagged_array, max_len):
 def root_to_h5(input_file, tree_name, branches, output_file, max_len=10):
     upfile = uproot.open(input_file)
     tree = upfile[tree_name]
-    
-    if branches == "all":
+    print(f"upfile: {upfile}")
+    print(f"tree: {tree}")
+    print(f"branches: {branches}")
+    if branches == "all" or branches == ["all"]:
         branches = tree.keys()
         
     ak_arrays = tree.arrays(branches, library="ak")

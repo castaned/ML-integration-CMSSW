@@ -10,8 +10,18 @@ convertion:
   #    - "A_Dr_Z"
   #    - "A_Lep1Z_eta"
   #    - "A_Lep1Z_phi"
-  #    - "A_Lep1Z_pt"
+  #    - "A_Lep1Z_p"
+
+# If you do not have jagged arrays leave it blank. If you use, the default value is 10
+  max_jagged_len:
   
-  max_jagged_len: # If you do not have jagged arrays leave it blank
-  
-  output_dir: "/eos/user/v/vminjare/nanoFiltered_h5"
+  eos_output_dir: "/eos/user/v/vminjare/nanoFiltered_h5"
+
+condor_params:
+  executable_file: "run_conversion.sh"
+  cpus: 1
+  gpus: 0
+  mem: 1.5GB
+  disk: 2GB
+  job_flavour: "espresso" # 20 minutes
+

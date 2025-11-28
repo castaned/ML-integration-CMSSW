@@ -48,7 +48,11 @@ def set_env_vars(proxy_path, eos_output_dir, afs_cms_base, processing_script):
    os.environ['AFS_CMS_BASE'] = afs_cms_base
    os.environ['PROCESSING_SCRIPT'] = processing_script
    
-   
+def set_env_vars_conversion(tree_name, branches, max_jagged_len):
+   os.environ['TREE_NAME'] = tree_name
+   os.environ['BRANCHES'] = ",".join(branches) if isinstance(branches, list) else str(branches)
+   os.environ['MAX_JAGGED_LEN'] = str(max_jagged_len)
+
 def create_condor_file(condor_params):
    name_file = "processing.jdl"
    exe = utils.require_key(condor_params, "executable_file")
@@ -74,6 +78,31 @@ queue INPUT_FILE, FLN, DATASET_DIR from args.dat
 """)
       return name_file
    
+def create_condor_convert_file(condor_params):
+   name_file = "converting.jdl"
+   exe = utils.require_key(condor_params, "executable_file")
+   cpus, gpus, mem, disk = (utils.require_key(condor_params, k) for k in ("cpus","gpus","mem", "disk"))
+   job_flavour = utils.require_key(condor_params, "job_flavour")
+   
+   with open(name_file, "w") as f:
+      f.write(f"""universe = vanilla
+executable = {exe}
+arguments = "$(INPUT_FILE) $(OUTPUT_FILE)"
+getenv = TREE_NAME, BRANCHES, MAX_JAGGED_LEN
+transfer_input_files = conversion_container.sif, ../utilities
+output = logs/job_$(ClusterId)_$(ProcId).out
+error = logs/job_$(ClusterId)_$(ProcId).err
+log = logs/job_$(ClusterId)_$(ProcId).log
+request_cpus = {cpus}
+request_gpus = {gpus}
+request_memory = {mem}
+request_disk = {disk}
++JobFlavour = {job_flavour}
+retry = 5
+transfer_output_files = ""
+queue INPUT_FILE OUTPUT_FILE from args_conversion.dat
+""")
+      return name_file
 
 
 

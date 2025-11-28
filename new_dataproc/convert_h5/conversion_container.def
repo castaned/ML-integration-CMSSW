@@ -1,0 +1,5 @@
+Bootstrap: docker
+From: python:3.12.2-slim
+
+%post
+    pip install uproot awkward tables
