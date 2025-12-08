@@ -45,6 +45,9 @@ nav:
     - data-processing/06_execution.md
   - Machine learning: 
     - ml/index.md
+  - Example of usage:
+    - usage/01_usage.md
+
 markdown_extensions:
    - admonition
    - pymdownx.details
