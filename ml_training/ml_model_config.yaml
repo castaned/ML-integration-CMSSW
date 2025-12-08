@@ -1,0 +1,24 @@
+---
+data:
+  input_paths:
+    - "/eos/user/directory/data"
+    -  "/eos/user/directory/data"
+
+  
+  output_path: "results"
+
+  features:
+    - ""
+
+  label: ""
+
+  num_classes: 2
+  
+model:
+  name: "mlp_binary_test"
+
+  type: "mlp"
+
+  ideal_accuracy: 95
+
+  num_models: 3

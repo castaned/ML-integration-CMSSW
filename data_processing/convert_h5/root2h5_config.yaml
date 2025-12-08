@@ -1,0 +1,24 @@
+---
+convertion:
+  input_dirs:
+    - "/eos/user/directory/data/root
+    - "/eos/user/directory/data/root
+    
+  tree_name: "Events"
+  
+  branches: "all"
+  #    - ""
+
+# If you do not have jagged arrays leave it blank. If you use, the default value is 10
+  max_jagged_len:
+  
+  eos_output_dir: "/eos/user/directory/data/h5"
+
+condor_params:
+  executable_file: "run_conversion.sh"
+  cpus: 1
+  gpus: 0
+  mem: 1.5GB
+  disk: 2GB
+  job_flavour: "espresso" # 20 minutes
+
