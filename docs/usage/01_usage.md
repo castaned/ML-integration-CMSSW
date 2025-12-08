@@ -59,7 +59,7 @@ data_processing:
     Indentation in YAML files is very important, and YAML files do not accept tabs.
 
 
-The main processing script, `processing_script`, in this case `filterNanoAOD.py`, must accept exactly the following arguments **input file path** **FLN** **OUTPUT DIRECTORY** in this order. For more information, check the [dataset processing section](data-processing/somewhere).
+The main processing script, `processing_script`, in this case `filterNanoAOD.py`, must accept exactly the following arguments **input file path** **FLN** **OUTPUT DIRECTORY** in this order. Additionally, dataset labels must start at 0 and increase sequentially without gaps. For more information, check the [dataset processing section](data-processing/somewhere).
 
 If your GRID proxy certificate is still valid, do not generate a new one. Change `generate: 1` to `generate: 0` under the `proxy` section.
 
@@ -77,7 +77,7 @@ Now we submit the jobs, one per ROOT file to process:
 python3 execute_data_processing.py -f data_processing_config.yaml
 ```
 
-You can check the status of your jobs in HTCondor with `condor_q`. Also, the logs are stored in `logs/`. After all the jobs finish, the new ROOT file will be in the directory specified by `eos_output_dir`.
+When you execute the Python script, it first creates a tar archive of the entire `afs_cms_base` directory and uploads it to `eos_output_dir`. This step is performed locally in your current shell and may take several minutes. Once the jobs are submitted to HTCondor, you can monitor their status using `condor_q`. Also, the logs are stored in `logs/`. After all the jobs finish, the new ROOT file will be in the directory specified by `eos_output_dir`.
 
 Now we convert the ROOT file into HDF5 files. First, we go to the directory:
 
