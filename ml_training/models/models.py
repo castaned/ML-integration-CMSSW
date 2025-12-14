@@ -1,7 +1,12 @@
 import torch
 import torch.nn as nn
 
-# Define  base MLP
+# Define base MLP
+class MLPTransform:
+    def __call__(self, data):
+        flatten = torch.cat([value.flatten() for value in data.values()])
+        return flatten
+
 class MLPmodel(nn.Module):
     def __init__(self, input_size, output_size, hidden_input_size, hidden_output_size, num_layers):
         super(MLPmodel, self).__init__()

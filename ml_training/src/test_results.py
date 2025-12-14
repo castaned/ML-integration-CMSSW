@@ -91,5 +91,6 @@ def test_results(model_name, model_type, dataset, output_dir, batch_size=2048):
     
     compute_ROC(outputs_test, labels_test, dataset.num_classes, output_dir, model_name)
     compute_cm(outputs_test, labels_test, output_dir, model_name)
-    
+
+    dataset.close()
     return 0

@@ -75,11 +75,6 @@ class h5Dataset(Dataset):
             if file:
                 file.close()
 
-class MLPTransform:
-    def __call__(self, data):
-        flatten = torch.cat([value.flatten() for value in data.values()])
-        return flatten
-
 
 def split_and_transform_pythorch(h5_dataset, test_size, batch_size, train_suffle=True):
 

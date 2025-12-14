@@ -3,6 +3,7 @@ import sys
 import utilities.prepare as prepare
 import utilities.utils as utils
 import utilities.learn as learn
+import models.models as models
 import src.optimize_model as opt
 import src.test_results as tr 
 import traceback
@@ -31,6 +32,8 @@ def main(config_path):
         label = utils.require_key(data_config, 'label')
         num_classes = utils.require_key(data_config, 'num_classes')
 
+        input_paths = [os.path.abspath(data_path) for data_path in input_paths] # Get absolute path for ray workers, otherwise they will not find the data inside the container
+        print(input_paths)
         print("Collecting data...")
         full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes)
         train_idx, test_idx = prepare.split_h5Dataset(full_dataset, 0.2, 16)
@@ -39,7 +42,7 @@ def main(config_path):
                 features,
                 label,
                 num_classes,
-                transform=prepare.MLPTransform(),
+                transform=models.MLPTransform(),
                 indices=[full_dataset.global_ids[i] for i in train_idx]
             )
         
@@ -48,7 +51,7 @@ def main(config_path):
                 features,
                 label,
                 num_classes,
-                transform=prepare.MLPTransform(),
+                transform=models.MLPTransform(),
                 indices=[full_dataset.global_ids[i] for i in test_idx]
             )
         
@@ -80,6 +83,10 @@ def main(config_path):
         sys.stderr.write(f"[ERROR] {error_message}")
 
     finally:
+        if full_dataset is not None: full_dataset.close()
+        if train_dataset is not None: train_dataset.close()
+        if test_dataset is not None: test_dataset.close()
+        
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 

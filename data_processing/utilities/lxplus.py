@@ -14,11 +14,13 @@ def generate_proxy(proxy_config):
    cmd = [
         'voms-proxy-init',
         '--voms', utils.require_key(proxy_config, 'voms'),
+        '--rfc',
         '--valid', utils.require_key(proxy_config, 'proxy_time'),
         '--out', proxy_path
         ]
 
    utils.exe_cmd(cmd, allow_tty_mode=True)
+   os.environ["X509_USER_PROXY"] = proxy_path
    print(f'\nTo set env varible in current shell execute: export X509_USER_PROXY={proxy_path}')
 
    
@@ -29,6 +31,7 @@ def das_query_endpoints(redirector, datasets):
       amount = utils.require_key(dataset, 'amount')
 
       cmd = ['dasgoclient', '-query', f'file dataset={FLN}']
+
       if amount == -1:
          files = utils.exe_cmd(cmd).splitlines()
       else:
@@ -62,7 +65,7 @@ def create_condor_processing_file(condor_params):
    with open(name_file, "w") as f:
       f.write(f"""universe = vanilla
 executable = {exe}
-arguments = "$(INPUT_FILE) $(FLN) $(DATASET_DIR)"
+arguments = "$(INPUT_FILE) $(FLN) $(OUTPUT_DIR)"
 getenv = X509_USER_PROXY, EOS_OUTPUT_DIR, AFS_CMS_BASE, PROCESSING_SCRIPT
 output = logs/job_$(ClusterId)_$(ProcId).out
 error = logs/job_$(ClusterId)_$(ProcId).err
@@ -74,7 +77,7 @@ request_disk = {disk}
 +JobFlavour = {job_flavour}
 retry = 5
 transfer_output_files = ""
-queue INPUT_FILE, FLN, DATASET_DIR from args.dat
+queue INPUT_FILE, FLN, OUTPUT_DIR from args_processing.dat
 """)
       return name_file
    

@@ -14,7 +14,7 @@ def load_config(config_path):
 def exe_cmd(cmd, allow_tty_mode=False):
    if isinstance(cmd, str):
       cmd = cmd.split()
-      
+
    try:
       if allow_tty_mode:
          result = subprocess.run(cmd, check=True)

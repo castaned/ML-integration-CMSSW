@@ -31,7 +31,7 @@ def root_to_h5(input_file, tree_name, branches, output_file, max_len=10):
                 write_carray(np_array, h5file, name=name)
                 continue
             
-            np_array = pad_or_truncate(array, max_len)  # shape [N, variable-length]
+            np_array = pad_or_truncate(array, max_len)  # shape [N, max-len-length]
             write_carray(np_array, h5file, name=name)
             
                 

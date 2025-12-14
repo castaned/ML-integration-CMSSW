@@ -161,5 +161,8 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
     print("Best model architecture:", best_model)
     
     learn.convert_to_onnx(dataset.num_features, best_model, output_dir, model_name=f'{model_name}')
+
+    ray.shutdown()
+    dataset.close()
     
     return 0

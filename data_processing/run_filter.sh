@@ -5,7 +5,7 @@ echo "Running on: $(hostname)"
 
 INPUT_FILE=$1
 FLN=$2
-DATASET_DIR=$3
+OUTPUT_DIR=$3
 
 xrdcp "root://eosuser.cern.ch/${EOS_OUTPUT_DIR}/CMSSW.tgz" .
 
@@ -15,6 +15,6 @@ cd CMSSW
 eval `scramv1 runtime -sh`
 
 echo "Data Processing..."
-python3 "$PROCESSING_SCRIPT" "$INPUT_FILE" "$FLN" "$DATASET_DIR"
+python3 "$PROCESSING_SCRIPT" "$INPUT_FILE" "$FLN" "$OUTPUT_DIR"
 
 echo "Time $(date)"

@@ -21,7 +21,9 @@ def main(config_path):
 
     proxy_path = utils.require_key(proxy_config, 'proxy_path')
     proxy_path = lxplus.expand_proxy_path(proxy_path)
-        
+
+    lxplus.set_env_vars_processing(proxy_path, eos_output_dir, afs_cms_base, processing_script)
+    
     datasets = lxplus.das_query_endpoints(redirector, datasets)
         
     args_dat = []
@@ -39,11 +41,9 @@ def main(config_path):
 
        mapping[ID] = FLN
 
-    utils.write_args_file("args.dat", args_dat)
+    utils.write_args_file("args_processing.dat", args_dat)
 
     utils.write_map_file("mapping.json", mapping)
-
-    lxplus.set_env_vars_processing(proxy_path, eos_output_dir, afs_cms_base, processing_script)
 
     utils.exe_cmd(['bash', 'set_env.sh'], allow_tty_mode=True)
 
