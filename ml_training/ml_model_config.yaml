@@ -19,7 +19,7 @@ data:
 model:
   name: ""
 
-  type: ""
+  type: "mlp"
 
   ideal_accuracy: 
 
