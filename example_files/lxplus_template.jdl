@@ -1,0 +1,23 @@
+# HTCondor Submission File 
+
+environment = \
+    EOS_INPUT_DIR=/eos/user/v/vminjare/test_conversionh5; \
+    EOS_OUTPUT_DIR=/eos/user/v/vminjare/outputs/$(ClusterId); \
+    REDIRECTOR=root://eosuser.cern.ch; \
+    RESULTS_DIR=results/
+
+#notify_user             = email@email.com
+notification            = Complete
+universe                = vanilla
+executable              = lxplus_run_template.sh
+should_transfer_files   = YES
+when_to_transfer_output = ON_EXIT
+transfer_input_files    = ./
+x509userproxy = $ENV(X509_USER_PROXY)
+output                  = job.$(ClusterId).$(ProcId).out
+error                   = job.$(ClusterId).$(ProcId).err
+log                     = job.$(ClusterId).$(ProcId).log
+request_cpus            = 5
+request_gpus            = 1
++JobFlavour = "microcentury"
+queue
