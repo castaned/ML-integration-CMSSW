@@ -1,12 +1,11 @@
 # HTCondor Submission File 
 
 environment = \
-    EOS_INPUT_DIR=/eos/user/v/vminjare/test_conversionh5; \
-    EOS_OUTPUT_DIR=/eos/user/v/vminjare/outputs/$(ClusterId); \
+    EOS_INPUT_DIR=; \
+    EOS_OUTPUT_DIR=; \
     REDIRECTOR=root://eosuser.cern.ch; \
-    RESULTS_DIR=results/
+    RESULTS_DIR=
 
-#notify_user             = email@email.com
 notification            = Complete
 universe                = vanilla
 executable              = lxplus_run_template.sh
