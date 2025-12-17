@@ -26,11 +26,11 @@ def generate_proxy(proxy_config):
    
 def das_query_endpoints(redirector, datasets): 
    for dataset in datasets:
-      FLN = utils.require_key(dataset, 'FLN')
+      LFN = utils.require_key(dataset, 'LFN')
       ID = utils.require_key(dataset, 'ID')
       amount = utils.require_key(dataset, 'amount')
 
-      cmd = ['dasgoclient', '-query', f'file dataset={FLN}']
+      cmd = ['dasgoclient', '-query', f'file dataset={LFN}']
 
       if amount == -1:
          files = utils.exe_cmd(cmd).splitlines()
@@ -65,7 +65,7 @@ def create_condor_processing_file(condor_params):
    with open(name_file, "w") as f:
       f.write(f"""universe = vanilla
 executable = {exe}
-arguments = "$(INPUT_FILE) $(FLN) $(OUTPUT_DIR)"
+arguments = "$(INPUT_FILE) $(LFN) $(OUTPUT_DIR)"
 getenv = X509_USER_PROXY, EOS_OUTPUT_DIR, AFS_CMS_BASE, PROCESSING_SCRIPT
 output = logs/job_$(ClusterId)_$(ProcId).out
 error = logs/job_$(ClusterId)_$(ProcId).err
@@ -77,7 +77,7 @@ request_disk = {disk}
 +JobFlavour = {job_flavour}
 retry = 5
 transfer_output_files = ""
-queue INPUT_FILE, FLN, OUTPUT_DIR from args_processing.dat
+queue INPUT_FILE, LFN, OUTPUT_DIR from args_processing.dat
 """)
       return name_file
    

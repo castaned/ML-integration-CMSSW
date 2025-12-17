@@ -13,15 +13,15 @@ data_processing:
     mem: 1.5GB
     disk: 2GB
     job_flavour: "espresso" # 20 minutes
-  processing_script: "src/DeepNTuples/data_processing/main_process/filterNanoAOD.py"
+  processing_script: "src/ml_framework/data_processing/main_process/filterNanoAOD.py"
   eos_output_dir: "/eos/user/v/vminjare/test_dataprocessing"
   afs_cms_base: "/afs/cern.ch/user/v/vminjare/CMSSW_13_3_0"
   redirector: "cms-xrd-global.cern.ch"
   datasets:
-    - FLN: "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
+    - LFN: "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
       ID: 0 
       amount: 3 # -1 is all root files
-    - FLN: "/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
+    - LFN: "/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
       ID: 1
       amount: -1
     

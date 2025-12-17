@@ -31,8 +31,8 @@ def train_model(hyperparam_space, dataset, ideal_acc, output_dir, model_name):
 
     patience = hyperparam_space["patience"]
     best_val_loss = float('inf')
-    epochs_without_improvement = hyperparam_space["epochs_without_improvement"]
-
+    epochs_without_improvement = 0
+    
     num_epochs = hyperparam_space["num_epochs"]
     batch_size = hyperparam_space["batch_size"]
     val_split = 0.2
@@ -98,12 +98,11 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
     hyperparam_space = {
         "hidden_input_size": tune.choice([64, 128, 256]),
         "hidden_output_size": tune.choice([16, 32, 64]),
-        "num_layers": tune.choice([1, 2, 3]),
+        "num_layers": tune.choice([1, 2, 3, 4]),
         "learning_rate": tune.loguniform(1e-4, 1e-2),
-        "batch_size": tune.choice([256, 512, 1024]),
-        "num_epochs": tune.choice([20]),
-        "patience": tune.choice([10]),
-        "epochs_without_improvement": tune.choice([10])
+        "batch_size": tune.choice([128, 256, 512, 1024]),
+        "num_epochs": tune.choice([300]),
+        "patience": tune.choice([10])
     }
 
     # Hyperparameter tuning scheduler

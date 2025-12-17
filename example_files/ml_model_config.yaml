@@ -19,6 +19,9 @@ data:
 
   num_classes: 2
   
+  # Leave this blank if you do not want to apply a mapping
+  label_mapping: "short_name_mapping.json"
+  
 model:
   name: "mlp_binary_test"
 

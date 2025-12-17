@@ -1,4 +1,14 @@
 import datetime
+import json
+
+def read_json(path):
+    with open(path, "r") as f:
+        return json.load(f)
+    
+def int_key_in_dict(class_labels):
+    if class_labels is None:
+        return None
+    return {int(k): v for k, v in class_labels.items()}
 
 def require_key(config, key):
     if key not in config:

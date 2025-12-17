@@ -18,10 +18,10 @@ data_processing:
   afs_cms_base: ""
   redirector: "cms-xrd-global.cern.ch"
   datasets:
-    - FLN: ""
+    - LFN: ""
       ID:  
-      amount:  # -1 is all root files
-    - FLN: ""
+      amount: # -1 is all root files
+    - LFN: ""
       ID: 
-      amount:
-      
+      amount: 
+    

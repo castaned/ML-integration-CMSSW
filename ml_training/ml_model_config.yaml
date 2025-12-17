@@ -10,17 +10,20 @@ data:
   features:
     - ""
     - ""
-    
 
   label: ""
 
   num_classes: 
   
+  # Leave this as null if you do not want to apply a mapping
+  label_mapping: null
+  
 model:
   name: ""
 
-  type: "mlp"
+  type: ""
 
   ideal_accuracy: 
 
-  num_models: 
+  num_models:
+  

@@ -29,17 +29,17 @@ def main(config_path):
     args_dat = []
     mapping = {}
     for dataset in datasets:
-       FLN = dataset["FLN"]
+       LFN = dataset["LFN"]
        ID = dataset["ID"]
        endpoints = dataset["endpoints"]
-       dataset_dir = f"{eos_output_dir}/{utils.path_to_dir_name(FLN)}"
+       dataset_dir = f"{eos_output_dir}/{utils.path_to_dir_name(LFN)}"
        
        os.makedirs(dataset_dir, exist_ok=True)
 
        for i, endpoint in enumerate(endpoints, 1):
-          args_dat.append(f"{endpoint}, {FLN}, {dataset_dir}")
+          args_dat.append(f"{endpoint}, {LFN}, {dataset_dir}")
 
-       mapping[ID] = FLN
+       mapping[ID] = LFN
 
     utils.write_args_file("args_processing.dat", args_dat)
 

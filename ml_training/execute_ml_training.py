@@ -31,9 +31,11 @@ def main(config_path):
         features = utils.require_key(data_config, 'features')
         label = utils.require_key(data_config, 'label')
         num_classes = utils.require_key(data_config, 'num_classes')
-
+        label_mapping_path = utils.require_key(data_config, 'label_mapping')
+        label_mapping = utils.read_json(label_mapping_path)
+        label_mapping = utils.int_key_in_dict(label_mapping)
         input_paths = [os.path.abspath(data_path) for data_path in input_paths] # Get absolute path for ray workers, otherwise they will not find the data inside the container
-        print(input_paths)
+
         print("Collecting data...")
         full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes)
         train_idx, test_idx = prepare.split_h5Dataset(full_dataset, 0.2, 16)
@@ -73,7 +75,7 @@ def main(config_path):
         
         print("testing model...")
         if model_type == 'mlp':
-            tr.test_results(model_name, model_type, test_dataset, output_dir)
+            tr.test_results(model_name, model_type, test_dataset, output_dir, class_labels=label_mapping)
             print("MLP testing completed.")
         else:
             print(f"The {model_type} is not available.")

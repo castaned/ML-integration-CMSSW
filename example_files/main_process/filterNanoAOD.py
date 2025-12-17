@@ -9,7 +9,7 @@ import math
 import itertools
 
 
-MAPPING_FILE = "src/DeepNTuples/data_processing/mapping.json"  # JSON file to store dataset mappings
+MAPPING_FILE = "src/ml_framework/data_processing/mapping.json"  # JSON file to store dataset mappings
 def get_dataset_id(dataset_folder):
     if not os.path.exists(MAPPING_FILE):
         raise FileNotFoundError(f"Mapping file {MAPPING_FILE} does not exist.")
@@ -526,7 +526,7 @@ pp_kwargs = dict(
     outputDir=outputDir,
     inputFiles=[inputFile],
     cut=None,
-    branchsel="src/DeepNTuples/data_processing/example/branchsel.txt",
+    branchsel="src/ml_training/data_processing/example/branchsel.txt",
     outputbranchsel=None,
     modules=mods,
     noOut=False,
