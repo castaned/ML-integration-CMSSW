@@ -22,5 +22,4 @@ ssh username@lxplus.cern.ch
 
 Upon successful connection, you will be placed in your home directory.
 
-![LXPLUS log in](assets/images/fig02-lxplus-login.png)
 

@@ -36,15 +36,14 @@ nav:
     - cern-systems/02_storage.md
     - cern-systems/03_computing-resources.md
     - cern-systems/04_CMSSW.md
-  - Data processing:
-    - data-processing/01_GRID-authentication.md
-    - data-processing/02_dataset-discovery.md
-    - data-processing/03_framework-setup.md
-    - data-processing/04_code-explanation.md
-    - data-processing/05_configuration.md
-    - data-processing/06_execution.md
-  - Machine learning: 
-    - ml/index.md
+    - cern-systems/05_GRID-authentication.md
+    - cern-systems/06-NanoAOD.md
+    - cern-systems/07_dataset-discovery.md 
+  - Framework:
+    - framework/01_architecture.md
+#    - framework/02_data-processing.md
+#    - framework/03_ml.md
+    - framework/04_framework-setup.md
   - Example of usage:
     - usage/01_usage.md
 
@@ -53,4 +52,5 @@ markdown_extensions:
    - pymdownx.details
    - pymdownx.superfences
    - footnotes
-   
+   - attr_list
+   - md_in_html

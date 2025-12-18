@@ -4,6 +4,7 @@ Welcome to a comprehensive documentation for CMS Machine Learning Framework,  an
 
 This framework automates the full workflow inside CERN's destributed computing ecosystem, minimizing the amount of ML expertise required.
 
+The repository can be found in [ML-integration-CMSSW](https://github.com/castaned/ML-integration-CMSSW)
 ---
 
 ## What this Framework Provides

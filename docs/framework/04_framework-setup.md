@@ -35,7 +35,8 @@ cd some_name
 
 * `data_processing/`: Tools for retrieving, filtering, and converting CMS data
 
-* `ML_processing/`: Tools for training machine learning models and performing inference.
+* `ml_training/`: Tools for training machine learning models and performing inference.
 
-These components are designed to function independently. If you work only requires data processing, you may safely remove the `ML_processing/` directory.
+* `example_files`: Example files used in the [Example of usage](../usage/01_usage.md#example-of-usage) section of this documentation.
 
+These components are designed to function independently. If you work only requires data processing, you may safely remove the `ml_training/` directory.

@@ -10,8 +10,4 @@ As I mentioned, LXPLUS is just a cluster of login nodes, the CPU intense calcula
 
 CERN documentation states that SLURM is dedicated to running multi-nodes jobs (*e.g.* MPI programs), and that HTConodr should be used otherwise. In our case, no programs run in multi-node jobs.
 
-The following diagram illustrates how AFS, EOS, and HTCondor interact within the CERN ecosystem:
-
-![Visual diagram of interaction of AFS, EOS, and HTCondor](assets/images/fig03-afs-eos-htcondor.png)
-
 [^1]: In this context, a job refers to a user-defined computational task, or set of tasks, submitted to a cluster via a scheduler like SLURM or HTCondor.
