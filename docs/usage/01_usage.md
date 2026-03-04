@@ -48,7 +48,7 @@ data_processing:
     mem: 1.5GB
     disk: 2GB
     job_flavour: "espresso" # 20 minutes
-  processing_script: "src/ml_framework/new_dataproc/example/filterNanoAOD.py"
+  processing_script: "src/ml_framework/example_files/main_process/filterNanoAOD.py"
   eos_output_dir: "/eos/user/v/vminjare/test_dataprocessing"
   afs_cms_base: "/afs/cern.ch/user/v/vminjare/CMSSW_13_3_0"
   redirector: "cms-xrd-global.cern.ch"
