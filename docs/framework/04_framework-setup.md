@@ -31,7 +31,7 @@ git clone https://github.com/castaned/ML-integration-CMSSW some_name
 cd some_name
 ```
 
-`some_name` is the directory name for the cloned repository. The repository contains two main directories:
+`some_name` is the directory name for the cloned repository. In this example `some_name` will be `ml_framework`. The repository contains two main directories:
 
 * `data_processing/`: Tools for retrieving, filtering, and converting CMS data
 
