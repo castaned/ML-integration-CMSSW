@@ -10,20 +10,7 @@ We assume the following:
 - You have your processing scripts for your specific analysis.
 
 
-First, clone the GitHub repository:
-
-```bash
-git clone https://github.com/castaned/ML-integration-CMSSW <directory_name>
-cd <directory_name>
-
-```
-
-You can choose any `<directory_name>` you like. In this example `<directory_name>` will be `ml_framework`.
-
-!!!Info
-    Remember that all example files can be found in the `example_files` directory of the repository.
-   
-First, we processed and convert the data. We move to the data processing directory:
+Considering we are in `ml_framework` forlder we move to the data processing directory:
 
 ```bash
 cd data_processing
