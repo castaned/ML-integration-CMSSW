@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" role="img" aria-labelledby="title desc">
+  <title id="title">ML-integration-CMSSW Branch Overview</title>
+  <desc id="desc">Single-page branch distribution diagram showing main, plotting feature branch, docs, and gh-pages.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f1e8; }
+      .panel { fill: #fcfaf5; stroke: #d8cfbf; stroke-width: 2; }
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #1f2937; }
+      .subtitle { font: 400 18px 'Segoe UI', Arial, sans-serif; fill: #4b5563; }
+      .box-title { font: 700 24px 'Segoe UI', Arial, sans-serif; fill: #111827; }
+      .box-text { font: 400 17px 'Segoe UI', Arial, sans-serif; fill: #334155; }
+      .small { font: 400 15px 'Segoe UI', Arial, sans-serif; fill: #475569; }
+      .main { fill: #ffffff; stroke: #1f2937; stroke-width: 3; }
+      .feature { fill: #fff2cc; stroke: #b7791f; stroke-width: 4; }
+      .docs { fill: #eef4ff; stroke: #4361b3; stroke-width: 3; }
+      .pages { fill: #edf7f2; stroke: #2f7d57; stroke-width: 3; }
+      .note { fill: #fff8e8; stroke: #c08a1a; stroke-width: 3; }
+      .line { stroke: #475569; stroke-width: 4; fill: none; stroke-linecap: round; }
+      .dashed { stroke-dasharray: 10 10; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#475569"/>
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1400" height="820"/>
+  <rect class="panel" x="32" y="28" rx="28" ry="28" width="1336" height="764"/>
+
+  <text class="title" x="70" y="70">ML-integration-CMSSW</text>
+  <text class="subtitle" x="70" y="105">Current GitHub branch distribution</text>
+  <line x1="70" y1="128" x2="1330" y2="128" stroke="#d8cfbf" stroke-width="2"/>
+
+  <rect class="note" x="70" y="165" rx="20" ry="20" width="1260" height="76" filter="url(#shadow)"/>
+  <text class="box-text" x="100" y="208">Students currently on <tspan font-weight="700">main</tspan> can switch to <tspan font-weight="700">plotting-from-skimmed-ntuples</tspan> for isolated plotting development.</text>
+
+  <rect class="main" x="110" y="340" rx="24" ry="24" width="320" height="160" filter="url(#shadow)"/>
+  <text class="box-title" x="145" y="390">main</text>
+  <text class="box-text" x="145" y="425">origin/main</text>
+  <text class="box-text" x="145" y="455">commit: c3eaa03</text>
+  <text class="small" x="145" y="487">Current stable code line</text>
+
+  <rect class="feature" x="540" y="340" rx="24" ry="24" width="430" height="180" filter="url(#shadow)"/>
+  <text class="box-title" x="575" y="390">plotting-from-skimmed-ntuples</text>
+  <text class="box-text" x="575" y="425">origin/plotting-from-skimmed-ntuples</text>
+  <text class="box-text" x="575" y="455">commit: 080a951</text>
+  <text class="small" x="575" y="487">Adds plotting utility, config, and framework overview</text>
+  <text class="small" x="575" y="512">Recommended branch for plotting development</text>
+
+  <rect class="docs" x="1010" y="260" rx="24" ry="24" width="250" height="150" filter="url(#shadow)"/>
+  <text class="box-title" x="1045" y="310">docs</text>
+  <text class="box-text" x="1045" y="345">origin/docs</text>
+  <text class="box-text" x="1045" y="375">commit: ed59afa</text>
+  <text class="small" x="1045" y="403">MkDocs documentation source</text>
+
+  <rect class="pages" x="1010" y="500" rx="24" ry="24" width="250" height="150" filter="url(#shadow)"/>
+  <text class="box-title" x="1045" y="550">gh-pages</text>
+  <text class="box-text" x="1045" y="585">origin/gh-pages</text>
+  <text class="box-text" x="1045" y="615">commit: 692bf05</text>
+  <text class="small" x="1045" y="643">Published documentation site</text>
+
+  <path class="line" marker-end="url(#arrow)" d="M 430 420 L 540 420"/>
+  <path class="line dashed" marker-end="url(#arrow)" d="M 1135 410 L 1135 500"/>
+
+  <text class="small" x="455" y="400">feature branch created from main</text>
+  <text class="small" x="1150" y="465">site deployment flow</text>
+
+  <rect class="main" x="150" y="610" rx="18" ry="18" width="760" height="105" filter="url(#shadow)"/>
+  <text class="box-title" x="180" y="650">Recommended student workflow</text>
+  <text class="box-text" x="180" y="685">git fetch origin  ->  git checkout plotting-from-skimmed-ntuples  ->  git pull</text>
+
+</svg>
