@@ -22,6 +22,17 @@ plotting:
       bins: 8
       range: [0, 8]
       output: "nLeptons.png"
+      style:
+        cms_label: "CMS"
+        extra_label: "Preliminary"
+        lumi_label: "Run 2 (13 TeV)"
+        title_size: 20
+        label_size: 18
+        tick_size: 15
+        legend_size: 14
+        line_width: 2.8
+        fill_alpha: 0.18
+        figsize: [10, 7]
 
     - branch: "A_Zmass"
       title: "Channel A Z Mass"
@@ -30,6 +41,14 @@ plotting:
       range: [0, 200]
       selection: "A_pass > 0"
       output: "A_Zmass.png"
+      style:
+        cms_label: "CMS"
+        extra_label: "Simulation Preliminary"
+        lumi_label: "Run 2 (13 TeV)"
+        title_size: 20
+        label_size: 18
+        tick_size: 15
+        legend_size: 14
 
     - branch: "B_Wmass"
       title: "Channel B W Mass"
@@ -38,6 +57,14 @@ plotting:
       range: [0, 200]
       selection: "B_pass > 0"
       output: "B_Wmass.png"
+      style:
+        cms_label: "CMS"
+        extra_label: "Simulation Preliminary"
+        lumi_label: "Run 2 (13 TeV)"
+        title_size: 20
+        label_size: 18
+        tick_size: 15
+        legend_size: 14
 
     - branch: "Dataset_ID"
       title: "Dataset Identifier"
@@ -45,3 +72,11 @@ plotting:
       bins: 10
       range: [0, 10]
       output: "dataset_id.png"
+      style:
+        cms_label: "CMS"
+        extra_label: "Internal"
+        lumi_label: "Run 2 (13 TeV)"
+        title_size: 20
+        label_size: 18
+        tick_size: 15
+        legend_size: 14

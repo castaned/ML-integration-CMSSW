@@ -9,12 +9,12 @@ import yaml
 
 
 DEFAULT_COLORS = [
-    "#1f77b4",
-    "#d62728",
-    "#2ca02c",
-    "#9467bd",
-    "#ff7f0e",
-    "#8c564b",
+    "#3f90da",
+    "#ffa90e",
+    "#bd1f01",
+    "#94a4a2",
+    "#832db6",
+    "#a96b59",
 ]
 
 
@@ -108,14 +108,88 @@ def build_histogram(data, bins, value_range):
     return np.histogram(data, bins=bins, range=value_range)
 
 
+def apply_cms_style(style_config):
+    plt.rcParams.update(
+        {
+            "figure.facecolor": "white",
+            "axes.facecolor": "white",
+            "axes.edgecolor": "#1f2937",
+            "axes.linewidth": 1.8,
+            "axes.labelsize": style_config.get("label_size", 18),
+            "axes.titlesize": style_config.get("title_size", 20),
+            "xtick.labelsize": style_config.get("tick_size", 15),
+            "ytick.labelsize": style_config.get("tick_size", 15),
+            "xtick.major.size": 7,
+            "ytick.major.size": 7,
+            "xtick.major.width": 1.6,
+            "ytick.major.width": 1.6,
+            "legend.fontsize": style_config.get("legend_size", 14),
+            "font.family": style_config.get("font_family", "DejaVu Sans"),
+            "savefig.facecolor": "white",
+            "savefig.bbox": "tight",
+        }
+    )
+
+
+def draw_cms_label(ax, style_config):
+    cms_label = style_config.get("cms_label", "CMS")
+    extra_label = style_config.get("extra_label", "Preliminary")
+    lumi_label = style_config.get("lumi_label", "")
+
+    ax.text(
+        0.0,
+        1.03,
+        cms_label,
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=style_config.get("cms_size", 20),
+        fontweight="bold",
+        color="#111827",
+    )
+    if extra_label:
+        ax.text(
+            0.12,
+            1.03,
+            extra_label,
+            transform=ax.transAxes,
+            ha="left",
+            va="bottom",
+            fontsize=style_config.get("extra_size", 15),
+            style="italic",
+            color="#374151",
+        )
+    if lumi_label:
+        ax.text(
+            1.0,
+            1.03,
+            lumi_label,
+            transform=ax.transAxes,
+            ha="right",
+            va="bottom",
+            fontsize=style_config.get("lumi_size", 14),
+            color="#374151",
+        )
+
+
+def style_axes(ax):
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.tick_params(axis="both", which="major", direction="in", top=False, right=False)
+
+
 def plot_variable(plot_config, datasets, output_dir):
-    fig, ax = plt.subplots(figsize=(9, 6))
+    style_config = plot_config.get("style", {})
+    apply_cms_style(style_config)
+    fig, ax = plt.subplots(figsize=tuple(style_config.get("figsize", [10, 7])))
 
     bins = plot_config.get("bins", 40)
     value_range = tuple(plot_config["range"]) if plot_config.get("range") else None
     density = plot_config.get("density", False)
     normalize = plot_config.get("normalize", False)
     branch = plot_config["branch"]
+    line_width = style_config.get("line_width", 2.8)
+    fill_alpha = style_config.get("fill_alpha", 0.15)
 
     for index, dataset in enumerate(datasets):
         values = read_dataset_values(dataset, plot_config)
@@ -132,18 +206,26 @@ def plot_variable(plot_config, datasets, output_dir):
         color = dataset.get("color", DEFAULT_COLORS[index % len(DEFAULT_COLORS)])
         label = dataset_label(dataset, index)
 
-        ax.step(centers, counts, where="mid", linewidth=2, color=color, label=label)
+        ax.step(centers, counts, where="mid", linewidth=line_width, color=color, label=label)
+        ax.fill_between(centers, counts, step="mid", alpha=fill_alpha, color=color)
 
     ax.set_title(plot_config.get("title", branch))
     ax.set_xlabel(plot_config.get("xlabel", branch))
     ax.set_ylabel(plot_config.get("ylabel", "Normalized events" if (normalize or density) else "Events"))
-    ax.grid(True, alpha=0.25)
+    ax.grid(True, axis="y", alpha=0.18, linewidth=1.0)
     if plot_config.get("logy", False):
         ax.set_yscale("log")
     if value_range:
         ax.set_xlim(value_range)
-    ax.legend(frameon=False)
-    fig.tight_layout()
+    style_axes(ax)
+    draw_cms_label(ax, style_config)
+    ax.legend(
+        frameon=False,
+        loc=style_config.get("legend_loc", "upper right"),
+        ncol=style_config.get("legend_ncol", 1),
+        handlelength=2.8,
+    )
+    fig.tight_layout(pad=1.3)
 
     output_name = plot_config.get("output", f"{branch}.png")
     output_path = Path(output_dir) / output_name
