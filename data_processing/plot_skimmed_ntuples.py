@@ -186,7 +186,7 @@ def plot_variable(plot_config, datasets, output_dir):
     bins = plot_config.get("bins", 40)
     value_range = tuple(plot_config["range"]) if plot_config.get("range") else None
     density = plot_config.get("density", False)
-    normalize = plot_config.get("normalize", False)
+    normalize = plot_config.get("normalize", True)
     branch = plot_config["branch"]
     line_width = style_config.get("line_width", 2.8)
     fill_alpha = style_config.get("fill_alpha", 0.15)
@@ -211,7 +211,7 @@ def plot_variable(plot_config, datasets, output_dir):
 
     ax.set_title(plot_config.get("title", branch))
     ax.set_xlabel(plot_config.get("xlabel", branch))
-    ax.set_ylabel(plot_config.get("ylabel", "Normalized events" if (normalize or density) else "Events"))
+    ax.set_ylabel(plot_config.get("ylabel", "Arbitrary units" if (normalize or density) else "Events"))
     ax.grid(True, axis="y", alpha=0.18, linewidth=1.0)
     if plot_config.get("logy", False):
         ax.set_yscale("log")

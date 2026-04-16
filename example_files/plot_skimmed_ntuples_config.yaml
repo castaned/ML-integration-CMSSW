@@ -19,6 +19,7 @@ plotting:
     - branch: "nLeptons"
       title: "Lepton Multiplicity"
       xlabel: "nLeptons"
+      normalize: true
       bins: 8
       range: [0, 8]
       output: "nLeptons.png"
@@ -37,6 +38,7 @@ plotting:
     - branch: "A_Zmass"
       title: "Channel A Z Mass"
       xlabel: "A_Zmass [GeV]"
+      normalize: true
       bins: 40
       range: [0, 200]
       selection: "A_pass > 0"
@@ -53,6 +55,7 @@ plotting:
     - branch: "B_Wmass"
       title: "Channel B W Mass"
       xlabel: "B_Wmass [GeV]"
+      normalize: true
       bins: 40
       range: [0, 200]
       selection: "B_pass > 0"
@@ -69,6 +72,7 @@ plotting:
     - branch: "Dataset_ID"
       title: "Dataset Identifier"
       xlabel: "Dataset_ID"
+      normalize: true
       bins: 10
       range: [0, 10]
       output: "dataset_id.png"
