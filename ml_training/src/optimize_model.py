@@ -148,13 +148,9 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
     results = tuner.fit()
 
     best_hyperparam = results.get_best_result(metric="acc", mode="max").config
-    best_model = models.MLPmodel(
-                       input_size=dataset.num_features, 
-                       output_size=dataset.num_classes,
-                       hidden_input_size=best_hyperparam["hidden_input_size"], 
-                       hidden_output_size=best_hyperparam["hidden_output_size"], 
-                       num_layers=best_hyperparam["num_layers"]
-                       )
+    checkpoint_path = f"{output_dir}/best_model_{model_name}.pth"
+    param_model = torch.load(checkpoint_path, weights_only=True)
+    best_model = models.MLPmodel.get_model(dataset.num_features, dataset.num_classes, param_model)
 
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)
@@ -162,6 +158,159 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
     learn.convert_to_onnx(dataset.num_features, best_model, output_dir, model_name=f'{model_name}')
 
     ray.shutdown()
-    dataset.close()
     
+    return 0
+
+
+def train_autoencoder(hyperparam_space, train_dataset, val_dataset, ideal_loss, output_dir, model_name):
+    device = learn.get_device()
+    print(f"Device: {device}")
+
+    model = models.AutoencoderModel(
+        input_size=train_dataset.num_features,
+        latent_size=hyperparam_space["latent_size"],
+        hidden_input_size=hyperparam_space["hidden_input_size"],
+        hidden_output_size=hyperparam_space["hidden_output_size"],
+    ).to(device)
+
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=hyperparam_space["learning_rate"])
+    print(model)
+
+    patience = hyperparam_space["patience"]
+    best_val_loss = float("inf")
+    epochs_without_improvement = 0
+
+    num_epochs = hyperparam_space["num_epochs"]
+    batch_size = hyperparam_space["batch_size"]
+
+    checkpoint_path = f"{output_dir}/best_model_{model_name}.pth"
+
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_dataloader = DataLoader(val_dataset, batch_size=batch_size)
+
+    for epoch in range(num_epochs):
+        model.train()
+        train_loss_sum = 0.0
+
+        for X_batch, _ in train_dataloader:
+            X_batch = X_batch.to(device)
+            optimizer.zero_grad()
+
+            reconstruction = model(X_batch)
+            loss = criterion(reconstruction, X_batch)
+
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            optimizer.step()
+
+            train_loss_sum += loss.item()
+
+        train_loss = train_loss_sum / max(len(train_dataloader), 1)
+
+        val_loss_sum = 0.0
+        model.eval()
+        with torch.no_grad():
+            for X_batch, _ in val_dataloader:
+                X_batch = X_batch.to(device)
+                reconstruction = model(X_batch)
+                val_loss_sum += criterion(reconstruction, X_batch).item()
+
+        val_loss = val_loss_sum / max(len(val_dataloader), 1)
+
+        print(
+            f"Epoch {epoch + 1}/{num_epochs}, "
+            f"Train loss: {train_loss:.6f}, Val loss: {val_loss:.6f}"
+        )
+        tune.report({"loss": val_loss, "train_loss": train_loss, "val_loss": val_loss})
+
+        if ideal_loss is not None and val_loss <= ideal_loss:
+            torch.save({"model_state": model.state_dict(), "hyperparam": hyperparam_space}, checkpoint_path)
+            print("Early stopping: Ideal reconstruction loss reached")
+            break
+        if val_loss < best_val_loss:
+            torch.save({"model_state": model.state_dict(), "hyperparam": hyperparam_space}, checkpoint_path)
+            best_val_loss = val_loss
+            epochs_without_improvement = 0
+        else:
+            epochs_without_improvement += 1
+
+        if epochs_without_improvement >= patience:
+            print(f"Early stopping: Validation loss did not improve for {patience} epochs")
+            break
+
+    return 0
+
+
+def tune_autoencoder(model_name, model_type, train_dataset, val_dataset, ideal_loss, num_models, output_dir):
+    hyperparam_space = {
+        "hidden_input_size": tune.choice([64, 128, 256]),
+        "hidden_output_size": tune.choice([16, 32, 64]),
+        "latent_size": tune.choice([4, 8, 16, 32]),
+        "learning_rate": tune.loguniform(1e-4, 1e-2),
+        "batch_size": tune.choice([128, 256, 512, 1024]),
+        "num_epochs": tune.choice([300]),
+        "patience": tune.choice([10]),
+    }
+
+    scheduler = ASHAScheduler(
+        metric="val_loss",
+        mode="min",
+        max_t=100,
+        grace_period=10,
+        reduction_factor=2,
+    )
+
+    ray.init()
+    resources = ray.available_resources()
+    num_cpus = int(resources.get("CPU", 1))
+    num_gpus = int(resources.get("GPU", 0))
+    print(f"CPUs avail: {num_cpus}, GPUs avail: {num_gpus}")
+
+    trainable = tune.with_resources(
+        tune.with_parameters(
+            train_autoencoder,
+            train_dataset=train_dataset,
+            val_dataset=val_dataset,
+            ideal_loss=ideal_loss,
+            output_dir=output_dir,
+            model_name=model_name,
+        ),
+        resources={"cpu": num_cpus, "gpu": num_gpus},
+    )
+
+    mlflow_callback = MLflowLoggerCallback(
+        tracking_uri=f"{output_dir}/mlruns",
+        experiment_name=f"{model_name}",
+        tags={"project": "ML_CMSSW_integration", "model": model_type},
+        save_artifact=True,
+    )
+
+    tuner = tune.Tuner(
+        trainable,
+        param_space=hyperparam_space,
+        tune_config=tune.TuneConfig(
+            num_samples=num_models,
+            scheduler=scheduler,
+        ),
+        run_config=tune.RunConfig(
+            storage_path=f"{output_dir}/tune_results",
+            callbacks=[mlflow_callback],
+        ),
+    )
+
+    results = tuner.fit()
+
+    best_hyperparam = results.get_best_result(metric="val_loss", mode="min").config
+    checkpoint_path = f"{output_dir}/best_model_{model_name}.pth"
+    param_model = torch.load(checkpoint_path, weights_only=True)
+    best_model = models.AutoencoderModel.get_model(train_dataset.num_features, param_model)
+
+    print("Best hyperparameters found were: ", best_hyperparam)
+    print("Best model architecture:", best_model)
+
+    learn.convert_to_onnx(train_dataset.num_features, best_model, output_dir, model_name=f"{model_name}")
+
+    ray.shutdown()
+
     return 0

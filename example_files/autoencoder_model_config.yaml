@@ -4,12 +4,11 @@ data:
     - "test_conversionh5/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM"
     - "test_conversionh5/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM"
 
-  # Optional split by role for anomaly detection
+  # Optional explicit split by role
   input_paths_normal: []
   input_paths_anomaly: []
 
-  
-  output_path: "results"
+  output_path: "results_autoencoder"
 
   features:
     - "A_Dr_Z"
@@ -17,23 +16,15 @@ data:
     - "MET_pt"
     - "B_Zmass"
     - "B_Dr_Z"
-    
 
   label: "Dataset_ID"
-
   num_classes: 2
-  
-  # Leave this blank if you do not want to apply a mapping
   label_mapping: "short_name_mapping.json"
-  
+
 model:
-  name: "mlp_binary_test"
-
-  type: "mlp"
-
-  ideal_accuracy: 95
-  ideal_loss: null
-
+  name: "ae_binary_test"
+  type: "autoencoder"
+  ideal_loss: 0.01
   num_models: 3
 
 anomaly_detection:

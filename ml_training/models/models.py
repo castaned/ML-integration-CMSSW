@@ -7,6 +7,10 @@ class MLPTransform:
         flatten = torch.cat([value.flatten() for value in data.values()])
         return flatten
 
+
+class AutoencoderTransform(MLPTransform):
+    pass
+
 class MLPmodel(nn.Module):
     def __init__(self, input_size, output_size, hidden_input_size, hidden_output_size, num_layers):
         super(MLPmodel, self).__init__()
@@ -44,5 +48,44 @@ class MLPmodel(nn.Module):
             hidden_output_size=hyperparam["hidden_output_size"],
             num_layers=hyperparam["num_layers"]
             )
+        model.load_state_dict(param_model["model_state"])
+        return model
+
+
+class AutoencoderModel(nn.Module):
+    def __init__(self, input_size, latent_size, hidden_input_size, hidden_output_size):
+        super(AutoencoderModel, self).__init__()
+
+        self.encoder = nn.Sequential(
+            nn.Linear(input_size, hidden_input_size),
+            nn.ReLU(),
+            nn.Linear(hidden_input_size, hidden_output_size),
+            nn.ReLU(),
+            nn.Linear(hidden_output_size, latent_size),
+            nn.ReLU(),
+        )
+
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_size, hidden_output_size),
+            nn.ReLU(),
+            nn.Linear(hidden_output_size, hidden_input_size),
+            nn.ReLU(),
+            nn.Linear(hidden_input_size, input_size),
+        )
+
+    def forward(self, x):
+        latent = self.encoder(x)
+        reconstruction = self.decoder(latent)
+        return reconstruction
+
+    @classmethod
+    def get_model(cls, input_size, param_model):
+        hyperparam = param_model["hyperparam"]
+        model = cls(
+            input_size=input_size,
+            latent_size=hyperparam["latent_size"],
+            hidden_input_size=hyperparam["hidden_input_size"],
+            hidden_output_size=hyperparam["hidden_output_size"],
+        )
         model.load_state_dict(param_model["model_state"])
         return model

@@ -4,6 +4,10 @@ data:
     - ""
     - ""
 
+  # Optional split by role for anomaly detection
+  input_paths_normal: []
+  input_paths_anomaly: []
+
   
   output_path: ""
 
@@ -23,7 +27,18 @@ model:
 
   type: ""
 
+  # Used by the MLP path
   ideal_accuracy: 
 
+  # Used by the autoencoder path
+  ideal_loss: null
+
   num_models:
+
+anomaly_detection:
+  normal_labels: []
+  anomaly_labels: []
+  val_size: 0.2
+  test_size: 0.2
+  seed: 16
   

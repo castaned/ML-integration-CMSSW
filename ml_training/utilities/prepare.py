@@ -71,9 +71,28 @@ class h5Dataset(Dataset):
         return x, y
                 
     def close(self):
-        for file in self.files:
+        for idx, file in enumerate(self.files):
             if file:
                 file.close()
+                self.files[idx] = None
+
+    def get_all_labels(self):
+        labels = []
+        opened_files = {}
+        try:
+            for file_id, event_id in self.global_ids:
+                if file_id not in opened_files:
+                    opened_files[file_id] = h5py.File(self.file_paths[file_id], "r")
+                labels.append(int(opened_files[file_id][self.label][event_id]))
+        finally:
+            for handle in opened_files.values():
+                handle.close()
+        return np.asarray(labels, dtype=int)
+
+    def filter_global_ids_by_labels(self, accepted_labels):
+        accepted_labels = set(int(label) for label in accepted_labels)
+        labels = self.get_all_labels()
+        return [self.global_ids[idx] for idx, label in enumerate(labels) if label in accepted_labels]
 
 
 def split_and_transform_pythorch(h5_dataset, test_size, batch_size, train_suffle=True):
@@ -96,5 +115,67 @@ def split_h5Dataset(dataset, test_size, seed):
             test_size=test_size,
             random_state=seed,
             shuffle=True,
-        )
+    )
     return train_idx, test_idx
+
+
+def split_global_ids(global_ids, test_size, seed):
+    if not global_ids:
+        return [], []
+
+    if test_size <= 0:
+        return list(global_ids), []
+    if test_size >= 1:
+        return [], list(global_ids)
+
+    train_ids, test_ids = train_test_split(
+        list(global_ids),
+        test_size=test_size,
+        random_state=seed,
+        shuffle=True,
+    )
+    return list(train_ids), list(test_ids)
+
+
+def build_autoencoder_splits(dataset, normal_labels, anomaly_labels, val_size, test_size, seed):
+    if val_size < 0 or test_size < 0 or (val_size + test_size) >= 1:
+        raise ValueError("val_size and test_size must be >= 0 and their sum must be < 1")
+
+    normal_ids = dataset.filter_global_ids_by_labels(normal_labels)
+    anomaly_ids = dataset.filter_global_ids_by_labels(anomaly_labels)
+
+    if not normal_ids:
+        raise ValueError("No events found for the requested normal_labels")
+    if not anomaly_ids:
+        raise ValueError("No events found for the requested anomaly_labels")
+
+    heldout_fraction = val_size + test_size
+    train_normal_ids, heldout_normal_ids = split_global_ids(normal_ids, heldout_fraction, seed)
+
+    if not heldout_normal_ids:
+        raise ValueError("No normal events left for validation/testing after the split")
+
+    if heldout_fraction == 0:
+        val_normal_ids, test_normal_ids = [], []
+    else:
+        test_fraction_inside_heldout = test_size / heldout_fraction if heldout_fraction > 0 else 0
+        val_normal_ids, test_normal_ids = split_global_ids(heldout_normal_ids, test_fraction_inside_heldout, seed + 1)
+
+    if heldout_fraction == 0:
+        val_anomaly_ids, test_anomaly_ids = [], []
+    else:
+        test_fraction_inside_heldout = test_size / heldout_fraction if heldout_fraction > 0 else 0
+        val_anomaly_ids, test_anomaly_ids = split_global_ids(anomaly_ids, test_fraction_inside_heldout, seed + 2)
+
+    rng = np.random.default_rng(seed)
+    val_ids = list(val_normal_ids) + list(val_anomaly_ids)
+    test_ids = list(test_normal_ids) + list(test_anomaly_ids)
+    rng.shuffle(val_ids)
+    rng.shuffle(test_ids)
+
+    return {
+        "train_normal": list(train_normal_ids),
+        "val_normal": list(val_normal_ids),
+        "val_mixed": val_ids,
+        "test_mixed": test_ids,
+    }
