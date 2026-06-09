@@ -146,6 +146,36 @@ def _plot_reconstruction_hist(scores, binary_labels, output_dir, model_name, spl
     plt.close()
 
 
+def _plot_reconstruction_events(scores, binary_labels, output_dir, model_name, split_name, threshold=None, max_events=300):
+    if scores.size == 0:
+        return
+
+    limit = min(int(max_events), scores.size)
+    event_ids = np.arange(limit)
+    visible_scores = scores[:limit]
+    visible_labels = binary_labels[:limit]
+
+    normal_mask = visible_labels == 0
+    anomaly_mask = visible_labels == 1
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(event_ids, visible_scores, color="0.7", linestyle="--", linewidth=1, alpha=0.8)
+    plt.scatter(event_ids[normal_mask], visible_scores[normal_mask], s=20, color="tab:blue", label="normal")
+    plt.scatter(event_ids[anomaly_mask], visible_scores[anomaly_mask], s=28, color="tab:red", label="anomaly")
+
+    if threshold is not None:
+        plt.axhline(threshold, color="black", linestyle=":", linewidth=1.5, label=f"threshold = {threshold:.4g}")
+
+    plt.xlabel(f"Event index (first {limit} events)")
+    plt.ylabel("Reconstruction error")
+    plt.title(f"Reconstruction Error by Event ({split_name})")
+    plt.legend(frameon=False)
+    plt.tight_layout()
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}.png", dpi=180)
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}.pdf")
+    plt.close()
+
+
 def _plot_binary_roc(scores, binary_labels, output_dir, model_name):
     fpr, tpr, _ = roc_curve(binary_labels, scores)
     roc_auc = auc(fpr, tpr)
@@ -239,10 +269,12 @@ def test_autoencoder_results(
     _plot_reconstruction_hist(val_scores, val_binary, output_dir, model_name, "val")
     _plot_reconstruction_hist(test_scores, test_binary, output_dir, model_name, "test")
 
+    threshold = _best_f1_threshold(val_scores, val_binary)
+    _plot_reconstruction_events(val_scores, val_binary, output_dir, model_name, "val", threshold=threshold)
+    _plot_reconstruction_events(test_scores, test_binary, output_dir, model_name, "test", threshold=threshold)
+
     roc_auc = _plot_binary_roc(test_scores, test_binary, output_dir, model_name)
     pr_auc = _plot_binary_pr(test_scores, test_binary, output_dir, model_name)
-
-    threshold = _best_f1_threshold(val_scores, val_binary)
     confusion_summary = _plot_binary_confusion(test_scores, test_binary, threshold, output_dir, model_name)
 
     summary = {
