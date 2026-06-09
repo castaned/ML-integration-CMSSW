@@ -175,6 +175,50 @@ def _plot_reconstruction_events(scores, binary_labels, output_dir, model_name, s
     plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}.pdf")
     plt.close()
 
+    positive_scores = np.maximum(visible_scores, 1e-12)
+    positive_threshold = max(float(threshold), 1e-12) if threshold is not None else None
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(event_ids, positive_scores, color="0.7", linestyle="--", linewidth=1, alpha=0.8)
+    plt.scatter(event_ids[normal_mask], positive_scores[normal_mask], s=20, color="tab:blue", label="normal")
+    plt.scatter(event_ids[anomaly_mask], positive_scores[anomaly_mask], s=28, color="tab:red", label="anomaly")
+
+    if positive_threshold is not None:
+        plt.axhline(positive_threshold, color="black", linestyle=":", linewidth=1.5, label=f"threshold = {threshold:.4g}")
+
+    plt.yscale("log")
+    plt.xlabel(f"Event index (first {limit} events)")
+    plt.ylabel("Reconstruction error (log scale)")
+    plt.title(f"Reconstruction Error by Event ({split_name}, log scale)")
+    plt.legend(frameon=False)
+    plt.tight_layout()
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}_log.png", dpi=180)
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}_log.pdf")
+    plt.close()
+
+    zoom_max = np.percentile(visible_scores, 95) if visible_scores.size > 1 else visible_scores.max()
+    if threshold is not None:
+        zoom_max = max(zoom_max, threshold * 1.1)
+    zoom_max = max(float(zoom_max), 1e-12)
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(event_ids, visible_scores, color="0.7", linestyle="--", linewidth=1, alpha=0.8)
+    plt.scatter(event_ids[normal_mask], visible_scores[normal_mask], s=20, color="tab:blue", label="normal")
+    plt.scatter(event_ids[anomaly_mask], visible_scores[anomaly_mask], s=28, color="tab:red", label="anomaly")
+
+    if threshold is not None:
+        plt.axhline(threshold, color="black", linestyle=":", linewidth=1.5, label=f"threshold = {threshold:.4g}")
+
+    plt.ylim(0, zoom_max)
+    plt.xlabel(f"Event index (first {limit} events)")
+    plt.ylabel("Reconstruction error")
+    plt.title(f"Reconstruction Error by Event ({split_name}, zoomed)")
+    plt.legend(frameon=False)
+    plt.tight_layout()
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}_zoom.png", dpi=180)
+    plt.savefig(f"{output_dir}/reconstruction_error_events_{split_name}_{model_name}_zoom.pdf")
+    plt.close()
+
 
 def _plot_binary_roc(scores, binary_labels, output_dir, model_name):
     fpr, tpr, _ = roc_curve(binary_labels, scores)
