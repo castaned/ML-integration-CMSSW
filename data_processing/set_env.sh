@@ -1,5 +1,4 @@
 #!/bin/bash
-
 echo "Starting job on $(date)"
 echo "Running on: $(hostname)"
 

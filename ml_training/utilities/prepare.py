@@ -69,7 +69,37 @@ class h5Dataset(Dataset):
             x = self.transform(x)
             
         return x, y
-                
+
+    def __getitems__(self, indices):
+        by_file = {}
+        for pos, idx in enumerate(indices):
+            file_id, event_id = self.global_ids[idx]
+            by_file.setdefault(file_id, []).append((event_id, pos))
+
+        results = [None] * len(indices)
+
+        for file_id, pairs in by_file.items():
+            # h5py fancy indexing requires ascending, unique order
+            pairs.sort(key=lambda p: p[0])
+            event_ids = [p[0] for p in pairs]
+            positions = [p[1] for p in pairs]
+
+            if self.files[file_id] is None:
+                self.files[file_id] = h5py.File(self.file_paths[file_id], "r")
+            file_h5 = self.files[file_id]
+
+            feat_arrays = {f: file_h5[f][event_ids] for f in self.features}
+            label_array = file_h5[self.label][event_ids]
+
+            for i, pos in enumerate(positions):
+                x = {f: torch.tensor(feat_arrays[f][i], dtype=torch.float32) for f in self.features}
+                y = torch.tensor(label_array[i], dtype=torch.long)
+                if self.transform:
+                    x = self.transform(x)
+                results[pos] = (x, y)
+
+        return results
+
     def close(self):
         for file in self.files:
             if file:
@@ -82,8 +112,14 @@ def split_and_transform_pythorch(h5_dataset, test_size, batch_size, train_suffle
     train_len  = len(h5_dataset) - test_len
     train_set, test_set = random_split(h5_dataset, [train_len, test_len])
     
-    train_dataloader = DataLoader(train_set, batch_size=batch_size, shuffle=train_suffle)
-    test_dataloader = DataLoader(test_set, batch_size=batch_size)
+    train_dataloader = DataLoader(
+        train_set, batch_size=batch_size, shuffle=train_suffle,
+        num_workers=4, pin_memory=True, persistent_workers=True,
+    )
+    test_dataloader = DataLoader(
+        test_set, batch_size=batch_size,
+        num_workers=2, pin_memory=True, persistent_workers=True,
+    )
     
     return train_dataloader, test_dataloader
 

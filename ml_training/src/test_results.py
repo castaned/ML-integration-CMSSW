@@ -87,7 +87,10 @@ def test_results(model_name, model_type, dataset, output_dir, batch_size=2048, c
         model = models.MLPmodel.get_model(dataset.num_features, dataset.num_classes, param_model)
     print(model)
     
-    dataloader = DataLoader(dataset, batch_size=batch_size)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size,
+        num_workers=4, pin_memory=True, persistent_workers=True,
+    )
     
     all_outputs = []
     all_labels = []

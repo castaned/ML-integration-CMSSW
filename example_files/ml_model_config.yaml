@@ -1,11 +1,10 @@
 ---
 data:
   input_paths:
-    - "test_conversionh5/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM"
-    - "test_conversionh5/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8_RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1_NANOAODSIM"
+    - "/lustre/home/hacosta/Open-Data/Processed/h5/fondo"
+    - "/lustre/home/hacosta/Open-Data/Processed/h5/senal"
 
-  
-  output_path: "results"
+  output_path: "/lustre/home/hacosta/Open-Data/results"
 
   features:
     - "A_Dr_Z"
@@ -13,20 +12,18 @@ data:
     - "MET_pt"
     - "B_Zmass"
     - "B_Dr_Z"
-    
 
   label: "Dataset_ID"
 
   num_classes: 2
-  
-  # Leave this blank if you do not want to apply a mapping
-  label_mapping: "short_name_mapping.json"
-  
+
+  label_mapping: "/lustre/home/hacosta/Open-Data/CMSS/data_processing/mapping.json"
+
 model:
-  name: "mlp_binary_test"
+  name: "mlp_signal_bkg"
 
   type: "mlp"
 
-  ideal_accuracy: 95
+  ideal_accuracy: 90
 
   num_models: 3

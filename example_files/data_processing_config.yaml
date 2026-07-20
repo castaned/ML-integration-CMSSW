@@ -1,27 +1,28 @@
 ---
 proxy:
-  generate: 1 # 1 yes, 0 no
+  generate: 0 
   voms: "cms"
   proxy_time: "192:00"
   proxy_path: "$HOME/.globus/x509up_u$(id -u)"
 
 data_processing:
-  condor_params:
+  input_mode: "open_data"
+  conda_env: "cd" 
+  slurm_params:
     executable_file: "run_filter.sh"
-    cpus: 1
-    gpus: 0
-    mem: 1.5GB
-    disk: 2GB
-    job_flavour: "espresso" # 20 minutes
-  processing_script: "src/ml_framework/data_processing/main_process/filterNanoAOD.py"
-  eos_output_dir: "/eos/user/v/vminjare/test_dataprocessing"
-  afs_cms_base: "/afs/cern.ch/user/v/vminjare/CMSSW_13_3_0"
-  redirector: "cms-xrd-global.cern.ch"
+    cpus: 1 
+    gpus: 0 
+    mem: "4000M" 
+    time: "04:00:00" 
+    partition: "cpu"
+  processing_script: "example_files/main_process/filterNanoAOD.py"
+  eos_output_dir: "/lustre/home/hacosta/Open-Data/Processed/root" 
+  redirector: ""
   datasets:
-    - LFN: "/ZGToLLG_01J_5f_TuneCP5_13TeV-amcatnloFXFX-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
-      ID: 0 
-      amount: 3 # -1 is all root files
-    - LFN: "/WprimeToWZToWlepZlep_narrow_M1000_TuneCP5_13TeV-madgraph-pythia8/RunIISummer20UL18NanoAODv9-106X_upgrade2018_realistic_v16_L1v1-v1/NANOAODSIM"
+    - name: "fondo"
+      ID: 0
+      path: "/lustre/home/hacosta/Open-Data/Data/fondo"
+    - name: "senal"
       ID: 1
-      amount: -1
-    
+      path: "/lustre/home/hacosta/Open-Data/Data/senal"
+

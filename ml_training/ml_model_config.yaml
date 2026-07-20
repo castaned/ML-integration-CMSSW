@@ -1,29 +1,29 @@
 ---
 data:
   input_paths:
-    - ""
-    - ""
+    - "/lustre/home/hacosta/Open-Data/Processed/h5/fondo"
+    - "/lustre/home/hacosta/Open-Data/Processed/h5/senal"
 
-  
-  output_path: ""
+  output_path: "/lustre/home/hacosta/Open-Data/results"
 
   features:
-    - ""
-    - ""
+    - "A_Dr_Z"
+    - "A_Zmass"
+    - "MET_pt"
+    - "B_Zmass"
+    - "B_Dr_Z"
 
-  label: ""
+  label: "Dataset_ID"
 
-  num_classes: 
-  
-  # Leave this as null if you do not want to apply a mapping
-  label_mapping: null
-  
+  num_classes: 2
+
+  label_mapping: "/lustre/home/hacosta/Open-Data/CMSS/data_processing/mapping.json"
+
 model:
-  name: ""
+  name: "mlp_signal_bkg"
 
-  type: ""
+  type: "mlp"
 
-  ideal_accuracy: 
+  ideal_accuracy: 90
 
-  num_models:
-  
+  num_models: 3

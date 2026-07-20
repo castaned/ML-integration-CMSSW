@@ -42,7 +42,10 @@ def onnx_inference(onnx_path, dataset, batch_size=2048):
     ort_session = ort.InferenceSession(onnx_path)
     input_name = ort_session.get_inputs()[0].name
     
-    dataloader = DataLoader(dataset, batch_size=batch_size)
+    dataloader = DataLoader(
+        dataset, batch_size=batch_size,
+        num_workers=4, persistent_workers=True,
+    )
     
     predictions_all = []
     probabilities_all = []

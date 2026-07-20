@@ -12,8 +12,13 @@ def main(config_path):
    
    config = utils.load_config(config_path)
    convertion = utils.require_key(config, 'convertion')
-   condor_params = utils.require_key(config, 'condor_params')
-   
+   slurm_params = utils.require_key(config, 'slurm_params')
+   conda_env = utils.require_key(convertion, 'conda_env')
+
+   # Raiz del repo (dos niveles arriba de convert_h5/), para el PYTHONPATH
+   # de run_conversion.sh.
+   project_dir = os.path.dirname(parent_dir)
+
    input_dirs = utils.require_key(convertion, 'input_dirs')
    tree_name = utils.require_key(convertion,'tree_name')
    branches = utils.require_key(convertion,'branches')
@@ -40,11 +45,11 @@ def main(config_path):
 
    utils.write_args_file("args_conversion.dat", args_dat)
 
-   lxplus.set_env_vars_conversion(tree_name, branches, max_jagged_len)
+   lxplus.set_env_vars_conversion(tree_name, branches, max_jagged_len, project_dir, conda_env)
 
-   condor_file = lxplus.create_condor_convert_file(condor_params)
-   
-   utils.submit_condor(condor_file)
+   slurm_file = lxplus.create_slurm_convert_script(slurm_params, len(args_dat))
+
+   utils.submit_slurm(slurm_file)
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert NanoAOD root file to h5 file")
