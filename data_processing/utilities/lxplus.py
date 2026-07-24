@@ -133,8 +133,9 @@ def build_args_open_data(datasets, eos_output_dir):
 
 
 # This function sets env variables that will be transferred to the worker
-# nodes via `#SBATCH --export=ALL` in el script de Slurm. Esto reduce el
-# numero de argumentos que hay que pasarle al ejecutable.
+# nodes via `getenv` en el .jdl de HTCondor, o via `#SBATCH --export=ALL` en
+# el script de Slurm (segun el scheduler elegido). Esto reduce el numero de
+# argumentos que hay que pasarle al ejecutable.
 #
 # Nota: ya no se necesita AFS_CMS_BASE / empaquetar un area de CMSSW, porque
 # run_filter.sh ahora usa mini_nanotools (PyROOT puro) en vez de
@@ -159,6 +160,87 @@ def set_env_vars_conversion(tree_name, branches, max_jagged_len, project_dir, co
     os.environ["CONDA_ENV_NAME"] = conda_env
 
 
+# ---------------------------------------------------------------------------
+# HTCondor
+# ---------------------------------------------------------------------------
+# HTCondor resuelve el equivalente al array job de Slurm de forma nativa con
+# `queue ... from args_processing.dat`: encola un job por cada linea del
+# archivo y le pasa las columnas como variables ($(INPUT_FILE), $(LFN),
+# $(OUTPUT_DIR)), sin necesidad de pasar n_jobs ni de parsear el archivo a
+# mano dentro del job (a diferencia de Slurm, que necesita conocer n_jobs de
+# antemano para `#SBATCH --array=1-N` y luego usar SLURM_ARRAY_TASK_ID + sed).
+def _condor_resource_lines(condor_params):
+    cpus, mem, disk, job_flavour = (
+        utils.require_key(condor_params, k)
+        for k in ("cpus", "mem", "disk", "job_flavour")
+    )
+    gpus = condor_params.get("gpus", 0)
+    requirements = condor_params.get("requirements")
+
+    lines = [
+        f"request_cpus            = {cpus}",
+        f"request_memory          = {mem}",
+        f"request_disk            = {disk}",
+    ]
+    if gpus and int(gpus) > 0:
+        lines.append(f"request_gpus            = {gpus}")
+    lines.append(f'+JobFlavour             = "{job_flavour}"')
+    if requirements:
+        lines.append(f"requirements            = {requirements}")
+    return "\n".join(lines)
+
+
+def create_condor_processing_file(condor_params):
+    os.makedirs("logs", exist_ok=True)
+    name_file = "processing.jdl"
+    exe = utils.require_key(condor_params, "executable_file")
+    resource_lines = _condor_resource_lines(condor_params)
+
+    with open(name_file, "w") as f:
+        f.write(f"""universe                 = vanilla
+executable              = {exe}
+arguments               = "$(INPUT_FILE) $(LFN) $(OUTPUT_DIR)"
+getenv                  = X509_USER_PROXY,EOS_OUTPUT_DIR,PROJECT_DIR,CONDA_ENV_NAME,PROCESSING_SCRIPT
+should_transfer_files   = NO
+output                  = logs/job_$(ClusterId)_$(ProcId).out
+error                   = logs/job_$(ClusterId)_$(ProcId).err
+log                     = logs/job_$(ClusterId)_$(ProcId).log
+{resource_lines}
+retry                   = 5
+queue INPUT_FILE, LFN, OUTPUT_DIR from args_processing.dat
+""")
+        return name_file
+
+
+def create_condor_convert_file(condor_params):
+    os.makedirs("logs", exist_ok=True)
+    name_file = "converting.jdl"
+    exe = utils.require_key(condor_params, "executable_file")
+    resource_lines = _condor_resource_lines(condor_params)
+
+    with open(name_file, "w") as f:
+        f.write(f"""universe                 = vanilla
+executable              = {exe}
+arguments               = "$(INPUT_FILE) $(OUTPUT_FILE)"
+getenv                  = TREE_NAME,BRANCHES,MAX_JAGGED_LEN,PROJECT_DIR,CONDA_ENV_NAME
+should_transfer_files   = NO
+output                  = logs/job_$(ClusterId)_$(ProcId).out
+error                   = logs/job_$(ClusterId)_$(ProcId).err
+log                     = logs/job_$(ClusterId)_$(ProcId).log
+{resource_lines}
+retry                   = 5
+queue INPUT_FILE, OUTPUT_FILE from args_conversion.dat
+""")
+        return name_file
+
+
+# ---------------------------------------------------------------------------
+# Slurm
+# ---------------------------------------------------------------------------
+# Slurm no tiene un equivalente nativo a `queue ... from file`, asi que aqui
+# si necesitamos saber n_jobs de antemano para declarar el array
+# (`#SBATCH --array=1-N`) y, dentro del job, usar SLURM_ARRAY_TASK_ID + sed
+# para leer la linea que le toca a cada tarea del array.
 def _slurm_resource_lines(slurm_params):
     cpus, gpus, mem, time = (
         utils.require_key(slurm_params, k) for k in ("cpus", "gpus", "mem", "time")

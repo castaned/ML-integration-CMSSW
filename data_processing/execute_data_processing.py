@@ -19,10 +19,20 @@ def main(config_path):
             f"input_mode invalido: '{input_mode}' (valores permitidos: 'cms_das', 'open_data')"
         )
 
+    # "condor" (default, HTCondor via `queue ... from args_processing.dat`) o
+    # "slurm" (array job via `#SBATCH --array`).
+    scheduler = processing_config.get("scheduler", "condor")
+    if scheduler not in ("condor", "slurm"):
+        raise ValueError(
+            f"scheduler invalido: '{scheduler}' (valores permitidos: 'condor', 'slurm')"
+        )
+
     datasets = utils.require_key(processing_config, "datasets")
     eos_output_dir = utils.require_key(processing_config, "eos_output_dir")
     conda_env = utils.require_key(processing_config, "conda_env")
-    slurm_params = utils.require_key(processing_config, "slurm_params")
+    scheduler_params = utils.require_key(
+        processing_config, "condor_params" if scheduler == "condor" else "slurm_params"
+    )
     processing_script = utils.require_key(processing_config, "processing_script")
 
     project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,9 +64,12 @@ def main(config_path):
 
     utils.write_map_file("mapping.json", mapping)
 
-    name_file = lxplus.create_slurm_processing_script(slurm_params, len(args_dat))
-
-    utils.submit_slurm(name_file)
+    if scheduler == "condor":
+        name_file = lxplus.create_condor_processing_file(scheduler_params)
+        utils.submit_condor(name_file)
+    else:
+        name_file = lxplus.create_slurm_processing_script(scheduler_params, len(args_dat))
+        utils.submit_slurm(name_file)
 
 
 if __name__ == "__main__":

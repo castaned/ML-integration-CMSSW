@@ -44,5 +44,9 @@ def write_map_file(json_name, data, indent=2):
         json.dump(data, json_file, indent=indent)
 
 
+def submit_condor(condor_file):
+    exe_cmd(["condor_submit", condor_file])
+
+
 def submit_slurm(slurm_script):
     exe_cmd(["sbatch", slurm_script])

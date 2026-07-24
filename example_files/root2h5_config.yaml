@@ -112,10 +112,21 @@ convertion:
   max_jagged_len: null
   
   eos_output_dir: "/lustre/home/hacosta/Open-Data/Processed/h5"
+# "condor" (HTCondor, requiere condor_params) o "slurm" (requiere slurm_params)
+scheduler: "condor"
+
+condor_params:
+  executable_file: "run_conversion.sh"
+  cpus: 1
+  gpus: 0
+  mem: "1500MB"
+  disk: "1GB"
+  job_flavour: "espresso" # 20 min (equivalente Slurm: time 00:20:00)
+
 slurm_params:
   executable_file: "run_conversion.sh"
   cpus: 1
   gpus: 0
   mem: "1500M"
   time: "00:20:00"
-  partition: "cpu" 
+  partition: "cpu"

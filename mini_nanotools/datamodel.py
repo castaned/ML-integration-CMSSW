@@ -4,9 +4,14 @@ _COUNTER_RE = re.compile(r"^n[A-Z]")
 
 
 class Event(object):
-    """Envuelve una entrada (evento) ya cargada de un TTree de entrada."""
+    """Envuelve una entrada (evento) ya cargada de un TTree de entrada.
+
+    Permite `event.MET_pt`, `event.HLT_Mu50`, etc. igual que en
+    PhysicsTools.NanoAODTools.
+    """
 
     def __init__(self, tree, entry):
+        # Evitar pasar por __setattr__/__getattr__ personalizados para estos:
         object.__setattr__(self, "_tree", tree)
         object.__setattr__(self, "_entry", entry)
         object.__setattr__(self, "_cache", {})

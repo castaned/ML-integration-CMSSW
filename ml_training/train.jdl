@@ -1,0 +1,21 @@
+environment = \
+    EOS_INPUT_DIR=; \
+    EOS_OUTPUT_DIR=; \
+    REDIRECTOR=root://eosuser.cern.ch; \
+    RESULTS_DIR=results/
+
+universe                = vanilla
+executable              = run_training.sh
+getenv                  = CONDA_ENV_NAME,CONDA_SETUP_SCRIPT
+should_transfer_files   = NO
+x509userproxy           = $ENV(X509_USER_PROXY)
+output                  = logs/job_$(ClusterId).out
+error                   = logs/job_$(ClusterId).err
+log                     = logs/job_$(ClusterId).log
+request_cpus            = 5
+request_gpus            = 1
+request_memory          = 16GB
+request_disk            = 20GB
++JobFlavour             = "tomorrow" # ~1 dia de margen (equivalente Slurm: time 08:00:00)
+retry                   = 5
+queue

@@ -132,6 +132,50 @@ def _passes_lumi_mask(mask, run, lumi):
     return any(a <= lumi <= b for a, b in ranges)
 
 
+_REQUIRED_COUNTER_BRANCHES = ("nElectron", "nMuon")
+
+
+def _force_keep_required_counters(tree):
+    existing = {b.GetName() for b in tree.GetListOfBranches()}
+    for name in _REQUIRED_COUNTER_BRANCHES:
+        if name in existing:
+            tree.SetBranchStatus(name, 1)
+
+
+_AUXILIARY_OBJECTS_TO_COPY = ("Runs", "LuminosityBlocks", "tag")
+
+
+def _copy_auxiliary_objects(fin, fout, skip_tree_name):
+    """Copia al archivo de salida los objetos de nivel superior listados en
+    _AUXILIARY_OBJECTS_TO_COPY (los mismos que preserva el PostProcessor real
+    de NanoAODTools/CMSSW), ignorando 'Events' (ya escrito aparte) y
+    cualquier otro objeto del archivo de entrada (p.ej. 'MetaData',
+    'ParameterSets').
+
+    Los arboles se copian completos (todas las entradas), sin aplicar
+    seleccion de eventos ni de ramas, porque no estan indexados por
+    evento (p.ej. 'Runs' tiene una entrada por run, no por evento).
+    """
+    fout.cd()
+    for key in fin.GetListOfKeys():
+        name = key.GetName()
+        if name == skip_tree_name:
+            continue
+        if name not in _AUXILIARY_OBJECTS_TO_COPY:
+            continue
+        # Evitar procesar la misma key mas de una vez si hay varios ciclos.
+        if fout.Get(name):
+            continue
+        obj = key.ReadObj()
+        class_name = obj.ClassName()
+        if class_name == "TTree":
+            cloned = obj.CloneTree(-1, "fast")
+            cloned.Write()
+        else:
+            # p.ej. TObjString "tag"
+            obj.Write(name)
+
+
 class PostProcessor(object):
     def __init__(
         self,
@@ -189,6 +233,7 @@ class PostProcessor(object):
             )
 
         _apply_branch_selection(tin, self.branchsel)
+        _force_keep_required_counters(tin)
 
         cut_formula = None
         if self.cut:
@@ -200,12 +245,18 @@ class PostProcessor(object):
 
         if not self.noOut:
             out_name = os.path.join(self.outputDir, os.path.basename(path))
-            fout = ROOT.TFile.Open(out_name, "RECREATE")
+            # Heredar la compresion del archivo de entrada (tipicamente
+            # LZMA(9) en CMS Open Data) en vez del ZLIB(1) por defecto de
+            # ROOT.
+            fout = ROOT.TFile.Open(
+                out_name, "RECREATE", "", fin.GetCompressionSettings()
+            )
             fout.cd()
             tout = tin.CloneTree(0)
             tout.SetName(self.outputTreeName)
             if self.outputbranchsel:
                 _apply_branch_selection(tout, self.outputbranchsel)
+                _force_keep_required_counters(tout)
             wrapped = WrappedOutputTree(tout)
 
         for m in self.modules:
@@ -251,6 +302,7 @@ class PostProcessor(object):
         if not self.noOut:
             fout.cd()
             tout.Write()
+            _copy_auxiliary_objects(fin, fout, self.treeName)
             fout.Close()
             out_desc = os.path.join(self.outputDir, os.path.basename(path))
         else:

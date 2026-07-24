@@ -8,13 +8,26 @@ proxy:
 data_processing:
   input_mode: "open_data"
   conda_env: "cd" 
+
+  # "condor" (HTCondor, requiere condor_params) o "slurm" (requiere slurm_params)
+  scheduler: "condor"
+
+  condor_params:
+    executable_file: "run_filter.sh"
+    cpus: 1
+    gpus: 0
+    mem: "4000MB"
+    disk: "2GB"
+    job_flavour: "workday" # ~8h de limite (equivalente Slurm: time 04:00:00)
+
   slurm_params:
     executable_file: "run_filter.sh"
-    cpus: 1 
-    gpus: 0 
-    mem: "4000M" 
-    time: "04:00:00" 
+    cpus: 1
+    gpus: 0
+    mem: "4000M"
+    time: "04:00:00"
     partition: "cpu"
+
   processing_script: "example_files/main_process/filterNanoAOD.py"
   eos_output_dir: "/lustre/home/hacosta/Open-Data/Processed/root" 
   redirector: ""

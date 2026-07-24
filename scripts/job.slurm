@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=cms_ml_training
+#SBATCH --job-name=comparacion_filtrado
 #SBATCH --cpus-per-task=5
 #SBATCH --mem=16G
 #SBATCH --time=08:00:00
@@ -10,4 +10,5 @@
 #SBATCH --export=ALL
 #SBATCH --partition=gpu
 
-bash run_training.sh
+python3 test_comparacion.py  /lustre/home/hacosta/Open-Data/Processed/root/fondo /lustre/home/hacosta/Open-Data/Processed/CMSS 
+

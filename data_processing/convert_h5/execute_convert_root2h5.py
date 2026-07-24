@@ -12,7 +12,17 @@ def main(config_path):
    
    config = utils.load_config(config_path)
    convertion = utils.require_key(config, 'convertion')
-   slurm_params = utils.require_key(config, 'slurm_params')
+
+   # "condor" (default, HTCondor via `queue ... from args_conversion.dat`) o
+   # "slurm" (array job via `#SBATCH --array`).
+   scheduler = config.get('scheduler', 'condor')
+   if scheduler not in ('condor', 'slurm'):
+      raise ValueError(
+          f"scheduler invalido: '{scheduler}' (valores permitidos: 'condor', 'slurm')"
+      )
+   scheduler_params = utils.require_key(
+       config, 'condor_params' if scheduler == 'condor' else 'slurm_params'
+   )
    conda_env = utils.require_key(convertion, 'conda_env')
 
    # Raiz del repo (dos niveles arriba de convert_h5/), para el PYTHONPATH
@@ -47,9 +57,12 @@ def main(config_path):
 
    lxplus.set_env_vars_conversion(tree_name, branches, max_jagged_len, project_dir, conda_env)
 
-   slurm_file = lxplus.create_slurm_convert_script(slurm_params, len(args_dat))
-
-   utils.submit_slurm(slurm_file)
+   if scheduler == 'condor':
+      condor_file = lxplus.create_condor_convert_file(scheduler_params)
+      utils.submit_condor(condor_file)
+   else:
+      slurm_file = lxplus.create_slurm_convert_script(scheduler_params, len(args_dat))
+      utils.submit_slurm(slurm_file)
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert NanoAOD root file to h5 file")
