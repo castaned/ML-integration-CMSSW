@@ -1,5 +1,4 @@
-# La documentación oficial se encuentra en [ML-integration-CMSSW documentation](https://castaned.github.io/ML-integration-CMSSW)
-
+# The official documentation can be found in [ML-integration-CMSSW documentation](https://castaned.github.io/ML-integration-CMSSW)
 # Example of usage — Open Data mode
 
 This documents the **`open_data`** variant of the framework described in *General architecture* and *Complete workflow*.
