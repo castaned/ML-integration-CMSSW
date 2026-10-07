@@ -81,7 +81,7 @@ def _scores(model, values, device, batch_size):
     return np.concatenate(result)
 
 
-def _save_plots(history, normal_scores, anomaly_scores, labels, scores, output_dir, name):
+def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores, labels, scores, output_dir, name):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
     plt.plot(history["val_loss"], label="SM validation")
@@ -96,12 +96,31 @@ def _save_plots(history, normal_scores, anomaly_scores, labels, scores, output_d
     plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="SM test")
     if len(anomaly_scores):
         plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Signal example")
+    plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
+                label=f"Threshold = {threshold:.3f}")
     plt.yscale("log")
     plt.xlabel("Reconstruction error (anomaly score)")
     plt.ylabel("Density")
     plt.legend()
     plt.tight_layout()
     plt.savefig(output_dir / f"scores_{name}.pdf")
+    plt.close()
+
+    below = val_scores < threshold
+    indices = np.arange(len(val_scores))
+    plt.figure(figsize=(9, 5))
+    plt.scatter(indices[below], val_scores[below], s=12, color="tab:blue",
+                alpha=0.7, label=f"Below threshold ({below.sum()})")
+    plt.scatter(indices[~below], val_scores[~below], s=18, color="crimson",
+                alpha=0.85, label=f"At or above threshold ({(~below).sum()})")
+    plt.axhline(threshold, color="black", linestyle="--", linewidth=1.5,
+                label=f"Threshold = {threshold:.3f}")
+    plt.xlabel("Event index in SM validation sample")
+    plt.ylabel("Reconstruction error (anomaly score)")
+    plt.title("SM validation events and anomaly threshold")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(output_dir / f"validation_events_{name}.pdf")
     plt.close()
 
     if len(anomaly_scores):
@@ -225,7 +244,8 @@ def run_autoencoder(config, output_path):
                           dynamic_axes={"input": {0: "batch"}, "reconstruction": {0: "batch"}})
         onnx.checker.check_model(onnx.load(str(onnx_path)))
 
-    _save_plots(history, normal_scores, anomaly_scores, labels, scores, output_dir, name)
+    _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
+                labels, scores, output_dir, name)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),

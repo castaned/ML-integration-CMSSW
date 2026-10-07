@@ -51,6 +51,8 @@ class AutoencoderTests(unittest.TestCase):
             np.testing.assert_allclose(checkpoint["mean"], train.mean(axis=0), rtol=1e-5)
             self.assertLess(np.max(checkpoint["mean"]), 2)
             self.assertTrue((output / "ROC_trial.pdf").is_file())
+            self.assertTrue((output / "scores_trial.pdf").is_file())
+            self.assertTrue((output / "validation_events_trial.pdf").is_file())
 
 
 if __name__ == "__main__":
