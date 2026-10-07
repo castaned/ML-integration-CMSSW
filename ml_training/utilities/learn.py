@@ -14,7 +14,7 @@ def compute_accuracy(outputs, y):
 def get_device():
     return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def convert_to_onnx(input_dim, model, output_dir, model_name, opset=12):
+def convert_to_onnx(input_dim, model, output_dir, model_name, opset=18):
 
     dummy_input = torch.randn(1, input_dim, dtype=torch.float32)
 
