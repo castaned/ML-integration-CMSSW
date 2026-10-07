@@ -246,6 +246,7 @@ def _slurm_resource_lines(slurm_params):
         utils.require_key(slurm_params, k) for k in ("cpus", "gpus", "mem", "time")
     )
     partition = slurm_params.get("partition")
+    account = slurm_params.get("account")
 
     lines = [
         f"#SBATCH --cpus-per-task={cpus}",
@@ -256,6 +257,8 @@ def _slurm_resource_lines(slurm_params):
         lines.append(f"#SBATCH --gres=gpu:{gpus}")
     if partition:
         lines.append(f"#SBATCH --partition={partition}")
+    if account:
+        lines.append(f"#SBATCH --account={account}")
     return "\n".join(lines)
 
 

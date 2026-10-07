@@ -40,6 +40,7 @@ data_processing:
   scheduler: "slurm"
   slurm_params:
     executable_file: "run_filter.sh"
+    account: "p002"  # Yuca: codigo de la cuenta/proyecto asignado
     cpus: 1
     gpus: 0
     mem: "4000M"
@@ -72,6 +73,11 @@ Submit the jobs — one Slurm array task (or one HTCondor job) per input `.root`
 ```bash
 python3 execute_data_processing.py -f data_processing_config.yaml
 ```
+
+En Yuca, Slurm exige una cuenta de proyecto. El ejemplo usa `p002`; cambiala
+si tu usuario tiene otra cuenta asignada. El framework incluira `#SBATCH --account=...`
+en el script generado. El mismo campo `slurm_params.account` se puede usar
+en la configuracion de conversion ROOT a HDF5.
 
 ## Optional QA scripts
 

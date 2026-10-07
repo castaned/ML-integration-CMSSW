@@ -125,6 +125,7 @@ condor_params:
 
 slurm_params:
   executable_file: "run_conversion.sh"
+  account: "p002"
   cpus: 1
   gpus: 0
   mem: "1500M"
