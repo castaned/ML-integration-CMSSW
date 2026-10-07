@@ -1,0 +1,27 @@
+data:
+  normal_input_paths:
+    - "$HOME/Open-Data/Processed/h5/fondo"
+  anomaly_input_paths:
+    - "$HOME/Open-Data/Processed/h5/senal"
+  output_path: "$HOME/Open-Data/Processed/results_autoencoder"
+  features: ["MET_pt", "nElectron", "nMuon", "nLeptons"]
+  label: "Dataset_ID"
+  normal_labels: [2]
+  anomaly_labels: [1]
+
+model:
+  name: "autoencoder_sm"
+  type: "autoencoder"
+  hidden_dims: [16, 8]
+  latent_dim: 2
+  epochs: 60
+  batch_size: 256
+  learning_rate: 0.001
+  patience: 8
+  export_onnx: true
+
+anomaly_detection:
+  validation_fraction: 0.2
+  test_fraction: 0.2
+  normal_quantile: 0.99
+  seed: 16

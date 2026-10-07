@@ -15,7 +15,7 @@ def main(config_path):
     config = prepare.load_config(config_path)
 
     data_config = utils.require_key(config, 'data')
-    output_dir = utils.require_key(data_config, 'output_path')
+    output_dir = os.path.expanduser(os.path.expandvars(utils.require_key(data_config, 'output_path')))
     
     if not os.path.isabs(output_dir):
         output_dir = os.path.abspath(output_dir)
@@ -28,6 +28,11 @@ def main(config_path):
     full_dataset = train_dataset = test_dataset = None
     
     try:
+        if utils.require_key(utils.require_key(config, 'model'), 'type') == 'autoencoder':
+            from src.autoencoder import run_autoencoder
+            run_autoencoder(config, output_dir)
+            print("Autoencoder training and evaluation completed.")
+            return
 
         input_paths = utils.require_key(data_config, 'input_paths')
         features = utils.require_key(data_config, 'features')

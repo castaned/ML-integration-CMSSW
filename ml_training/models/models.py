@@ -46,3 +46,26 @@ class MLPmodel(nn.Module):
             )
         model.load_state_dict(param_model["model_state"])
         return model
+
+
+class AutoencoderModel(nn.Module):
+    def __init__(self, input_size, hidden_dims, latent_dim):
+        super().__init__()
+        encoder = []
+        width = input_size
+        for hidden in hidden_dims:
+            encoder.extend((nn.Linear(width, hidden), nn.ReLU()))
+            width = hidden
+        encoder.append(nn.Linear(width, latent_dim))
+        self.encoder = nn.Sequential(*encoder)
+
+        decoder = []
+        width = latent_dim
+        for hidden in reversed(hidden_dims):
+            decoder.extend((nn.Linear(width, hidden), nn.ReLU()))
+            width = hidden
+        decoder.append(nn.Linear(width, input_size))
+        self.decoder = nn.Sequential(*decoder)
+
+    def forward(self, x):
+        return self.decoder(self.encoder(x))
