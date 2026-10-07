@@ -81,7 +81,7 @@ def compute_cm(outputs, labels, output_dir, model_name, class_labels=None):
 
 def test_results(model_name, model_type, dataset, output_dir, batch_size=2048, class_labels=None):
     
-    param_model = torch.load(f"{output_dir}/best_model_{model_name}.pth", weights_only=True)
+    param_model = torch.load(f"{output_dir}/best_model_{model_name}.pth", map_location="cpu", weights_only=True)
     
     if model_type == 'mlp':
         model = models.MLPmodel.get_model(dataset.num_features, dataset.num_classes, param_model)

@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.utils
+import os
+import shutil
 from sklearn.model_selection import train_test_split
 import utilities.prepare as prepare
 import utilities.learn as learn
@@ -37,7 +39,7 @@ def train_model(hyperparam_space, dataset, ideal_acc, output_dir, model_name):
     batch_size = hyperparam_space["batch_size"]
     val_split = 0.2
 
-    checkpoint_path = f'{output_dir}/best_model_{model_name}.pth'    
+    checkpoint_path = os.path.join(tune.get_context().get_trial_dir(), f'best_model_{model_name}.pth')
 
     
     train_dataloader, val_dataloader = prepare.split_and_transform_pythorch(dataset, val_split, batch_size)
@@ -115,7 +117,7 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
         )
     
     
-    ray.init()
+    ray.init(num_cpus=int(os.environ.get("SLURM_CPUS_PER_TASK", os.cpu_count() or 1)))
     resources = ray.available_resources()
     num_cpus = int(resources.get("CPU", 1))
     num_gpus = int(resources.get("GPU", 0))
@@ -147,14 +149,12 @@ def tune_mlp(model_name, model_type, dataset, ideal_acc, num_models, output_dir)
     
     results = tuner.fit()
 
-    best_hyperparam = results.get_best_result(metric="acc", mode="max").config
-    best_model = models.MLPmodel(
-                       input_size=dataset.num_features, 
-                       output_size=dataset.num_classes,
-                       hidden_input_size=best_hyperparam["hidden_input_size"], 
-                       hidden_output_size=best_hyperparam["hidden_output_size"], 
-                       num_layers=best_hyperparam["num_layers"]
-                       )
+    best_result = results.get_best_result(metric="val_loss", mode="min")
+    best_hyperparam = best_result.config
+    checkpoint_path = os.path.join(output_dir, f'best_model_{model_name}.pth')
+    shutil.copyfile(os.path.join(best_result.path, f'best_model_{model_name}.pth'), checkpoint_path)
+    param_model = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    best_model = models.MLPmodel.get_model(dataset.num_features, dataset.num_classes, param_model)
 
     print("Best hyperparameters found were: ", best_hyperparam)
     print("Best model architecture:", best_model)

@@ -25,6 +25,7 @@ def main(config_path):
     
     sys.stdout = utils.TimestampedLogger(sys.stdout, f"{output_dir}/stdout.log")
     sys.stderr = utils.TimestampedLogger(sys.stderr, f"{output_dir}/stderr.log")
+    full_dataset = train_dataset = test_dataset = None
     
     try:
 
@@ -88,6 +89,7 @@ def main(config_path):
     except Exception as e:
         error_message = traceback.format_exc()
         sys.stderr.write(f"[ERROR] {error_message}")
+        raise
 
     finally:
         if full_dataset is not None: full_dataset.close()
