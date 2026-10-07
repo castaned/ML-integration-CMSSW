@@ -1,5 +1,5 @@
 site_name: ML integration in CMSSW
-site_url: https://github.com/castaned/ML-integration-CMSS/documentation
+site_url: https://castaned.github.io/ML-integration-CMSSW/
 theme:
     name: material
 
