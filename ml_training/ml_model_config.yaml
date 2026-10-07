@@ -17,6 +17,9 @@ data:
 
   num_classes: 2
 
+  # Signal has Dataset_ID 1; background has Dataset_ID 2 in the ROOT/HDF5 files.
+  class_id_map: {1: 1, 2: 0}
+
   label_mapping: "/lustre/home/hacosta/Open-Data/CMSS/data_processing/mapping.json"
 
 model:

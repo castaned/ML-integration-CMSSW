@@ -3,6 +3,7 @@ import sys
 import utilities.prepare as prepare
 import utilities.utils as utils
 import utilities.learn as learn
+from utilities.labels import normalize_class_id_map, remap_class_names
 import models.models as models
 import src.optimize_model as opt
 import src.test_results as tr 
@@ -31,13 +32,15 @@ def main(config_path):
         features = utils.require_key(data_config, 'features')
         label = utils.require_key(data_config, 'label')
         num_classes = utils.require_key(data_config, 'num_classes')
+        class_id_map = normalize_class_id_map(data_config.get('class_id_map'), num_classes)
         label_mapping_path = utils.require_key(data_config, 'label_mapping')
         label_mapping = utils.read_json(label_mapping_path)
         label_mapping = utils.int_key_in_dict(label_mapping)
+        label_mapping = remap_class_names(label_mapping, class_id_map)
         input_paths = [os.path.abspath(data_path) for data_path in input_paths] # Get absolute path for ray workers, otherwise they will not find the data inside the container
 
         print("Collecting data...")
-        full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes)
+        full_dataset = prepare.h5Dataset(input_paths, features, label, num_classes, class_id_map=class_id_map)
         train_idx, test_idx = prepare.split_h5Dataset(full_dataset, 0.2, 16)
         train_dataset = prepare.h5Dataset(
                 input_paths,
@@ -45,6 +48,7 @@ def main(config_path):
                 label,
                 num_classes,
                 transform=models.MLPTransform(),
+                class_id_map=class_id_map,
                 indices=[full_dataset.global_ids[i] for i in train_idx]
             )
         
@@ -54,6 +58,7 @@ def main(config_path):
                 label,
                 num_classes,
                 transform=models.MLPTransform(),
+                class_id_map=class_id_map,
                 indices=[full_dataset.global_ids[i] for i in test_idx]
             )
         

@@ -21,7 +21,7 @@ source "${CONDA_SETUP_SCRIPT:-$HOME/miniconda3/etc/profile.d/conda.sh}"
 conda activate "$CONDA_ENV_NAME"
 set -u
 echo "Running training"
-python3 execute_ml_training.py -f ml_model_config.yaml
+python3 execute_ml_training.py -f "${ML_CONFIG_PATH:-ml_model_config.yaml}"
 
 if [ -n "$EOS_OUTPUT_DIR" ]; then
     xrdfs "$REDIRECTOR" mkdir -p "$EOS_OUTPUT_DIR"

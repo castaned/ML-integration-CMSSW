@@ -9,18 +9,20 @@ import h5py
 from torch.utils.data import random_split
 import yaml
 import os
+from utilities.labels import encode_label, normalize_class_id_map
 
 def load_config(config_path):
     with open(config_path) as f:
         return yaml.safe_load(f)
     
 class h5Dataset(Dataset):
-    def __init__(self, dir_paths, features, label, num_classes, indices=None, transform=None):
+    def __init__(self, dir_paths, features, label, num_classes, indices=None, transform=None, class_id_map=None):
         
         self.features = features
         self.label = label
         self.num_classes = num_classes
         self.transform = transform
+        self.class_id_map = normalize_class_id_map(class_id_map, num_classes)
         
         self.file_paths = []
         self.file_event_counts = []
@@ -51,7 +53,7 @@ class h5Dataset(Dataset):
                                     
     def __len__(self):
         return len(self.global_ids)
-        
+
     def __getitem__(self, idx):
         file_id, event_id = self.global_ids[idx]
         
@@ -63,7 +65,7 @@ class h5Dataset(Dataset):
         x = [file_h5[feature][event_id][...] for feature in self.features]
         x = {f: torch.tensor(x[i], dtype=torch.float32) for i, f in enumerate(self.features)}
         
-        y = torch.tensor(file_h5[self.label][event_id], dtype=torch.long)
+        y = torch.tensor(encode_label(file_h5[self.label][event_id], self.num_classes, self.class_id_map), dtype=torch.long)
         
         if self.transform:
             x = self.transform(x)
@@ -93,7 +95,7 @@ class h5Dataset(Dataset):
 
             for i, pos in enumerate(positions):
                 x = {f: torch.tensor(feat_arrays[f][i], dtype=torch.float32) for f in self.features}
-                y = torch.tensor(label_array[i], dtype=torch.long)
+                y = torch.tensor(encode_label(label_array[i], self.num_classes, self.class_id_map), dtype=torch.long)
                 if self.transform:
                     x = self.transform(x)
                 results[pos] = (x, y)
