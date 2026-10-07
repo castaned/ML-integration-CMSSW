@@ -75,3 +75,11 @@ nav:
     - framework/04_framework-setup.md
   - Example of usage:
     - usage/01_usage.md
+  - Curso Yuca (Open Data):
+    - yuca-course/index.md
+    - yuca-course/01_entorno.md
+    - yuca-course/02_datos.md
+    - yuca-course/03_procesamiento.md
+    - yuca-course/04_clasificador.md
+    - yuca-course/05_autoencoder.md
+    - yuca-course/06_problemas.md
