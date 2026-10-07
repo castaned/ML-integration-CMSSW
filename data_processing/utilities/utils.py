@@ -49,4 +49,8 @@ def submit_condor(condor_file):
 
 
 def submit_slurm(slurm_script):
-    exe_cmd(["sbatch", slurm_script])
+    result = exe_cmd(["sbatch", slurm_script])
+    if result is None:
+        raise RuntimeError(f"Slurm rejected {slurm_script}")
+    print(result.strip())
+    return result
