@@ -1,4 +1,5 @@
 import importlib.util
+import csv
 import json
 import tempfile
 import unittest
@@ -21,8 +22,10 @@ class AutoencoderTests(unittest.TestCase):
             rng = np.random.default_rng(7)
             normal = rng.normal(size=(60, 3)).astype("f4")
             anomaly = rng.normal(loc=5, size=(12, 3)).astype("f4")
+            qcd = rng.normal(loc=2, size=(15, 3)).astype("f4")
             paths = []
-            for name, values, label in (("normal", normal, 2), ("anomaly", anomaly, 1)):
+            for name, values, label in (("normal", normal, 2), ("anomaly", anomaly, 1),
+                                        ("qcd", qcd, 3)):
                 path = root / f"{name}.h5"
                 with h5py.File(path, "w") as handle:
                     for index in range(3):
@@ -32,6 +35,7 @@ class AutoencoderTests(unittest.TestCase):
 
             config = {
                 "data": {"normal_input_paths": [paths[0]], "anomaly_input_paths": [paths[1]],
+                         "qcd_input_paths": [paths[2]], "qcd_labels": [3],
                          "features": ["f0", "f1", "f2"], "label": "Dataset_ID",
                          "normal_labels": [2], "anomaly_labels": [1]},
                 "model": {"name": "trial", "type": "autoencoder", "hidden_dims": [4],
@@ -48,11 +52,18 @@ class AutoencoderTests(unittest.TestCase):
 
             self.assertEqual(metrics["normal_train"], len(train))
             self.assertEqual(metrics["signal_test"], len(anomaly))
+            self.assertEqual(metrics["qcd_test"], len(qcd))
+            self.assertGreaterEqual(metrics["qcd_test_fpr"], 0)
             np.testing.assert_allclose(checkpoint["mean"], train.mean(axis=0), rtol=1e-5)
             self.assertLess(np.max(checkpoint["mean"]), 2)
             self.assertTrue((output / "ROC_trial.pdf").is_file())
             self.assertTrue((output / "scores_trial.pdf").is_file())
             self.assertTrue((output / "validation_events_trial.pdf").is_file())
+            self.assertTrue((output / "EWK_QCD_trial.pdf").is_file())
+            with (output / "scores_trial.csv").open(newline="", encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(sum(row["sample"] == "QCD_test" for row in rows), len(qcd))
+            self.assertEqual(sum(row["sample"] == "signal_example" for row in rows), len(anomaly))
 
 
 if __name__ == "__main__":

@@ -98,3 +98,25 @@ en la configuracion de conversion ROOT a HDF5.
   ```
 
 Both are also wired to sample Slurm submission files (`scripts/compresion.slurm`, `scripts/job.slurm`) if you need to run them on the cluster rather than on a login node — edit the hardcoded paths at the bottom of each `.slurm` file before submitting with `sbatch`.
+
+## Evaluate QCD without retraining on it
+
+After copying ROOT files into `$HOME/Open-Data/Data/QCD`, generate three separate
+configs from the personal EWK/Wprime configs already in `$HOME/Open-Data`:
+
+```bash
+python scripts/setup_qcd_evaluation.py
+```
+
+This creates `qcd_data_processing_config.yaml`, `qcd_root2h5_config.yaml`,
+and `autoencoder_qcd_model_config.yaml`. It refuses to overwrite existing
+configs. The QCD sample receives `Dataset_ID=3`; the existing EWK and Wprime
+HDF5 files are reused. Process QCD, convert it, and then run the new
+autoencoder config. The new results go to `results_autoencoder_qcd`, leaving
+the original run untouched. QCD is evaluated externally and never changes
+the EWK training split, normalization, or anomaly threshold.
+
+`execute_data_processing.py` rewrites `data_processing/mapping.json` for the
+datasets in each submission. Submit the QCD-only job only after the previous
+EWK/Wprime processing jobs have finished. If the original mapping is needed
+later, retain a copy before submission and restore/merge it after QCD finishes.

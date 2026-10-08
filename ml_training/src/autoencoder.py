@@ -81,7 +81,8 @@ def _scores(model, values, device, batch_size):
     return np.concatenate(result)
 
 
-def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores, labels, scores, output_dir, name):
+def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
+                qcd_scores, labels, scores, output_dir, name):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
     plt.plot(history["val_loss"], label="SM validation")
@@ -93,9 +94,11 @@ def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores, l
     plt.close()
 
     plt.figure(figsize=(7, 5))
-    plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="SM test")
+    plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
     if len(anomaly_scores):
-        plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Signal example")
+        plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Wprime example")
+    if len(qcd_scores):
+        plt.hist(qcd_scores, bins=50, density=True, alpha=0.5, label="QCD test")
     plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
                 label=f"Threshold = {threshold:.3f}")
     plt.yscale("log")
@@ -105,6 +108,20 @@ def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores, l
     plt.tight_layout()
     plt.savefig(output_dir / f"scores_{name}.pdf")
     plt.close()
+
+    if len(qcd_scores):
+        plt.figure(figsize=(7, 5))
+        plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+        plt.hist(qcd_scores, bins=50, density=True, alpha=0.6, label="QCD test")
+        plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
+                    label=f"EWK threshold = {threshold:.3f}")
+        plt.yscale("log")
+        plt.xlabel("Reconstruction error (anomaly score)")
+        plt.ylabel("Density")
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_dir / f"EWK_QCD_{name}.pdf")
+        plt.close()
 
     below = val_scores < threshold
     indices = np.arange(len(val_scores))
@@ -158,9 +175,17 @@ def run_autoencoder(config, output_path):
     if not normal_labels or normal_labels & anomaly_labels:
         raise ValueError("Normal and anomaly labels must be nonempty and disjoint")
 
+    qcd_paths = data.get("qcd_input_paths", [])
+    qcd_labels = set(int(value) for value in data.get("qcd_labels", []))
+    if qcd_paths and (not qcd_labels or qcd_labels & (normal_labels | anomaly_labels)):
+        raise ValueError("QCD labels must be nonempty and distinct from normal and signal labels")
+
     normal = _load_events(data["normal_input_paths"], features, data["label"], normal_labels)
     anomaly_paths = data.get("anomaly_input_paths", [])
     anomaly = _load_events(anomaly_paths, features, data["label"], anomaly_labels) if anomaly_paths else np.empty((0, len(features)), dtype=np.float32)
+    qcd = _load_events(qcd_paths, features, data["label"], qcd_labels) if qcd_paths else np.empty((0, len(features)), dtype=np.float32)
+    if qcd_paths and not len(qcd):
+        raise ValueError("QCD input contains no events; check the skim before evaluation")
     seed = int(detection.get("seed", 16))
     torch.manual_seed(seed)
     torch.set_num_threads(max(1, int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))))
@@ -171,7 +196,7 @@ def run_autoencoder(config, output_path):
     scale = train.std(axis=0)
     scale[scale == 0] = 1
     normalize = lambda values: np.asarray((values - mean) / scale, dtype=np.float32)
-    train, val, test, anomaly = map(normalize, (train, val, test, anomaly))
+    train, val, test, anomaly, qcd = map(normalize, (train, val, test, anomaly, qcd))
 
     hidden_dims = [int(width) for width in settings["hidden_dims"]]
     latent_dim = int(settings["latent_dim"])
@@ -226,6 +251,7 @@ def run_autoencoder(config, output_path):
     threshold = float(np.quantile(val_scores, quantile))
     normal_scores = _scores(model, test, device, batch_size)
     anomaly_scores = _scores(model, anomaly, device, batch_size) if len(anomaly) else np.empty(0)
+    qcd_scores = _scores(model, qcd, device, batch_size) if len(qcd) else np.empty(0)
     scores = np.concatenate((normal_scores, anomaly_scores))
     labels = np.concatenate((np.zeros(len(normal_scores), dtype=int), np.ones(len(anomaly_scores), dtype=int)))
 
@@ -245,11 +271,13 @@ def run_autoencoder(config, output_path):
         onnx.checker.check_model(onnx.load(str(onnx_path)))
 
     _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
-                labels, scores, output_dir, name)
+                qcd_scores, labels, scores, output_dir, name)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),
                "signal_test_tpr": float(np.mean(anomaly_scores >= threshold)) if len(anomaly_scores) else None,
+               "qcd_test": len(qcd),
+               "qcd_test_fpr": float(np.mean(qcd_scores >= threshold)) if len(qcd_scores) else None,
                "roc_auc": float(roc_auc_score(labels, scores)) if len(anomaly_scores) else None,
                "average_precision": float(average_precision_score(labels, scores)) if len(anomaly_scores) else None,
                "features": features, "seed": seed}
@@ -259,5 +287,7 @@ def run_autoencoder(config, output_path):
         writer = csv.writer(handle)
         writer.writerow(["sample", "anomaly_score", "above_threshold"])
         for score, label in zip(scores, labels):
-            writer.writerow(["signal_example" if label else "SM_test", float(score), int(score >= threshold)])
+            writer.writerow(["signal_example" if label else "EWK_test", float(score), int(score >= threshold)])
+        for score in qcd_scores:
+            writer.writerow(["QCD_test", float(score), int(score >= threshold)])
     print(json.dumps(metrics, indent=2))
