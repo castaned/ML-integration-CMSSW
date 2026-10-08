@@ -128,3 +128,20 @@ for evaluation, splits EWK and QCD separately, balances their training
 sampling and validation, and writes results to a new directory. The 99th
 percentile threshold refers to an equal EWK/QCD mixture, not a physical
 cross-section-weighted SM prediction.
+
+## Reprocess with the three-lepton Z+W filter
+
+`filterNanoAOD.py` now returns `True` only when an event has at least three
+selected leptons, an opposite-sign same-flavour Z candidate, and a W-lepton
+candidate. The output still carries `A_pass` through `D_pass` for later
+channel-specific studies. Each processing log prints the input/3-lepton/Z/W
+cutflow and the channel counts. `Z_pass` is *not* a Z-mass-window cut, and
+`W_pass` is *not* a W-mass-window cut; they indicate that the corresponding
+candidate-finding functions succeeded.
+
+On Yuca, generate separate configs with `python scripts/setup_wz_skim.py`.
+The new ROOT, HDF5, and autoencoder outputs use `root_wz`, `h5_wz`, and
+`results_autoencoder_sm_mixture_wz` respectively, so the previous unfiltered
+pilot results are not overwritten. Run processing and inspect the cutflow
+before conversion or training: QCD may have too few surviving events to
+support the existing train/validation/test split.

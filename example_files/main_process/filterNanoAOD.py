@@ -56,6 +56,7 @@ class LeptonFilter(Module):
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
+        self.cutflow = {name: 0 for name in ("input", "3lep", "z", "w", "A", "B", "C", "D")}
 
         branches = [
             "Zmass",
@@ -123,6 +124,8 @@ class LeptonFilter(Module):
         inputTree.SetBranchStatus("HLT_Ele32_WPTight_Gsf", 1)
 
     def analyze(self, event):
+        self.cutflow["input"] += 1
+        selected_wz = False
 
         self.out.fillBranch("Dataset_ID", self.dataset_id)  # Store dataset as integer
 
@@ -257,11 +260,13 @@ class LeptonFilter(Module):
 
         if len(good_leptons) >= self.minLeptons:
 
+            self.cutflow["3lep"] += 1
             self.out.fillBranch("3Lep_pass", 1)
 
             foundZ, pair, best_Zmass = self.findBestZCandidate(good_leptons)
 
             if foundZ:
+                self.cutflow["z"] += 1
                 self.out.fillBranch("Z_pass", 1)
 
                 l1, l2 = pair
@@ -272,6 +277,8 @@ class LeptonFilter(Module):
 
                 if foundW:
 
+                    self.cutflow["w"] += 1
+                    selected_wz = True
                     self.out.fillBranch("W_pass", 1)
 
                     ####### A channel (eeenu) ############
@@ -282,6 +289,7 @@ class LeptonFilter(Module):
                     ):
 
                         self.out.fillBranch("A_pass", 1)
+                        self.cutflow["A"] += 1
                         self.out.fillBranch("A_nlep", len(good_leptons))
 
                         lepton1_pt = l1.pt
@@ -329,6 +337,7 @@ class LeptonFilter(Module):
                     ):
 
                         self.out.fillBranch("B_pass", 1)
+                        self.cutflow["B"] += 1
                         self.out.fillBranch("B_nlep", len(good_leptons))
 
                         lepton1_pt = l1.pt
@@ -386,6 +395,7 @@ class LeptonFilter(Module):
                     ):
 
                         self.out.fillBranch("C_pass", 1)
+                        self.cutflow["C"] += 1
                         self.out.fillBranch("C_nlep", len(good_leptons))
 
                         lepton1_pt = l1.pt
@@ -399,7 +409,8 @@ class LeptonFilter(Module):
                         dr, dphi, deta = self.dr_l1l2_Z(pair)
                         self.out.fillBranch("C_ptZ", ptZ)
                         self.out.fillBranch("C_Dr_Z", dr)
-                        self.out.fillBranch("C_Dr_Z", dphi)
+                        self.out.fillBranch("C_Dphi_Z", dphi)
+                        self.out.fillBranch("C_Deta_Z", deta)
                         self.out.fillBranch("C_Zmass", best_Zmass)
                         self.out.fillBranch("C_Lep1Z_pt", lepton1_pt)
                         self.out.fillBranch("C_Lep2Z_pt", lepton2_pt)
@@ -442,6 +453,7 @@ class LeptonFilter(Module):
                     ):
 
                         self.out.fillBranch("D_pass", 1)
+                        self.cutflow["D"] += 1
                         self.out.fillBranch("D_nlep", len(good_leptons))
 
                         lepton1_pt = l1.pt
@@ -481,7 +493,10 @@ class LeptonFilter(Module):
                         total_pt = lepton1_pt + lepton2_pt + lepton3_pt
                         self.out.fillBranch("D_Sum_pt", total_pt)
 
-        return True
+        return selected_wz
+
+    def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
+        print(f"[LeptonFilter] Dataset {self.dataset_id} cutflow: {self.cutflow}")
 
     def etaphiplane(self, lepton1, lepton2):
         dr_etaphi = ()
@@ -498,8 +513,8 @@ class LeptonFilter(Module):
             0.000511 if abs(lepton.pdgId) == 11 else 0.105
         )  # Electron: 0.511 MeV, Muon: 105 MeV
         e = math.sqrt(
-            lepton.pt**2 * math.cosh(lepton.eta) ** 2 + 0.000511**2
-        )  # Electron mass ~0.511 MeV
+            lepton.pt**2 * math.cosh(lepton.eta) ** 2 + m_lepton**2
+        )
         px = lepton.pt * math.cos(lepton.phi)
         py = lepton.pt * math.sin(lepton.phi)
         pz = lepton.pt * math.sinh(lepton.eta)
@@ -586,31 +601,28 @@ class LeptonFilter(Module):
             return 0
 
 
-# Main execution
-inputFile = sys.argv[1]
-dataset_folder = sys.argv[2]
-outputDir = sys.argv[3]
+if __name__ == "__main__":
+    inputFile = sys.argv[1]
+    dataset_folder = sys.argv[2]
+    outputDir = sys.argv[3]
 
-mods = [LeptonFilter(dataset_folder)]
+    mods = [LeptonFilter(dataset_folder)]
 
-# 1) Build kwargs FIRST
-pp_kwargs = dict(
-    outputDir=outputDir,
-    inputFiles=[inputFile],
-    cut=None,
-    branchsel="example_files/main_process/branchsel.txt",
-    outputbranchsel=None,
-    modules=mods,
-    noOut=False,
-    justcount=False,
-)
+    pp_kwargs = dict(
+        outputDir=outputDir,
+        inputFiles=[inputFile],
+        cut=None,
+        branchsel="example_files/main_process/branchsel.txt",
+        outputbranchsel=None,
+        modules=mods,
+        noOut=False,
+        justcount=False,
+    )
 
-# 2) Add JSON only for DATA
-if is_data_file(inputFile):
-    if not os.path.exists(JSON_PATH):
-        raise FileNotFoundError(f"Detected DATA but JSON not found: {JSON_PATH}")
-    pp_kwargs["jsonInput"] = JSON_PATH  # filter bad lumis BEFORE modules
+    if is_data_file(inputFile):
+        if not os.path.exists(JSON_PATH):
+            raise FileNotFoundError(f"Detected DATA but JSON not found: {JSON_PATH}")
+        pp_kwargs["jsonInput"] = JSON_PATH
 
-# 3) Run
-p = PostProcessor(**pp_kwargs)
-p.run()
+    p = PostProcessor(**pp_kwargs)
+    p.run()
