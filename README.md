@@ -120,3 +120,11 @@ the EWK training split, normalization, or anomaly threshold.
 datasets in each submission. Submit the QCD-only job only after the previous
 EWK/Wprime processing jobs have finished. If the original mapping is needed
 later, retain a copy before submission and restore/merge it after QCD finishes.
+
+To compare against an autoencoder trained on both known SM samples, after
+converting QCD to HDF5 run `python scripts/setup_sm_mixture.py`. The generated
+`$HOME/Open-Data/autoencoder_sm_mixture_model_config.yaml` keeps Wprime only
+for evaluation, splits EWK and QCD separately, balances their training
+sampling and validation, and writes results to a new directory. The 99th
+percentile threshold refers to an equal EWK/QCD mixture, not a physical
+cross-section-weighted SM prediction.

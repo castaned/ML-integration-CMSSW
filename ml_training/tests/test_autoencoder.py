@@ -1,5 +1,6 @@
 import importlib.util
 import csv
+import copy
 import json
 import tempfile
 import unittest
@@ -64,6 +65,28 @@ class AutoencoderTests(unittest.TestCase):
                 rows = list(csv.DictReader(handle))
             self.assertEqual(sum(row["sample"] == "QCD_test" for row in rows), len(qcd))
             self.assertEqual(sum(row["sample"] == "signal_example" for row in rows), len(anomaly))
+
+            mixture = copy.deepcopy(config)
+            mixture["data"]["normal_input_paths"] = [paths[0], paths[2]]
+            mixture["data"]["normal_labels"] = [2, 3]
+            del mixture["data"]["qcd_input_paths"]
+            del mixture["data"]["qcd_labels"]
+            mixture["model"]["name"] = "mixture"
+            mixture_output = root / "mixture_results"
+            run_autoencoder(mixture, str(mixture_output))
+            mixture_metrics = json.loads((mixture_output / "metrics_mixture.json").read_text())
+            mixture_checkpoint = torch.load(mixture_output / "best_model_mixture.pth",
+                                            map_location="cpu", weights_only=True)
+            ewk_train, _, _ = _split_normal(normal, 0.2, 0.2, 13)
+            qcd_train, _, _ = _split_normal(qcd, 0.2, 0.2, 14)
+            expected_mean = (ewk_train.mean(axis=0) + qcd_train.mean(axis=0)) / 2
+            np.testing.assert_allclose(mixture_checkpoint["mean"], expected_mean, rtol=1e-5)
+            self.assertEqual(mixture_metrics["normal_training_by_id"], {"2": 36, "3": 9})
+            self.assertEqual(mixture_metrics["normal_validation_by_id"], {"2": 12, "3": 3})
+            self.assertEqual(mixture_metrics["normal_test_by_id"], {"2": 12, "3": 3})
+            self.assertEqual(mixture_metrics["qcd_test"], 3)
+            self.assertEqual(mixture_metrics["signal_test"], len(anomaly))
+            self.assertTrue((mixture_output / "EWK_QCD_mixture.pdf").is_file())
 
 
 if __name__ == "__main__":

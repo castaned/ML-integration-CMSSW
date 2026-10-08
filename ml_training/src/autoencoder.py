@@ -13,7 +13,7 @@ import numpy as np
 import onnx
 import torch
 from sklearn.metrics import average_precision_score, roc_auc_score, roc_curve, precision_recall_curve
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 
 from models.models import AutoencoderModel
 
@@ -33,8 +33,9 @@ def _files(paths):
     return files
 
 
-def _load_events(paths, features, label, allowed_labels):
+def _load_events(paths, features, label, allowed_labels, return_labels=False):
     arrays = []
+    label_arrays = []
     allowed = set(int(value) for value in allowed_labels)
     for path in _files(paths):
         with h5py.File(path, "r") as handle:
@@ -54,7 +55,9 @@ def _load_events(paths, features, label, allowed_labels):
             if not np.isfinite(values).all():
                 raise ValueError(f"{path}: non-finite feature values")
             arrays.append(values)
-    return np.concatenate(arrays)
+            label_arrays.append(labels)
+    values = np.concatenate(arrays)
+    return (values, np.concatenate(label_arrays)) if return_labels else values
 
 
 def _split_normal(values, validation_fraction, test_fraction, seed):
@@ -70,6 +73,39 @@ def _split_normal(values, validation_fraction, test_fraction, seed):
     return values[shuffled[n_val + n_test:]], values[shuffled[:n_val]], values[shuffled[n_val:n_val + n_test]]
 
 
+def _split_by_process(values, labels, validation_fraction, test_fraction, seed):
+    splits = [[], [], []]
+    split_labels = [[], [], []]
+    for process_id in sorted(np.unique(labels)):
+        parts = _split_normal(values[labels == process_id], validation_fraction,
+                              test_fraction, seed + int(process_id))
+        for index, part in enumerate(parts):
+            splits[index].append(part)
+            split_labels[index].append(np.full(len(part), process_id, dtype=int))
+    return tuple(np.concatenate(parts) for parts in splits), tuple(
+        np.concatenate(parts) for parts in split_labels)
+
+
+def _balanced_mean_scale(values, labels):
+    groups = [values[labels == process_id] for process_id in np.unique(labels)]
+    mean = np.mean([group.mean(axis=0) for group in groups], axis=0)
+    second_moment = np.mean([np.mean(group.astype(np.float64) ** 2, axis=0)
+                             for group in groups], axis=0)
+    scale = np.sqrt(np.maximum(second_moment - mean.astype(np.float64) ** 2, 0))
+    scale[scale == 0] = 1
+    return mean, scale
+
+
+def _balanced_quantile(scores, labels, quantile):
+    weights = np.zeros(len(scores), dtype=np.float64)
+    for process_id in np.unique(labels):
+        mask = labels == process_id
+        weights[mask] = 1 / mask.sum()
+    order = np.argsort(scores)
+    cumulative = np.cumsum(weights[order]) / weights.sum()
+    return float(np.interp(quantile, cumulative, scores[order]))
+
+
 def _scores(model, values, device, batch_size):
     model.eval()
     result = []
@@ -81,7 +117,7 @@ def _scores(model, values, device, batch_size):
     return np.concatenate(result)
 
 
-def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
+def _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
                 qcd_scores, labels, scores, output_dir, name):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
@@ -94,7 +130,7 @@ def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
     plt.close()
 
     plt.figure(figsize=(7, 5))
-    plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+    plt.hist(ewk_scores, bins=50, density=True, alpha=0.6, label="EWK test")
     if len(anomaly_scores):
         plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Wprime example")
     if len(qcd_scores):
@@ -111,10 +147,10 @@ def _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
 
     if len(qcd_scores):
         plt.figure(figsize=(7, 5))
-        plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+        plt.hist(ewk_scores, bins=50, density=True, alpha=0.6, label="EWK test")
         plt.hist(qcd_scores, bins=50, density=True, alpha=0.6, label="QCD test")
         plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
-                    label=f"EWK threshold = {threshold:.3f}")
+                    label=f"SM threshold = {threshold:.3f}")
         plt.yscale("log")
         plt.xlabel("Reconstruction error (anomaly score)")
         plt.ylabel("Density")
@@ -180,7 +216,13 @@ def run_autoencoder(config, output_path):
     if qcd_paths and (not qcd_labels or qcd_labels & (normal_labels | anomaly_labels)):
         raise ValueError("QCD labels must be nonempty and distinct from normal and signal labels")
 
-    normal = _load_events(data["normal_input_paths"], features, data["label"], normal_labels)
+    normal, normal_ids = _load_events(data["normal_input_paths"], features,
+                                      data["label"], normal_labels, return_labels=True)
+    if set(np.unique(normal_ids)) != normal_labels:
+        raise ValueError("Every configured normal label needs at least one event")
+    mixed_normal = len(normal_labels) > 1
+    if mixed_normal and normal_labels != {2, 3}:
+        raise ValueError("The mixed-SM mode expects EWK ID 2 and QCD ID 3")
     anomaly_paths = data.get("anomaly_input_paths", [])
     anomaly = _load_events(anomaly_paths, features, data["label"], anomaly_labels) if anomaly_paths else np.empty((0, len(features)), dtype=np.float32)
     qcd = _load_events(qcd_paths, features, data["label"], qcd_labels) if qcd_paths else np.empty((0, len(features)), dtype=np.float32)
@@ -189,11 +231,22 @@ def run_autoencoder(config, output_path):
     seed = int(detection.get("seed", 16))
     torch.manual_seed(seed)
     torch.set_num_threads(max(1, int(os.environ.get("SLURM_CPUS_PER_TASK", "1"))))
-    train, val, test = _split_normal(normal, float(detection["validation_fraction"]), float(detection["test_fraction"]), seed)
+    validation_fraction = float(detection["validation_fraction"])
+    test_fraction = float(detection["test_fraction"])
+    if mixed_normal:
+        (train, val, test), (train_ids, val_ids, test_ids) = _split_by_process(
+            normal, normal_ids, validation_fraction, test_fraction, seed)
+    else:
+        train, val, test = _split_normal(normal, validation_fraction, test_fraction, seed)
+        process_id = next(iter(normal_labels))
+        train_ids, val_ids, test_ids = (np.full(len(part), process_id, dtype=int)
+                                        for part in (train, val, test))
 
     # Fit preprocessing on normal training events only.
-    mean = train.mean(axis=0)
-    scale = train.std(axis=0)
+    if mixed_normal:
+        mean, scale = _balanced_mean_scale(train, train_ids)
+    else:
+        mean, scale = train.mean(axis=0), train.std(axis=0)
     scale[scale == 0] = 1
     normalize = lambda values: np.asarray((values - mean) / scale, dtype=np.float32)
     train, val, test, anomaly, qcd = map(normalize, (train, val, test, anomaly, qcd))
@@ -209,7 +262,19 @@ def run_autoencoder(config, output_path):
     patience = int(settings["patience"])
     if batch_size < 1 or patience < 1:
         raise ValueError("batch_size and patience must be positive")
-    loader = DataLoader(TensorDataset(torch.from_numpy(train)), batch_size=batch_size, shuffle=True)
+    if mixed_normal:
+        sample_weights = np.zeros(len(train), dtype=np.float64)
+        for process_id in normal_labels:
+            mask = train_ids == process_id
+            sample_weights[mask] = 1 / mask.sum()
+        sampler = WeightedRandomSampler(torch.from_numpy(sample_weights), len(train),
+                                        replacement=True,
+                                        generator=torch.Generator().manual_seed(seed))
+        loader = DataLoader(TensorDataset(torch.from_numpy(train)), batch_size=batch_size,
+                            sampler=sampler)
+    else:
+        loader = DataLoader(TensorDataset(torch.from_numpy(train)), batch_size=batch_size,
+                            shuffle=True)
     val_tensor = torch.from_numpy(val).to(device)
     history = {"train_loss": [], "val_loss": []}
     best_loss = float("inf")
@@ -227,7 +292,12 @@ def run_autoencoder(config, output_path):
             losses.append((loss.item(), len(batch)))
         model.eval()
         with torch.no_grad():
-            val_loss = torch.mean((model(val_tensor) - val_tensor) ** 2).item()
+            val_errors = torch.mean((model(val_tensor) - val_tensor) ** 2, dim=1).cpu().numpy()
+            if mixed_normal:
+                val_loss = float(np.mean([val_errors[val_ids == process_id].mean()
+                                          for process_id in normal_labels]))
+            else:
+                val_loss = float(val_errors.mean())
         train_loss = sum(loss * count for loss, count in losses) / len(train)
         history["train_loss"].append(train_loss)
         history["val_loss"].append(val_loss)
@@ -248,10 +318,13 @@ def run_autoencoder(config, output_path):
     quantile = float(detection["normal_quantile"])
     if not 0 < quantile < 1:
         raise ValueError("normal_quantile must be between 0 and 1")
-    threshold = float(np.quantile(val_scores, quantile))
+    threshold = (_balanced_quantile(val_scores, val_ids, quantile) if mixed_normal
+                 else float(np.quantile(val_scores, quantile)))
     normal_scores = _scores(model, test, device, batch_size)
     anomaly_scores = _scores(model, anomaly, device, batch_size) if len(anomaly) else np.empty(0)
-    qcd_scores = _scores(model, qcd, device, batch_size) if len(qcd) else np.empty(0)
+    ewk_scores = normal_scores[test_ids == 2] if mixed_normal else normal_scores
+    qcd_scores = (normal_scores[test_ids == 3] if mixed_normal else
+                  _scores(model, qcd, device, batch_size) if len(qcd) else np.empty(0))
     scores = np.concatenate((normal_scores, anomaly_scores))
     labels = np.concatenate((np.zeros(len(normal_scores), dtype=int), np.ones(len(anomaly_scores), dtype=int)))
 
@@ -270,14 +343,24 @@ def run_autoencoder(config, output_path):
                           dynamic_axes={"input": {0: "batch"}, "reconstruction": {0: "batch"}})
         onnx.checker.check_model(onnx.load(str(onnx_path)))
 
-    _save_plots(history, val_scores, threshold, normal_scores, anomaly_scores,
+    _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
                 qcd_scores, labels, scores, output_dir, name)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),
+               "balanced_normal_test_fpr": float(np.mean([
+                   np.mean(normal_scores[test_ids == process_id] >= threshold)
+                   for process_id in sorted(normal_labels)])),
                "signal_test_tpr": float(np.mean(anomaly_scores >= threshold)) if len(anomaly_scores) else None,
-               "qcd_test": len(qcd),
+               "ewk_test_fpr": float(np.mean(ewk_scores >= threshold)),
+               "qcd_test": len(qcd_scores),
                "qcd_test_fpr": float(np.mean(qcd_scores >= threshold)) if len(qcd_scores) else None,
+               "normal_training_by_id": {str(process_id): int((train_ids == process_id).sum())
+                                         for process_id in sorted(normal_labels)},
+               "normal_validation_by_id": {str(process_id): int((val_ids == process_id).sum())
+                                           for process_id in sorted(normal_labels)},
+               "normal_test_by_id": {str(process_id): int((test_ids == process_id).sum())
+                                     for process_id in sorted(normal_labels)},
                "roc_auc": float(roc_auc_score(labels, scores)) if len(anomaly_scores) else None,
                "average_precision": float(average_precision_score(labels, scores)) if len(anomaly_scores) else None,
                "features": features, "seed": seed}
@@ -286,8 +369,12 @@ def run_autoencoder(config, output_path):
     with open(output_dir / f"scores_{name}.csv", "w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow(["sample", "anomaly_score", "above_threshold"])
-        for score, label in zip(scores, labels):
-            writer.writerow(["signal_example" if label else "EWK_test", float(score), int(score >= threshold)])
-        for score in qcd_scores:
-            writer.writerow(["QCD_test", float(score), int(score >= threshold)])
+        for score, process_id in zip(normal_scores, test_ids):
+            writer.writerow(["QCD_test" if process_id == 3 else "EWK_test",
+                             float(score), int(score >= threshold)])
+        for score in anomaly_scores:
+            writer.writerow(["signal_example", float(score), int(score >= threshold)])
+        if not mixed_normal:
+            for score in qcd_scores:
+                writer.writerow(["QCD_test", float(score), int(score >= threshold)])
     print(json.dumps(metrics, indent=2))
