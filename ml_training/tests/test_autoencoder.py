@@ -87,6 +87,8 @@ class AutoencoderTests(unittest.TestCase):
             self.assertEqual(mixture_metrics["qcd_test"], 3)
             self.assertEqual(mixture_metrics["signal_test"], len(anomaly))
             self.assertTrue((mixture_output / "EWK_QCD_mixture.pdf").is_file())
+            self.assertTrue((mixture_output / "scores_mixture.pdf").is_file())
+            self.assertTrue((mixture_output / "scores_by_process_mixture.pdf").is_file())
 
 
 if __name__ == "__main__":

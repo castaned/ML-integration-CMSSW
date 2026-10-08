@@ -117,8 +117,9 @@ def _scores(model, values, device, batch_size):
     return np.concatenate(result)
 
 
-def _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
-                qcd_scores, labels, scores, output_dir, name):
+def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
+                anomaly_scores, qcd_scores, labels, scores, output_dir, name,
+                mixed_normal):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
     plt.plot(history["val_loss"], label="SM validation")
@@ -130,10 +131,17 @@ def _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
     plt.close()
 
     plt.figure(figsize=(7, 5))
-    plt.hist(ewk_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+    if mixed_normal:
+        plot_scores = np.concatenate((ewk_scores, qcd_scores))
+        plot_weights = np.concatenate((np.full(len(ewk_scores), 0.5 / len(ewk_scores)),
+                                       np.full(len(qcd_scores), 0.5 / len(qcd_scores))))
+        plt.hist(plot_scores, bins=50, weights=plot_weights, density=True,
+                 alpha=0.6, label="SM test (EWK + QCD, 50/50)")
+    else:
+        plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
     if len(anomaly_scores):
         plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Wprime example")
-    if len(qcd_scores):
+    if len(qcd_scores) and not mixed_normal:
         plt.hist(qcd_scores, bins=50, density=True, alpha=0.5, label="QCD test")
     plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
                 label=f"Threshold = {threshold:.3f}")
@@ -144,6 +152,23 @@ def _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
     plt.tight_layout()
     plt.savefig(output_dir / f"scores_{name}.pdf")
     plt.close()
+
+    if mixed_normal:
+        plt.figure(figsize=(7, 5))
+        plt.hist(ewk_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+        plt.hist(qcd_scores, bins=50, density=True, alpha=0.5, label="QCD test")
+        if len(anomaly_scores):
+            plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6,
+                     label="Wprime example")
+        plt.axvline(threshold, color="crimson", linestyle="--", linewidth=2,
+                    label=f"Threshold = {threshold:.3f}")
+        plt.yscale("log")
+        plt.xlabel("Reconstruction error (anomaly score)")
+        plt.ylabel("Density")
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_dir / f"scores_by_process_{name}.pdf")
+        plt.close()
 
     if len(qcd_scores):
         plt.figure(figsize=(7, 5))
@@ -343,8 +368,9 @@ def run_autoencoder(config, output_path):
                           dynamic_axes={"input": {0: "batch"}, "reconstruction": {0: "batch"}})
         onnx.checker.check_model(onnx.load(str(onnx_path)))
 
-    _save_plots(history, val_scores, threshold, ewk_scores, anomaly_scores,
-                qcd_scores, labels, scores, output_dir, name)
+    _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
+                anomaly_scores, qcd_scores, labels, scores, output_dir, name,
+                mixed_normal)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),
