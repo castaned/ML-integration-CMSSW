@@ -145,3 +145,12 @@ The new ROOT, HDF5, and autoencoder outputs use `root_wz`, `h5_wz`, and
 pilot results are not overwritten. Run processing and inspect the cutflow
 before conversion or training: QCD may have too few surviving events to
 support the existing train/validation/test split.
+
+For the first selected-region pilot, QCD has zero events after the W cut.
+Generate `wz_ewk_root2h5_config.yaml` and
+`autoencoder_ewk_wz_model_config.yaml` with
+`python scripts/setup_wz_ewk_pilot.py`. These configs convert only the selected
+EWK and Wprime ROOT files and train the autoencoder on selected EWK events;
+Wprime remains evaluation-only. The new results go to
+`results_autoencoder_ewk_wz`. With only one EWK input file and 184 selected
+events, treat the metrics and plots as a pilot, not a stable physics result.
