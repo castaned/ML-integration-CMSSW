@@ -185,9 +185,13 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
         plt.close()
 
     if mixed_normal:
-        fig, axes = plt.subplots(2, 1, figsize=(10, 8), constrained_layout=True)
-        for ax, process_id, process_name in zip(axes, (2, 3), ("EWK", "QCD")):
-            process_scores = val_scores[val_ids == process_id]
+        panels = [("EWK", "validation", val_scores[val_ids == 2], 2),
+                  ("QCD", "validation", val_scores[val_ids == 3], 3)]
+        if len(anomaly_scores):
+            panels.append(("Wprime", "evaluation only", anomaly_scores, 1))
+        fig, axes = plt.subplots(len(panels), 1,
+                                 figsize=(10, 3.5 * len(panels)), constrained_layout=True)
+        for ax, (process_name, role, process_scores, process_id) in zip(axes, panels):
             below_indices = np.flatnonzero(process_scores < threshold)
             above_indices = np.flatnonzero(process_scores >= threshold)
             if len(below_indices) > 4000:
@@ -202,12 +206,13 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
             ax.axhline(threshold, color="black", linestyle="--", linewidth=1.5,
                        label=f"Threshold = {threshold:.3f}")
             rate = 100 * len(above_indices) / len(process_scores)
-            ax.set_title(f"{process_name} validation: {len(process_scores)} events, "
+            ax.set_title(f"{process_name} {role}: {len(process_scores)} events, "
                          f"{rate:.2f}% above threshold")
-            ax.set_xlabel(f"Event index within {process_name} validation sample")
+            ax.set_xlabel(f"Event index within {process_name} {role} sample")
             ax.set_ylabel("Reconstruction error")
             ax.legend(loc="upper right")
-        fig.suptitle("SM validation by process (blue subsampled for display)")
+        fig.suptitle("SM validation and Wprime evaluation "
+                     "(blue subsampled for display)")
         fig.savefig(output_dir / f"validation_events_{name}.pdf")
         plt.close(fig)
     else:
