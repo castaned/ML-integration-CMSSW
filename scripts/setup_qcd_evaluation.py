@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--qcd-dir", type=Path, default=home / "Open-Data/Data/QCD")
     parser.add_argument("--config-dir", type=Path, default=home / "Open-Data")
     parser.add_argument("--qcd-id", type=int, default=3)
+    parser.add_argument("--account", help="Slurm account; required if base configs omit it")
     args = parser.parse_args()
 
     qcd_dir = args.qcd_dir.expanduser().resolve()
@@ -43,10 +44,15 @@ def main():
             configs[key] = copy.deepcopy(yaml.safe_load(handle))
 
     processing = configs["processing"]["data_processing"]
+    account = args.account or processing["slurm_params"].get("account")
+    if not account:
+        parser.error("Missing Slurm account; rerun with --account PROJECT_CODE")
+    processing["slurm_params"]["account"] = account
     processing["datasets"] = [{"name": "QCD", "ID": args.qcd_id, "path": str(qcd_dir)}]
     root_output = Path(processing["eos_output_dir"]).expanduser()
 
     conversion = configs["conversion"]["convertion"]
+    configs["conversion"]["slurm_params"]["account"] = account
     conversion["input_dirs"] = [str(root_output / "QCD")]
     h5_output = Path(conversion["eos_output_dir"]).expanduser()
 

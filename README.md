@@ -105,7 +105,7 @@ After copying ROOT files into `$HOME/Open-Data/Data/QCD`, generate three separat
 configs from the personal EWK/Wprime configs already in `$HOME/Open-Data`:
 
 ```bash
-python scripts/setup_qcd_evaluation.py
+python scripts/setup_qcd_evaluation.py --account p002
 ```
 
 This creates `qcd_data_processing_config.yaml`, `qcd_root2h5_config.yaml`,
