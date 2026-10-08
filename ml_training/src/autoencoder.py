@@ -119,7 +119,7 @@ def _scores(model, values, device, batch_size):
 
 def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
                 anomaly_scores, qcd_scores, labels, scores, output_dir, name,
-                mixed_normal):
+                mixed_normal, val_ids):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
     plt.plot(history["val_loss"], label="SM validation")
@@ -184,22 +184,49 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
         plt.savefig(output_dir / f"EWK_QCD_{name}.pdf")
         plt.close()
 
-    below = val_scores < threshold
-    indices = np.arange(len(val_scores))
-    plt.figure(figsize=(9, 5))
-    plt.scatter(indices[below], val_scores[below], s=12, color="tab:blue",
-                alpha=0.7, label=f"Below threshold ({below.sum()})")
-    plt.scatter(indices[~below], val_scores[~below], s=18, color="crimson",
-                alpha=0.85, label=f"At or above threshold ({(~below).sum()})")
-    plt.axhline(threshold, color="black", linestyle="--", linewidth=1.5,
-                label=f"Threshold = {threshold:.3f}")
-    plt.xlabel("Event index in SM validation sample")
-    plt.ylabel("Reconstruction error (anomaly score)")
-    plt.title("SM validation events and anomaly threshold")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(output_dir / f"validation_events_{name}.pdf")
-    plt.close()
+    if mixed_normal:
+        fig, axes = plt.subplots(2, 1, figsize=(10, 8), constrained_layout=True)
+        for ax, process_id, process_name in zip(axes, (2, 3), ("EWK", "QCD")):
+            process_scores = val_scores[val_ids == process_id]
+            below_indices = np.flatnonzero(process_scores < threshold)
+            above_indices = np.flatnonzero(process_scores >= threshold)
+            if len(below_indices) > 4000:
+                below_indices = np.sort(np.random.default_rng(16 + process_id).choice(
+                    below_indices, size=4000, replace=False))
+            ax.scatter(below_indices, process_scores[below_indices], s=9,
+                       color="tab:blue", alpha=0.55,
+                       label=f"Below (shown {len(below_indices)})")
+            ax.scatter(above_indices, process_scores[above_indices], s=16,
+                       color="crimson", alpha=0.8,
+                       label=f"At/above ({len(above_indices)})")
+            ax.axhline(threshold, color="black", linestyle="--", linewidth=1.5,
+                       label=f"Threshold = {threshold:.3f}")
+            rate = 100 * len(above_indices) / len(process_scores)
+            ax.set_title(f"{process_name} validation: {len(process_scores)} events, "
+                         f"{rate:.2f}% above threshold")
+            ax.set_xlabel(f"Event index within {process_name} validation sample")
+            ax.set_ylabel("Reconstruction error")
+            ax.legend(loc="upper right")
+        fig.suptitle("SM validation by process (blue subsampled for display)")
+        fig.savefig(output_dir / f"validation_events_{name}.pdf")
+        plt.close(fig)
+    else:
+        below = val_scores < threshold
+        indices = np.arange(len(val_scores))
+        plt.figure(figsize=(9, 5))
+        plt.scatter(indices[below], val_scores[below], s=12, color="tab:blue",
+                    alpha=0.7, label=f"Below threshold ({below.sum()})")
+        plt.scatter(indices[~below], val_scores[~below], s=18, color="crimson",
+                    alpha=0.85, label=f"At or above threshold ({(~below).sum()})")
+        plt.axhline(threshold, color="black", linestyle="--", linewidth=1.5,
+                    label=f"Threshold = {threshold:.3f}")
+        plt.xlabel("Event index in SM validation sample")
+        plt.ylabel("Reconstruction error (anomaly score)")
+        plt.title("SM validation events and anomaly threshold")
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_dir / f"validation_events_{name}.pdf")
+        plt.close()
 
     if len(anomaly_scores):
         fpr, tpr, _ = roc_curve(labels, scores)
@@ -370,7 +397,7 @@ def run_autoencoder(config, output_path):
 
     _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
                 anomaly_scores, qcd_scores, labels, scores, output_dir, name,
-                mixed_normal)
+                mixed_normal, val_ids)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),

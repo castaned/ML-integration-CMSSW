@@ -89,6 +89,7 @@ class AutoencoderTests(unittest.TestCase):
             self.assertTrue((mixture_output / "EWK_QCD_mixture.pdf").is_file())
             self.assertTrue((mixture_output / "scores_mixture.pdf").is_file())
             self.assertTrue((mixture_output / "scores_by_process_mixture.pdf").is_file())
+            self.assertTrue((mixture_output / "validation_events_mixture.pdf").is_file())
 
 
 if __name__ == "__main__":
