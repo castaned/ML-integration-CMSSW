@@ -168,6 +168,9 @@ Check the per-process cutflows before conversion: each of DYJets, WZ, and ZZ
 needs enough selected events for train/validation/test. The code fails clearly
 if one process has none or too few. Outputs are isolated under
 `root_sm_cocktail`, `h5_sm_cocktail`, and `results_autoencoder_sm_cocktail`.
+When more ROOT files are added later, run the conversion command with
+`--skip-existing --skip-empty-trees` to process only files without an HDF5
+counterpart. Check that previous HDF5 files are valid before skipping them.
 
 To compare boosted-sensitive inputs without reprocessing ROOT files, run
 `python scripts/setup_boosted_features.py` on Yuca. The new autoencoder config

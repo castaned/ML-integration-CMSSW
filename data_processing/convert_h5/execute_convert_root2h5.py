@@ -8,7 +8,7 @@ import utilities.utils as utils
 import utilities.lxplus as lxplus
 import utilities.root as root
 
-def main(config_path, skip_empty_trees=False):
+def main(config_path, skip_empty_trees=False, skip_existing=False):
    
    config = utils.load_config(config_path)
    convertion = utils.require_key(config, 'convertion')
@@ -52,16 +52,23 @@ def main(config_path, skip_empty_trees=False):
       root_files = [f for f in os.listdir(input_dir) if f.endswith('.root')]
       for root_file in root_files:
          input_path = os.path.join(input_dir, root_file)
+         output_path = os.path.join(exp_dir, os.path.splitext(root_file)[0] + '.h5')
+         if skip_existing and os.path.exists(output_path):
+            print(f"Skipping {input_path}: output already exists at {output_path}")
+            continue
          if skip_empty_trees:
             with uproot.open(input_path) as source:
                if tree_name not in source:
                   print(f"Skipping {input_path}: no {tree_name} tree (zero selected events)")
                   continue
-         output_path = os.path.join(exp_dir, os.path.splitext(root_file)[0] + '.h5')
          args_dat.append(f"{input_path} {output_path}")
 
    if not args_dat:
+      if skip_existing:
+         print("No new ROOT files to convert")
+         return
       raise ValueError("No ROOT files with a conversion tree were found")
+   print(f"Submitting {len(args_dat)} ROOT files for conversion")
 
    utils.write_args_file("args_conversion.dat", args_dat)
 
@@ -79,6 +86,9 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--file', type=str, help="Path to the configuration file.", required=True)
     parser.add_argument('--skip-empty-trees', action='store_true',
                         help="Skip ROOT files without the configured tree")
+    parser.add_argument('--skip-existing', action='store_true',
+                        help="Do not reconvert ROOT files whose HDF5 output already exists")
     args = parser.parse_args()
     
-    main(args.file, skip_empty_trees=args.skip_empty_trees)
+    main(args.file, skip_empty_trees=args.skip_empty_trees,
+         skip_existing=args.skip_existing)
