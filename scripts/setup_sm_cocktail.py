@@ -58,6 +58,7 @@ def main():
     conversion["slurm_params"]["account"] = args.account
     conversion["convertion"]["input_dirs"] = [str(root_output / name) for name in PROCESSES]
     conversion["convertion"]["eos_output_dir"] = str(h5_output)
+    conversion["convertion"]["skip_empty_trees"] = True
 
     autoencoder = configs["autoencoder"]
     model_data = autoencoder["data"]

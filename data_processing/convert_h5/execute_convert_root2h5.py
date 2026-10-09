@@ -8,7 +8,7 @@ import utilities.utils as utils
 import utilities.lxplus as lxplus
 import utilities.root as root
 
-def main(config_path):
+def main(config_path, skip_empty_trees=False):
    
    config = utils.load_config(config_path)
    convertion = utils.require_key(config, 'convertion')
@@ -34,6 +34,9 @@ def main(config_path):
    branches = utils.require_key(convertion,'branches')
    output_dir = utils.require_key(convertion,'eos_output_dir')
    max_jagged_len = utils.require_key(convertion, 'max_jagged_len')
+   skip_empty_trees = skip_empty_trees or convertion.get('skip_empty_trees', False)
+   if skip_empty_trees:
+      import uproot
    if not max_jagged_len:
       max_jagged_len = 10
       
@@ -49,9 +52,16 @@ def main(config_path):
       root_files = [f for f in os.listdir(input_dir) if f.endswith('.root')]
       for root_file in root_files:
          input_path = os.path.join(input_dir, root_file)
+         if skip_empty_trees:
+            with uproot.open(input_path) as source:
+               if tree_name not in source:
+                  print(f"Skipping {input_path}: no {tree_name} tree (zero selected events)")
+                  continue
          output_path = os.path.join(exp_dir, os.path.splitext(root_file)[0] + '.h5')
          args_dat.append(f"{input_path} {output_path}")
 
+   if not args_dat:
+      raise ValueError("No ROOT files with a conversion tree were found")
 
    utils.write_args_file("args_conversion.dat", args_dat)
 
@@ -67,6 +77,8 @@ def main(config_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert NanoAOD root file to h5 file")
     parser.add_argument('-f', '--file', type=str, help="Path to the configuration file.", required=True)
+    parser.add_argument('--skip-empty-trees', action='store_true',
+                        help="Skip ROOT files without the configured tree")
     args = parser.parse_args()
     
-    main(args.file)
+    main(args.file, skip_empty_trees=args.skip_empty_trees)
