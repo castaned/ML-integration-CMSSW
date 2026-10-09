@@ -168,3 +168,13 @@ Check the per-process cutflows before conversion: each of DYJets, WZ, and ZZ
 needs enough selected events for train/validation/test. The code fails clearly
 if one process has none or too few. Outputs are isolated under
 `root_sm_cocktail`, `h5_sm_cocktail`, and `results_autoencoder_sm_cocktail`.
+
+To compare boosted-sensitive inputs without reprocessing ROOT files, run
+`python scripts/setup_boosted_features.py` on Yuca. The new autoencoder config
+uses `MET_pt`, virtual features `M3l` (invariant mass of the three charged
+leptons, excluding the neutrino), `Z_deltaR` (separation of the selected Z
+pair), and `Z_mass`. The virtual features read the branch for the event's
+passing A/B/C/D channel from the existing HDF5 files. Output goes to a new
+`results_autoencoder_sm_cocktail_boosted` directory with the same split seed.
+`python scripts/check_boosted_cut.py` reports the unweighted per-process
+efficiency of `Z_deltaR < 1.5`; it does not modify the training selection.

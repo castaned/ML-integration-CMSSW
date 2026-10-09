@@ -12,6 +12,30 @@ DEPENDENCIES = ("numpy", "torch", "h5py", "sklearn", "matplotlib", "onnx")
 
 @unittest.skipUnless(all(importlib.util.find_spec(name) for name in DEPENDENCIES), "ML dependencies are not installed")
 class AutoencoderTests(unittest.TestCase):
+    def test_channel_features_follow_the_passing_channel(self):
+        import h5py
+        import numpy as np
+        from src.autoencoder import _load_events
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "channels.h5"
+            with h5py.File(path, "w") as handle:
+                handle.create_dataset("Dataset_ID", data=[4, 4, 4, 4])
+                for index, channel in enumerate("ABCD"):
+                    passed = np.zeros(4, dtype=int)
+                    passed[index] = 1
+                    handle.create_dataset(f"{channel}_pass", data=passed)
+                    for branch, offset in (("Sum_mass", 100), ("Dr_Z", 0.1),
+                                           ("Zmass", 90)):
+                        values = np.full(4, -999.0)
+                        values[index] = offset + index
+                        handle.create_dataset(f"{channel}_{branch}", data=values)
+            values = _load_events([str(path)], ["M3l", "Z_deltaR", "Z_mass"],
+                                  "Dataset_ID", [4])
+            np.testing.assert_allclose(values[:, 0], [100, 101, 102, 103])
+            np.testing.assert_allclose(values[:, 1], [0.1, 1.1, 2.1, 3.1])
+            np.testing.assert_allclose(values[:, 2], [90, 91, 92, 93])
+
     def test_training_uses_only_normal_events(self):
         import h5py
         import numpy as np

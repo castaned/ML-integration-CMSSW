@@ -18,6 +18,30 @@ from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 from models.models import AutoencoderModel
 
 
+CHANNEL_FEATURES = {"M3l": "Sum_mass", "Z_deltaR": "Dr_Z", "Z_mass": "Zmass"}
+CHANNELS = "ABCD"
+
+
+def _channel_feature(handle, feature, n_events, path):
+    required = [f"{channel}_pass" for channel in CHANNELS]
+    required += [f"{channel}_{CHANNEL_FEATURES[feature]}" for channel in CHANNELS]
+    missing = set(required) - set(handle.keys())
+    if missing:
+        raise ValueError(f"{path}: missing branches for {feature}: {sorted(missing)}")
+    passes = np.column_stack([np.asarray(handle[f"{channel}_pass"][:], dtype=bool)
+                              for channel in CHANNELS])
+    if passes.shape != (n_events, len(CHANNELS)) or np.any(passes.sum(axis=1) != 1):
+        raise ValueError(f"{path}: {feature} needs exactly one passing channel per event")
+    values = np.empty(n_events, dtype=np.float32)
+    for index, channel in enumerate(CHANNELS):
+        branch = np.asarray(handle[f"{channel}_{CHANNEL_FEATURES[feature]}"][:],
+                            dtype=np.float32)
+        if branch.shape != (n_events,):
+            raise ValueError(f"{path}: invalid {channel} branch shape for {feature}")
+        values[passes[:, index]] = branch[passes[:, index]]
+    return values
+
+
 def _files(paths):
     files = []
     for raw in paths:
@@ -39,7 +63,7 @@ def _load_events(paths, features, label, allowed_labels, return_labels=False):
     allowed = set(int(value) for value in allowed_labels)
     for path in _files(paths):
         with h5py.File(path, "r") as handle:
-            missing = set(features + [label]) - set(handle.keys())
+            missing = (set(features + [label]) - set(CHANNEL_FEATURES)) - set(handle.keys())
             if missing:
                 raise ValueError(f"{path}: missing branches {sorted(missing)}")
             labels = np.asarray(handle[label][:], dtype=int)
@@ -47,7 +71,9 @@ def _load_events(paths, features, label, allowed_labels, return_labels=False):
                 raise ValueError(f"{path}: contains labels outside {sorted(allowed)}")
             columns = []
             for feature in features:
-                column = np.asarray(handle[feature][:], dtype=np.float32)
+                column = (_channel_feature(handle, feature, len(labels), path)
+                          if feature in CHANNEL_FEATURES else
+                          np.asarray(handle[feature][:], dtype=np.float32))
                 if column.ndim != 1 or len(column) != len(labels):
                     raise ValueError(f"{path}: {feature} must be one scalar per event")
                 columns.append(column)
