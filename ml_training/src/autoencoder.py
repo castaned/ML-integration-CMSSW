@@ -18,7 +18,8 @@ from torch.utils.data import DataLoader, TensorDataset, WeightedRandomSampler
 from models.models import AutoencoderModel
 
 
-CHANNEL_FEATURES = {"M3l": "Sum_mass", "Z_deltaR": "Dr_Z", "Z_mass": "Zmass"}
+CHANNEL_FEATURES = {"M3l": "Sum_mass", "Z_deltaR": "Dr_Z", "Z_mass": "Zmass",
+                    "Lep_pt_sum": "Sum_pt"}
 CHANNELS = "ABCD"
 
 

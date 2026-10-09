@@ -198,3 +198,9 @@ calibrated residual. Calibration uses SM training events only; thresholds use
 SM validation events only. The separate `score_study` result directory contains
 JSON rates at target 1% and 5% balanced SM false-positive rates and a ROC PDF.
 Wprime is evaluation-only, not a reason to select one score as universally best.
+For a controlled feature ablation on the same no-cut DYJets/WZ/ZZ inputs,
+`python scripts/setup_ptsum_ablation.py` creates a new model config with one
+extra input, `Lep_pt_sum`. This is the scalar sum of the three selected
+leptons' transverse momenta, read from the passing A/B/C/D channel; it is
+not the vector transverse momentum of the system. The original model and
+results are untouched.

@@ -35,15 +35,17 @@ class AutoencoderTests(unittest.TestCase):
                     passed[index] = 1
                     handle.create_dataset(f"{channel}_pass", data=passed)
                     for branch, offset in (("Sum_mass", 100), ("Dr_Z", 0.1),
-                                           ("Zmass", 90)):
+                                           ("Zmass", 90), ("Sum_pt", 200)):
                         values = np.full(4, -999.0)
                         values[index] = offset + index
                         handle.create_dataset(f"{channel}_{branch}", data=values)
-            values = _load_events([str(path)], ["M3l", "Z_deltaR", "Z_mass"],
+            values = _load_events([str(path)],
+                                  ["M3l", "Z_deltaR", "Z_mass", "Lep_pt_sum"],
                                   "Dataset_ID", [4])
             np.testing.assert_allclose(values[:, 0], [100, 101, 102, 103])
             np.testing.assert_allclose(values[:, 1], [0.1, 1.1, 2.1, 3.1])
             np.testing.assert_allclose(values[:, 2], [90, 91, 92, 93])
+            np.testing.assert_allclose(values[:, 3], [200, 201, 202, 203])
 
     def test_training_uses_only_normal_events(self):
         import h5py
