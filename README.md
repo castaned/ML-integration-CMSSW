@@ -154,3 +154,17 @@ EWK and Wprime ROOT files and train the autoencoder on selected EWK events;
 Wprime remains evaluation-only. The new results go to
 `results_autoencoder_ewk_wz`. With only one EWK input file and 184 selected
 events, treat the metrics and plots as a pilot, not a stable physics result.
+
+For an isolated three-process SM pilot on Yuca, put compatible NanoAOD ROOT
+files in `$HOME/Open-Data/Data/DYJets`, `WZ`, and `ZZ`, then run
+`python scripts/setup_sm_cocktail.py`. This writes new processing, conversion,
+and autoencoder configs under `$HOME/Open-Data` without changing earlier runs.
+The processing config selects the three-lepton Z+W region for each process;
+Wprime is read only from the existing selected `h5_wz/senal` directory for
+evaluation. Each SM process gets an equal share of training sampling,
+preprocessing, validation threshold, test histogram, and ROC weighting.
+This is equal *process* weighting, not cross-section or luminosity weighting.
+Check the per-process cutflows before conversion: each of DYJets, WZ, and ZZ
+needs enough selected events for train/validation/test. The code fails clearly
+if one process has none or too few. Outputs are isolated under
+`root_sm_cocktail`, `h5_sm_cocktail`, and `results_autoencoder_sm_cocktail`.

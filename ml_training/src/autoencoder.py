@@ -119,7 +119,7 @@ def _scores(model, values, device, batch_size):
 
 def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
                 anomaly_scores, qcd_scores, labels, scores, output_dir, name,
-                mixed_normal, val_ids):
+                mixed_normal, val_ids, test_ids, process_names, evaluation_weights):
     plt.figure(figsize=(7, 5))
     plt.plot(history["train_loss"], label="Training")
     plt.plot(history["val_loss"], label="SM validation")
@@ -132,13 +132,15 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
 
     plt.figure(figsize=(7, 5))
     if mixed_normal:
-        plot_scores = np.concatenate((ewk_scores, qcd_scores))
-        plot_weights = np.concatenate((np.full(len(ewk_scores), 0.5 / len(ewk_scores)),
-                                       np.full(len(qcd_scores), 0.5 / len(qcd_scores))))
-        plt.hist(plot_scores, bins=50, weights=plot_weights, density=True,
-                 alpha=0.6, label="SM test (EWK + QCD, 50/50)")
+        plot_weights = np.zeros(len(normal_scores), dtype=float)
+        for process_id in process_names:
+            mask = test_ids == process_id
+            plot_weights[mask] = 1 / (len(process_names) * mask.sum())
+        plt.hist(normal_scores, bins=50, weights=plot_weights, density=True,
+                 alpha=0.6, label="SM test (equal process weights)")
     else:
-        plt.hist(normal_scores, bins=50, density=True, alpha=0.6, label="EWK test")
+        plt.hist(normal_scores, bins=50, density=True, alpha=0.6,
+                 label=f"{process_names[int(test_ids[0])]} test")
     if len(anomaly_scores):
         plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6, label="Wprime example")
     if len(qcd_scores) and not mixed_normal:
@@ -155,8 +157,9 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
 
     if mixed_normal:
         plt.figure(figsize=(7, 5))
-        plt.hist(ewk_scores, bins=50, density=True, alpha=0.6, label="EWK test")
-        plt.hist(qcd_scores, bins=50, density=True, alpha=0.5, label="QCD test")
+        for process_id, process_name in process_names.items():
+            plt.hist(normal_scores[test_ids == process_id], bins=50, density=True,
+                     alpha=0.5, label=f"{process_name} test")
         if len(anomaly_scores):
             plt.hist(anomaly_scores, bins=50, density=True, alpha=0.6,
                      label="Wprime example")
@@ -185,8 +188,8 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
         plt.close()
 
     if mixed_normal:
-        panels = [("EWK", "validation", val_scores[val_ids == 2], 2),
-                  ("QCD", "validation", val_scores[val_ids == 3], 3)]
+        panels = [(process_name, "validation", val_scores[val_ids == process_id], process_id)
+                  for process_id, process_name in process_names.items()]
         if len(anomaly_scores):
             panels.append(("Wprime", "evaluation only", anomaly_scores, 1))
         fig, axes = plt.subplots(len(panels), 1,
@@ -234,9 +237,9 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
         plt.close()
 
     if len(anomaly_scores):
-        fpr, tpr, _ = roc_curve(labels, scores)
+        fpr, tpr, _ = roc_curve(labels, scores, sample_weight=evaluation_weights)
         plt.figure(figsize=(7, 5))
-        plt.plot(fpr, tpr, label=f"AUC = {roc_auc_score(labels, scores):.3f}")
+        plt.plot(fpr, tpr, label=f"AUC = {roc_auc_score(labels, scores, sample_weight=evaluation_weights):.3f}")
         plt.plot([0, 1], [0, 1], "k--")
         plt.xlabel("False positive rate")
         plt.ylabel("True positive rate")
@@ -245,9 +248,10 @@ def _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
         plt.savefig(output_dir / f"ROC_{name}.pdf")
         plt.close()
 
-        precision, recall, _ = precision_recall_curve(labels, scores)
+        precision, recall, _ = precision_recall_curve(labels, scores,
+                                                     sample_weight=evaluation_weights)
         plt.figure(figsize=(7, 5))
-        plt.plot(recall, precision, label=f"AP = {average_precision_score(labels, scores):.3f}")
+        plt.plot(recall, precision, label=f"AP = {average_precision_score(labels, scores, sample_weight=evaluation_weights):.3f}")
         plt.xlabel("Recall")
         plt.ylabel("Precision")
         plt.legend()
@@ -267,6 +271,14 @@ def run_autoencoder(config, output_path):
     anomaly_labels = set(int(value) for value in data["anomaly_labels"])
     if not normal_labels or normal_labels & anomaly_labels:
         raise ValueError("Normal and anomaly labels must be nonempty and disjoint")
+    process_names = {int(key): str(value) for key, value in data.get(
+        "normal_process_names", {}).items()}
+    if process_names and set(process_names) != normal_labels:
+        raise ValueError("normal_process_names must name every normal label exactly once")
+    for process_id in normal_labels:
+        process_names.setdefault(process_id, {2: "EWK", 3: "QCD"}.get(
+            process_id, f"Process {process_id}"))
+    process_names = dict(sorted(process_names.items()))
 
     qcd_paths = data.get("qcd_input_paths", [])
     qcd_labels = set(int(value) for value in data.get("qcd_labels", []))
@@ -278,8 +290,6 @@ def run_autoencoder(config, output_path):
     if set(np.unique(normal_ids)) != normal_labels:
         raise ValueError("Every configured normal label needs at least one event")
     mixed_normal = len(normal_labels) > 1
-    if mixed_normal and normal_labels != {2, 3}:
-        raise ValueError("The mixed-SM mode expects EWK ID 2 and QCD ID 3")
     anomaly_paths = data.get("anomaly_input_paths", [])
     anomaly = _load_events(anomaly_paths, features, data["label"], anomaly_labels) if anomaly_paths else np.empty((0, len(features)), dtype=np.float32)
     qcd = _load_events(qcd_paths, features, data["label"], qcd_labels) if qcd_paths else np.empty((0, len(features)), dtype=np.float32)
@@ -384,6 +394,12 @@ def run_autoencoder(config, output_path):
                   _scores(model, qcd, device, batch_size) if len(qcd) else np.empty(0))
     scores = np.concatenate((normal_scores, anomaly_scores))
     labels = np.concatenate((np.zeros(len(normal_scores), dtype=int), np.ones(len(anomaly_scores), dtype=int)))
+    evaluation_weights = np.ones(len(scores), dtype=float)
+    for process_id in normal_labels:
+        mask = test_ids == process_id
+        evaluation_weights[:len(normal_scores)][mask] = 1 / (len(normal_labels) * mask.sum())
+    if len(anomaly_scores):
+        evaluation_weights[len(normal_scores):] = 1 / len(anomaly_scores)
 
     output_dir = Path(output_path)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -402,7 +418,7 @@ def run_autoencoder(config, output_path):
 
     _save_plots(history, val_scores, threshold, normal_scores, ewk_scores,
                 anomaly_scores, qcd_scores, labels, scores, output_dir, name,
-                mixed_normal, val_ids)
+                mixed_normal, val_ids, test_ids, process_names, evaluation_weights)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),
@@ -410,7 +426,7 @@ def run_autoencoder(config, output_path):
                    np.mean(normal_scores[test_ids == process_id] >= threshold)
                    for process_id in sorted(normal_labels)])),
                "signal_test_tpr": float(np.mean(anomaly_scores >= threshold)) if len(anomaly_scores) else None,
-               "ewk_test_fpr": float(np.mean(ewk_scores >= threshold)),
+               "ewk_test_fpr": float(np.mean(ewk_scores >= threshold)) if len(ewk_scores) else None,
                "qcd_test": len(qcd_scores),
                "qcd_test_fpr": float(np.mean(qcd_scores >= threshold)) if len(qcd_scores) else None,
                "normal_training_by_id": {str(process_id): int((train_ids == process_id).sum())
@@ -419,8 +435,12 @@ def run_autoencoder(config, output_path):
                                            for process_id in sorted(normal_labels)},
                "normal_test_by_id": {str(process_id): int((test_ids == process_id).sum())
                                      for process_id in sorted(normal_labels)},
-               "roc_auc": float(roc_auc_score(labels, scores)) if len(anomaly_scores) else None,
-               "average_precision": float(average_precision_score(labels, scores)) if len(anomaly_scores) else None,
+               "normal_process_names": {str(key): value for key, value in process_names.items()},
+               "normal_test_fpr_by_id": {str(process_id): float(np.mean(
+                   normal_scores[test_ids == process_id] >= threshold))
+                   for process_id in sorted(normal_labels)},
+               "roc_auc": float(roc_auc_score(labels, scores, sample_weight=evaluation_weights)) if len(anomaly_scores) else None,
+               "average_precision": float(average_precision_score(labels, scores, sample_weight=evaluation_weights)) if len(anomaly_scores) else None,
                "features": features, "seed": seed}
     with open(output_dir / f"metrics_{name}.json", "w", encoding="utf-8") as handle:
         json.dump(metrics, handle, indent=2)
@@ -428,7 +448,7 @@ def run_autoencoder(config, output_path):
         writer = csv.writer(handle)
         writer.writerow(["sample", "anomaly_score", "above_threshold"])
         for score, process_id in zip(normal_scores, test_ids):
-            writer.writerow(["QCD_test" if process_id == 3 else "EWK_test",
+            writer.writerow([f"{process_names[int(process_id)]}_test",
                              float(score), int(score >= threshold)])
         for score in anomaly_scores:
             writer.writerow(["signal_example", float(score), int(score >= threshold)])

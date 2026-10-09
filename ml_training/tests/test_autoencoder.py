@@ -91,6 +91,35 @@ class AutoencoderTests(unittest.TestCase):
             self.assertTrue((mixture_output / "scores_by_process_mixture.pdf").is_file())
             self.assertTrue((mixture_output / "validation_events_mixture.pdf").is_file())
 
+            cocktail_paths = []
+            for process_id, location in ((4, 0), (5, 1), (6, 2)):
+                path = root / f"process_{process_id}.h5"
+                values = rng.normal(loc=location, size=(30 + 10 * (process_id - 4), 3)).astype("f4")
+                with h5py.File(path, "w") as handle:
+                    for index in range(3):
+                        handle.create_dataset(f"f{index}", data=values[:, index])
+                    handle.create_dataset("Dataset_ID", data=np.full(len(values), process_id))
+                cocktail_paths.append(str(path))
+            cocktail = copy.deepcopy(config)
+            cocktail["data"]["normal_input_paths"] = cocktail_paths
+            cocktail["data"]["normal_labels"] = [4, 5, 6]
+            cocktail["data"]["normal_process_names"] = {4: "DYJets", 5: "WZ", 6: "ZZ"}
+            del cocktail["data"]["qcd_input_paths"]
+            del cocktail["data"]["qcd_labels"]
+            cocktail["model"]["name"] = "cocktail"
+            cocktail_output = root / "cocktail_results"
+            run_autoencoder(cocktail, str(cocktail_output))
+            cocktail_metrics = json.loads((cocktail_output / "metrics_cocktail.json").read_text())
+            self.assertEqual(cocktail_metrics["normal_training_by_id"],
+                             {"4": 18, "5": 24, "6": 30})
+            self.assertEqual(cocktail_metrics["normal_test_by_id"],
+                             {"4": 6, "5": 8, "6": 10})
+            self.assertEqual(set(cocktail_metrics["normal_test_fpr_by_id"]), {"4", "5", "6"})
+            self.assertTrue((cocktail_output / "scores_by_process_cocktail.pdf").is_file())
+            with (cocktail_output / "scores_cocktail.csv").open(newline="", encoding="utf-8") as handle:
+                names = {row["sample"] for row in csv.DictReader(handle)}
+            self.assertEqual(names, {"DYJets_test", "WZ_test", "ZZ_test", "signal_example"})
+
 
 if __name__ == "__main__":
     unittest.main()
