@@ -12,6 +12,17 @@ DEPENDENCIES = ("numpy", "torch", "h5py", "sklearn", "matplotlib", "onnx")
 
 @unittest.skipUnless(all(importlib.util.find_spec(name) for name in DEPENDENCIES), "ML dependencies are not installed")
 class AutoencoderTests(unittest.TestCase):
+    def test_mass_diagnostic_uses_training_test_split(self):
+        import numpy as np
+        from plot_score_diagnostics import test_indices
+        from src.autoencoder import _split_by_process
+
+        labels = np.repeat([4, 5, 6], [20, 30, 40])
+        values = np.arange(len(labels), dtype=np.float32).reshape(-1, 1)
+        (_, _, expected), _ = _split_by_process(values, labels, 0.2, 0.2, 16)
+        selected = test_indices(labels, 0.2, 0.2, 16)
+        np.testing.assert_array_equal(values[selected], expected)
+
     def test_score_study_balances_sm_processes(self):
         import numpy as np
         from compare_autoencoder_scores import process_weights

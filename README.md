@@ -204,3 +204,10 @@ extra input, `Lep_pt_sum`. This is the scalar sum of the three selected
 leptons' transverse momenta, read from the passing A/B/C/D channel; it is
 not the vector transverse momentum of the system. The original model and
 results are untouched.
+For a frozen-model diagnostic of the five-feature DYJets/WZ/ZZ run, use
+`python ml_training/plot_score_diagnostics.py -f "$HOME/Open-Data/autoencoder_sm_cocktail_dy102_ptsum_config.yaml"`
+from the repository root. The separate `mass_channel_diagnostics` directory
+shows reconstruction score versus charged-trilepton mass by process and by
+channel, plus the equal-process SM mass distribution before/after the fixed
+SM-validation score threshold. Only held-out SM test events and external
+Wprime events appear in the scatter plots; no new model is trained.
