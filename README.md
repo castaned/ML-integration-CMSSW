@@ -211,3 +211,12 @@ shows reconstruction score versus charged-trilepton mass by process and by
 channel, plus the equal-process SM mass distribution before/after the fixed
 SM-validation score threshold. Only held-out SM test events and external
 Wprime events appear in the scatter plots; no new model is trained.
+As an independent rarity baseline, run
+`python ml_training/compare_sm_density.py -f "$HOME/Open-Data/autoencoder_sm_cocktail_dy102_ptsum_config.yaml"`.
+It fits one Gaussian kernel density estimator per SM process on the saved
+training split, combines them with equal process priors, chooses its bandwidth
+by balanced SM validation likelihood, and compares negative log density with
+the frozen autoencoder MSE on the same held-out SM events and external Wprime
+events. Its separate `sm_density_study` directory contains JSON operating
+points and a ROC PDF. This equal-process baseline is not a cross-section-
+weighted physics model, and Wprime must not be used to tune the density model.

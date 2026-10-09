@@ -12,6 +12,17 @@ DEPENDENCIES = ("numpy", "torch", "h5py", "sklearn", "matplotlib", "onnx")
 
 @unittest.skipUnless(all(importlib.util.find_spec(name) for name in DEPENDENCIES), "ML dependencies are not installed")
 class AutoencoderTests(unittest.TestCase):
+    def test_density_mixture_uses_equal_process_priors(self):
+        import numpy as np
+        from compare_sm_density import fit_process_densities, mixture_log_density
+
+        values = np.array([[-2.0], [-1.8], [-2.2], [2.0], [2.2], [1.8]],
+                          dtype=np.float32)
+        ids = np.array([4, 4, 4, 5, 5, 5])
+        models = fit_process_densities(values, ids, 0.5)
+        score = mixture_log_density(models, np.array([[-2.0], [2.0]]))
+        self.assertAlmostEqual(score[0], score[1], places=5)
+
     def test_mass_diagnostic_uses_training_test_split(self):
         import numpy as np
         from plot_score_diagnostics import test_indices
