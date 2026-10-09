@@ -189,3 +189,12 @@ To run a separate post-cut autoencoder pilot, use
 configurations, and plots remain untouched. The cut itself must be reported
 separately from the autoencoder performance; DYJets has very small statistics
 after this cut, so its train/validation/test metrics are not stable.
+
+To study the anomaly *score* without retraining, run
+`python ml_training/compare_autoencoder_scores.py -f "$HOME/Open-Data/autoencoder_sm_cocktail_dy102_config.yaml"`
+from the repository root. It reloads the frozen model and exact seeded split,
+then compares ordinary MSE, per-feature residual-calibrated MSE, and maximum
+calibrated residual. Calibration uses SM training events only; thresholds use
+SM validation events only. The separate `score_study` result directory contains
+JSON rates at target 1% and 5% balanced SM false-positive rates and a ROC PDF.
+Wprime is evaluation-only, not a reason to select one score as universally best.
