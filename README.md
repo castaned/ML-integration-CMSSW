@@ -178,3 +178,11 @@ passing A/B/C/D channel from the existing HDF5 files. Output goes to a new
 `results_autoencoder_sm_cocktail_boosted` directory with the same split seed.
 `python scripts/check_boosted_cut.py` reports the unweighted per-process
 efficiency of `Z_deltaR < 1.5`; it does not modify the training selection.
+To run a separate post-cut autoencoder pilot, use
+`python scripts/make_dr15_selection.py`. It copies only events with
+`Z_deltaR < 1.5` from the selected HDF5 inputs into
+`Processed/h5_sm_cocktail_dr15/{DYJets,WZ,ZZ,senal}` and writes
+`autoencoder_sm_cocktail_dr15_config.yaml`. Earlier HDF5 files, model
+configurations, and plots remain untouched. The cut itself must be reported
+separately from the autoencoder performance; DYJets has very small statistics
+after this cut, so its train/validation/test metrics are not stable.
