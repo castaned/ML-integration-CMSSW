@@ -19,13 +19,18 @@ from models.models import AutoencoderModel
 
 
 CHANNEL_FEATURES = {"M3l": "Sum_mass", "Z_deltaR": "Dr_Z", "Z_mass": "Zmass",
-                    "Lep_pt_sum": "Sum_pt"}
+                    "Lep_pt_sum": "Sum_pt", "Z_pt": "ptZ",
+                    "Lep1Z_pt": "Lep1Z_pt", "Lep2Z_pt": "Lep2Z_pt",
+                    "Lep3W_pt": "Lep3W_pt", "W_mt": "Lep3W_pt"}
 CHANNELS = "ABCD"
 
 
 def _channel_feature(handle, feature, n_events, path):
     required = [f"{channel}_pass" for channel in CHANNELS]
     required += [f"{channel}_{CHANNEL_FEATURES[feature]}" for channel in CHANNELS]
+    if feature == "W_mt":
+        required += ["MET_pt", "MET_phi"]
+        required += [f"{channel}_Lep3W_phi" for channel in CHANNELS]
     missing = set(required) - set(handle.keys())
     if missing:
         raise ValueError(f"{path}: missing branches for {feature}: {sorted(missing)}")
@@ -39,6 +44,11 @@ def _channel_feature(handle, feature, n_events, path):
                             dtype=np.float32)
         if branch.shape != (n_events,):
             raise ValueError(f"{path}: invalid {channel} branch shape for {feature}")
+        if feature == "W_mt":
+            phi = np.asarray(handle[f"{channel}_Lep3W_phi"][:], dtype=np.float32)
+            met = np.asarray(handle["MET_pt"][:], dtype=np.float32)
+            met_phi = np.asarray(handle["MET_phi"][:], dtype=np.float32)
+            branch = np.sqrt(np.maximum(2 * branch * met * (1 - np.cos(phi - met_phi)), 0))
         values[passes[:, index]] = branch[passes[:, index]]
     return values
 

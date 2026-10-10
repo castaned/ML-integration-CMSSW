@@ -1,0 +1,72 @@
+"""Lightweight pilot checks: no PyTorch or cluster required."""
+import ast
+import importlib.util
+from pathlib import Path
+import tempfile
+import unittest
+
+import h5py
+import numpy as np
+import yaml
+
+REPO = Path(__file__).resolve().parents[1]
+
+
+class PilotTests(unittest.TestCase):
+    def test_transverse_mass_uses_selected_channel_and_wrapped_angle(self):
+        tree = ast.parse((REPO / "ml_training/src/autoencoder.py").read_text())
+        nodes = [n for n in tree.body if
+                 isinstance(n, ast.FunctionDef) and n.name == "_channel_feature" or
+                 isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and
+                    t.id in ("CHANNEL_FEATURES", "CHANNELS") for t in n.targets)]
+        scope = {"np": np}
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), "features", "exec"), scope)
+        with tempfile.TemporaryDirectory() as directory:
+            with h5py.File(Path(directory) / "test.h5", "w") as h:
+                h["MET_pt"] = [100., 100.]
+                h["MET_phi"] = [0., -np.pi]
+                for channel in "ABCD":
+                    h[f"{channel}_pass"] = [int(channel == "A"), int(channel == "B")]
+                    h[f"{channel}_Lep3W_pt"] = [25. if channel == "A" else -999.,
+                                               25. if channel == "B" else -999.]
+                    h[f"{channel}_Lep3W_phi"] = [np.pi, np.pi]
+                result = scope["_channel_feature"](h, "W_mt", 2, "test")
+                np.testing.assert_allclose(result, [100., 0.], atol=1e-4)
+
+    def test_configs_replace_inclusive_dy_and_preserve_originals(self):
+        spec = importlib.util.spec_from_file_location("pilot", REPO / "scripts/setup_dyjets_ht_pilot.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            processing = {"proxy": {"generate": 0}, "data_processing": {
+                "slurm_params": {"account": "test"}}}
+            conversion = {"slurm_params": {"account": "test"}, "convertion": {"branches": []}}
+            model = {"data": {"anomaly_input_paths": ["signal"], "normal_labels": [4, 5, 6]},
+                     "model": {"latent_dim": 2}, "anomaly_detection": {"seed": 16}}
+            originals = {}
+            for name, config in (("sm_cocktail_processing_config.yaml", processing),
+                                 ("sm_cocktail_root2h5_config.yaml", conversion),
+                                 ("autoencoder_sm_cocktail_dy102_ptsum_config.yaml", model)):
+                originals[name] = yaml.safe_dump(config)
+                (base / name).write_text(originals[name])
+            for ht in module.BINS:
+                folder = base / "Data" / f"DYJets_HT{ht}"
+                folder.mkdir(parents=True)
+                (folder / f"{ht}.root").touch()
+            module.generate(base)
+            p = yaml.safe_load((base / "dyjets_ht_processing_config.yaml").read_text())
+            self.assertEqual(len(p["data_processing"]["datasets"]), 1)
+            self.assertEqual(len(p["data_processing"]["datasets"][0]["files"]), 4)
+            configs = [yaml.safe_load((base / f"autoencoder_dyjets_ht_{n}features_config.yaml").read_text()) for n in (5, 10)]
+            self.assertEqual(configs[0]["data"]["normal_input_paths"], configs[1]["data"]["normal_input_paths"])
+            self.assertEqual(configs[0]["anomaly_detection"], configs[1]["anomaly_detection"])
+            self.assertEqual(len(configs[1]["data"]["features"]), 10)
+            for name, text in originals.items():
+                self.assertEqual((base / name).read_text(), text)
+            with self.assertRaises(FileExistsError):
+                module.generate(base)
+
+
+if __name__ == "__main__":
+    unittest.main()
