@@ -9,14 +9,14 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     folder = args.folder.expanduser().resolve()
-    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v3.zip").expanduser().resolve()
+    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v4.zip").expanduser().resolve()
     if not folder.is_dir():
         parser.error(f"Missing figure directory: {folder}")
-    required = ["ROC.pdf", "scores_by_process.pdf", "architecture.pdf", "loss.pdf"]
+    required = ["ROC.pdf", "scores_by_process.pdf", "architecture.pdf", "loss.pdf", "wprime_decay.pdf"]
     missing = [name for name in required if not (folder / name).is_file()]
     if missing:
         parser.error(f"Missing main poster figures: {missing}")
-    stems = {"ROC", "PR", "scores", "scores_by_process", "architecture", "loss"}
+    stems = {"ROC", "PR", "scores", "scores_by_process", "architecture", "loss", "wprime_decay"}
     files = sorted(path for path in folder.iterdir() if path.is_file() and (
         path.name == "README.txt" or path.stem in stems and path.suffix in (".pdf", ".png")))
     variables = folder / "variable_distributions"
