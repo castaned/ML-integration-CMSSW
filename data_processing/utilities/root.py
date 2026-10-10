@@ -3,6 +3,9 @@ import awkward as ak
 import tables
 
 def write_carray(array, h5file, name, group_path='/', **kwargs):
+        if 0 in array.shape:
+            h5file.create_array(group_path, name, obj=array, createparents=True)
+            return
         h5file.create_carray(group_path, name, obj=array, createparents=True, **kwargs)
 
 def pad_or_truncate(jagged_array, max_len):

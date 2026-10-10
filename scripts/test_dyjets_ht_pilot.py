@@ -4,6 +4,10 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import Mock, patch
+import os
+import sys
+from types import SimpleNamespace
 
 import h5py
 import numpy as np
@@ -13,6 +17,56 @@ REPO = Path(__file__).resolve().parents[1]
 
 
 class PilotTests(unittest.TestCase):
+    def test_empty_arrays_use_uncompressed_storage(self):
+        tree = ast.parse((REPO / "data_processing/utilities/root.py").read_text())
+        node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "write_carray")
+        scope = {}
+        exec(compile(ast.Module(body=[node], type_ignores=[]), "writer", "exec"), scope)
+        handle = Mock()
+        scope["write_carray"](np.empty((0,)), handle, "empty")
+        handle.create_array.assert_called_once()
+        handle.create_carray.assert_not_called()
+        scope["write_carray"](np.ones(2), handle, "filled")
+        handle.create_carray.assert_called_once()
+
+    def test_empty_tree_quarantines_stale_h5_before_skip_existing(self):
+        tree = ast.parse((REPO / "data_processing/convert_h5/execute_convert_root2h5.py").read_text())
+        node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "main")
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            inputs = base / "DYJets"
+            inputs.mkdir()
+            (inputs / "empty.root").touch()
+            (inputs / "valid.root").touch()
+            output = base / "h5/DYJets"
+            output.mkdir(parents=True)
+            (output / "empty.h5").write_bytes(b"incomplete")
+            config = {"scheduler": "slurm", "slurm_params": {}, "convertion": {
+                "conda_env": "test", "input_dirs": [str(inputs)], "tree_name": "Events",
+                "branches": ["MET_pt"], "eos_output_dir": str(base / "h5"),
+                "max_jagged_len": None}}
+            utils = Mock()
+            utils.load_config.return_value = config
+            utils.require_key.side_effect = lambda obj, key: obj[key]
+            lxplus = Mock()
+            def open_root(path):
+                context = Mock()
+                context.__enter__ = Mock(return_value={"Events": SimpleNamespace(
+                    num_entries=0 if Path(path).stem == "empty" else 2)})
+                context.__exit__ = Mock(return_value=False)
+                return context
+            scope = {"os": os, "utils": utils, "lxplus": lxplus,
+                     "__file__": str(REPO / "data_processing/convert_h5/execute_convert_root2h5.py"),
+                     "parent_dir": str(REPO / "data_processing")}
+            exec(compile(ast.Module(body=[node], type_ignores=[]), "converter", "exec"), scope)
+            with patch.dict(sys.modules, {"uproot": SimpleNamespace(open=open_root)}):
+                scope["main"]("config", skip_empty_trees=True, skip_existing=True)
+            self.assertFalse((output / "empty.h5").exists())
+            self.assertEqual((output / "empty.h5.empty-root").read_bytes(), b"incomplete")
+            args = utils.write_args_file.call_args.args[1]
+            self.assertEqual(len(args), 1)
+            self.assertIn("valid.root", args[0])
+
     def test_transverse_mass_uses_selected_channel_and_wrapped_angle(self):
         tree = ast.parse((REPO / "ml_training/src/autoencoder.py").read_text())
         nodes = [n for n in tree.body if

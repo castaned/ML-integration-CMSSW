@@ -53,14 +53,20 @@ def main(config_path, skip_empty_trees=False, skip_existing=False):
       for root_file in root_files:
          input_path = os.path.join(input_dir, root_file)
          output_path = os.path.join(exp_dir, os.path.splitext(root_file)[0] + '.h5')
+         if skip_empty_trees:
+            with uproot.open(input_path) as source:
+               if tree_name not in source or source[tree_name].num_entries == 0:
+                  print(f"Skipping {input_path}: missing or empty {tree_name} tree")
+                  if os.path.exists(output_path):
+                     quarantine = output_path + '.empty-root'
+                     if os.path.exists(quarantine):
+                        raise FileExistsError(f"Quarantine already exists: {quarantine}")
+                     os.rename(output_path, quarantine)
+                     print(f"Preserved stale output at {quarantine}")
+                  continue
          if skip_existing and os.path.exists(output_path):
             print(f"Skipping {input_path}: output already exists at {output_path}")
             continue
-         if skip_empty_trees:
-            with uproot.open(input_path) as source:
-               if tree_name not in source:
-                  print(f"Skipping {input_path}: no {tree_name} tree (zero selected events)")
-                  continue
          args_dat.append(f"{input_path} {output_path}")
 
    if not args_dat:
