@@ -51,15 +51,13 @@ def load_scores(config):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-f", "--file", type=Path, required=True)
-    parser.add_argument("--baseline", type=Path, help="Optional matched five-feature configuration")
     parser.add_argument("--output-dir", type=Path)
     args = parser.parse_args()
     config = yaml.safe_load(args.file.read_text())
     folder, name, metrics, groups, labels, scores, weights = load_scores(config)
-    output = args.output_dir or folder / "poster_figures"
+    output = args.output_dir or folder / "poster_figures_10variables"
     if output.exists():
         parser.error(f"Refusing to overwrite {output}; choose a new --output-dir")
-    baseline = load_scores(yaml.safe_load(args.baseline.read_text())) if args.baseline else None
     output.mkdir(parents=True)
     plt.rcParams.update({"font.size": 13, "axes.spines.top": False, "axes.spines.right": False})
     def save(stem):
@@ -69,15 +67,13 @@ def main():
         plt.close()
 
     plt.figure(figsize=(7, 5.5))
-    for title, y, s, w in [(f"{len(config['data']['features'])} variables", labels, scores, weights)] + (
-            [("5 variables", baseline[4], baseline[5], baseline[6])] if baseline else []):
-        fpr, tpr, _ = roc_curve(y, s, sample_weight=w)
-        plt.plot(fpr, tpr, linewidth=2, label=f"{title}: AUC {roc_auc_score(y, s, sample_weight=w):.3f}")
+    fpr, tpr, _ = roc_curve(labels, scores, sample_weight=weights)
+    plt.plot(fpr, tpr, linewidth=2, label=f"{len(config['data']['features'])} variables: AUC {roc_auc_score(labels, scores, sample_weight=weights):.3f}")
     plt.plot([0, 1], [0, 1], "k--", linewidth=1)
     plt.xlabel("Aceptación de fondo SM (pesos iguales por proceso)")
     plt.ylabel("Eficiencia Wprime")
     plt.legend()
-    save("ROC_comparison" if baseline else "ROC")
+    save("ROC")
 
     precision, recall, _ = precision_recall_curve(labels, scores, sample_weight=weights)
     plt.figure(figsize=(7, 5.5))

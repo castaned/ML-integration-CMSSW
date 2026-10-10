@@ -32,11 +32,11 @@ class PosterTests(unittest.TestCase):
                 for name in ("DYJets_test", "WZ_test", "ZZ_test", "signal_example"):
                     for score in ([3, 4] if name == "signal_example" else [1, 2]):
                         writer.writerow([name, score, int(score >= 2.5)])
-            with patch.object(sys, "argv", ["poster", "-f", str(path), "--baseline", str(path)]):
+            with patch.object(sys, "argv", ["poster", "-f", str(path)]):
                 module.main()
-            for stem in ("ROC_comparison", "PR", "scores", "scores_by_process", "architecture"):
+            for stem in ("ROC", "PR", "scores", "scores_by_process", "architecture"):
                 for extension in ("pdf", "png"):
-                    self.assertGreater((folder / "poster_figures" / f"{stem}.{extension}").stat().st_size, 100)
+                    self.assertGreater((folder / "poster_figures_10variables" / f"{stem}.{extension}").stat().st_size, 100)
             metrics["roc_auc"] = 0.5
             metric_path.write_text(json.dumps(metrics))
             with self.assertRaisesRegex(ValueError, "AUC"):

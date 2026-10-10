@@ -82,12 +82,11 @@ From the repository root after both trainings have completed:
 
 ```bash
 python scripts/make_poster_plots.py \
-  -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml" \
-  --baseline "$HOME/Open-Data/autoencoder_dyjets_ht_5features_config.yaml"
+  -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml"
 ```
 
 PDF and 300 dpi PNG files are written to the ten-feature results folder under
-`poster_figures`: ROC_comparison, PR, scores, scores_by_process and architecture.
+`poster_figures_10variables`: ROC, PR, scores, scores_by_process and architecture.
 The original training loss PDF is copied as loss.pdf. No loss history is invented.
 The script checks that CSV scores reproduce the reported AUC. PR uses an artificial
 equal-total-weight SM/signal mixture and should not be interpreted as physical
