@@ -75,3 +75,34 @@ and `results_autoencoder_dyjets_ht_10features`. Use loss, scores_by_process, ROC
 and metrics files to compare them. Wprime is evaluation-only; repeated inspection
 of its performance makes these comparisons exploratory, requiring a fresh final
 evaluation sample before any definitive claim.
+
+## Poster figures without retraining
+
+From the repository root after both trainings have completed:
+
+```bash
+python scripts/make_poster_plots.py \
+  -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml" \
+  --baseline "$HOME/Open-Data/autoencoder_dyjets_ht_5features_config.yaml"
+```
+
+PDF and 300 dpi PNG files are written to the ten-feature results folder under
+`poster_figures`: ROC_comparison, PR, scores, scores_by_process and architecture.
+The original training loss PDF is copied as loss.pdf. No loss history is invented.
+The script checks that CSV scores reproduce the reported AUC. PR uses an artificial
+equal-total-weight SM/signal mixture and should not be interpreted as physical
+purity. Existing poster output directories are preserved; choose a different
+`--output-dir` to regenerate.
+
+Optional frozen-model studies, using existing scripts without retraining:
+
+```bash
+python ml_training/compare_autoencoder_scores.py -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml"
+python ml_training/compare_sm_density.py -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml"
+python ml_training/plot_score_diagnostics.py -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml"
+```
+
+These create score_study, sm_density_study and mass_channel_diagnostics under the
+new ten-feature results folder. Their old-run values must not be reused for the
+new sample/model. Run on a compute allocation; files and seeded splits must be
+unchanged since training.
