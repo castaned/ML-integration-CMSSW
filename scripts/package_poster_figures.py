@@ -9,7 +9,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     folder = args.folder.expanduser().resolve()
-    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v2.zip").expanduser().resolve()
+    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v3.zip").expanduser().resolve()
     if not folder.is_dir():
         parser.error(f"Missing figure directory: {folder}")
     required = ["ROC.pdf", "scores_by_process.pdf", "architecture.pdf", "loss.pdf"]
@@ -19,6 +19,11 @@ if __name__ == "__main__":
     stems = {"ROC", "PR", "scores", "scores_by_process", "architecture", "loss"}
     files = sorted(path for path in folder.iterdir() if path.is_file() and (
         path.name == "README.txt" or path.stem in stems and path.suffix in (".pdf", ".png")))
+    variables = folder / "variable_distributions"
+    if not (variables / "variables_all.pdf").is_file():
+        parser.error("Run scripts/plot_poster_variables.py before packaging")
+    files += sorted(path for path in variables.iterdir() if path.is_file()
+                    and path.suffix in (".pdf", ".png", ".json"))
     with ZipFile(output, "x", compression=ZIP_DEFLATED) as archive:
         for path in files:
             archive.write(path, str(Path("poster_figures_10variables") / path.relative_to(folder)))

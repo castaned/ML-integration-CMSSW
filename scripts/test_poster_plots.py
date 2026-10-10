@@ -1,16 +1,35 @@
 """Verify figure generation with synthetic scores, never presented as results."""
 import csv
+import ast
 import importlib.util
 import json
 from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
+import numpy as np
 import yaml
 
 
 class PosterTests(unittest.TestCase):
+    def test_variable_histograms_share_full_range_and_normalization(self):
+        tree = ast.parse(Path(__file__).with_name("plot_poster_variables.py").read_text())
+        nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "draw"
+                 or isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id in
+                    ("LABELS", "COLORS") for t in n.targets)]
+        scope = {"np": np}
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), "variables", "exec"), scope)
+        groups = {"DYJets": np.array([[1.], [2.]]), "Wprime": np.array([[10.], [20.]])}
+        ax = Mock()
+        scope["draw"](ax, "MET_pt", 0, groups)
+        calls = ax.hist.call_args_list
+        self.assertEqual(len(calls), 2)
+        np.testing.assert_array_equal(calls[0].kwargs["bins"], calls[1].kwargs["bins"])
+        self.assertEqual(calls[0].kwargs["bins"][0], 1.)
+        self.assertEqual(calls[0].kwargs["bins"][-1], 20.)
+        self.assertTrue(all(call.kwargs["density"] for call in calls))
+
     def test_figures_and_auc_consistency(self):
         spec = importlib.util.spec_from_file_location("poster", Path(__file__).with_name("make_poster_plots.py"))
         module = importlib.util.module_from_spec(spec)

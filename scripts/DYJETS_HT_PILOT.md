@@ -88,6 +88,18 @@ python scripts/make_poster_plots.py \
 PDF and 300 dpi PNG files are written to the ten-feature results folder under
 `poster_figures_10variables`: ROC, PR, scores, scores_by_process and architecture.
 The original training loss PDF is copied as loss.pdf. No loss history is invented.
+To compare input observables before standardization, add:
+
+```bash
+python scripts/plot_poster_variables.py -f "$HOME/Open-Data/autoencoder_dyjets_ht_10features_config.yaml"
+python scripts/package_poster_figures.py
+```
+
+This adds a ten-variable mosaic and individual PDF/PNG panels under
+`poster_figures_10variables/variable_distributions`. SM uses only training events;
+Wprime is evaluation-only. Every process has unit-area normalization, common bins
+per variable and full-range plots. Suggested poster panels: MET_pt, M3l, Z_pt and
+W_mt. The verified archive is `graficos_poster_autoencoder_10variables_v3.zip`.
 The script checks that CSV scores reproduce the reported AUC. PR uses an artificial
 equal-total-weight SM/signal mixture and should not be interpreted as physical
 purity. Existing poster output directories are preserved; choose a different
