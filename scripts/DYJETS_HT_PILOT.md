@@ -100,11 +100,13 @@ This adds a ten-variable mosaic and individual PDF/PNG panels under
 `poster_figures_10variables/variable_distributions`. SM uses only training events;
 Wprime is evaluation-only. Every process has unit-area normalization, common bins
 per variable and full-range plots. Suggested poster panels: MET_pt, M3l, Z_pt and
-W_mt. The verified archive is `graficos_poster_autoencoder_10variables_v4.zip`.
-It also includes wprime_decay.pdf/png: the Wprime positive leptonic WZ decay,
+W_mt. The verified archive is `graficos_poster_autoencoder_10variables_v5.zip`.
+It also includes wprime_decay.pdf/png: schematic quark/antiquark annihilation
+to Wprime and its positive leptonic WZ decay,
 with its charge conjugate understood. The supplied dataset name identifies a
 narrow 1 TeV Wprime benchmark at 13 TeV, in UL16 NanoAODv9. No production mechanism
-or numerical width is assumed in the diagram.
+or numerical width is established from the dataset name alone; the initial state
+shown is illustrative and couplings/flavors require the generator configuration.
 The script checks that CSV scores reproduce the reported AUC. PR uses an artificial
 equal-total-weight SM/signal mixture and should not be interpreted as physical
 purity. Existing poster output directories are preserved; choose a different

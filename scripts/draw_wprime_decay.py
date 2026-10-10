@@ -1,4 +1,4 @@
-"""Draw the Wprime WZ leptonic benchmark decay without assuming production."""
+"""Draw schematic quark annihilation and the leptonic Wprime WZ decay."""
 import argparse
 from pathlib import Path
 import matplotlib
@@ -12,7 +12,7 @@ def draw(output):
     output.mkdir(parents=True, exist_ok=True)
     if any((output / f"wprime_decay.{ext}").exists() for ext in ("pdf", "png")):
         raise FileExistsError("Decay figures already exist")
-    fig, ax = plt.subplots(figsize=(9, 5))
+    fig, ax = plt.subplots(figsize=(6, 7))
     def wave(start, end, cycles=7):
         start, end = np.array(start, dtype=float), np.array(end, dtype=float)
         delta = end - start
@@ -27,17 +27,19 @@ def draw(output):
         if inward:
             p, q = q, p
         ax.annotate("", xy=q, xytext=p, arrowprops={"arrowstyle": "-|>", "color": "black", "lw": 1.5})
-    v, w, z = (1.5, 0), (3.2, 0.9), (3.2, -0.9)
-    wave((0.1,0),v); wave(v,w); wave(v,z)
-    fermion(w,(4.8,1.65),inward=True); fermion(w,(4.8,0.35))
-    fermion(z,(4.8,-0.35)); fermion(z,(4.8,-1.65),inward=True)
-    for point in (v,w,z): ax.plot(*point,'ko',ms=4)
-    for x,y,label in [(0.6,0.25,r"$W^{\prime +}$"),(2.25,0.8,r"$W^+$"),(2.25,-0.8,r"$Z$"),
-        (4.9,1.65,r"$\ell^+$"),(4.9,0.35,r"$\nu_{\ell}$"),(4.9,-0.35,r"$\ell^- $"),(4.9,-1.65,r"$\ell^+$")]:
-        ax.text(x,y,label,fontsize=23,ha='left',va='center')
-    ax.text(2.7,2.15,r"$W^{\prime +}\to W^+Z\to\ell^+\nu\,\ell^-\ell^+$",ha='center',fontsize=20)
-    ax.text(2.7,-2.2,"Referencia: masa 1 TeV, anchura estrecha\nSe muestra Wprime positivo; el canal conjugado también es posible.",ha='center',fontsize=11)
-    ax.set(xlim=(-0.1,5.7),ylim=(-2.5,2.55)); ax.axis('off')
+    initial, v, z, w = (0.9,0), (2.4,0), (3.5,1.2), (3.5,-1.2)
+    fermion((0.15,-2.25),initial)
+    fermion((0.15,2.25),initial,inward=True)
+    wave(initial,v); wave(v,z); wave(v,w)
+    fermion(z,(5,2.3),inward=True); fermion(z,(5,0.8))
+    fermion(w,(5,-0.8)); fermion(w,(5,-2.3),inward=True)
+    for x,y,label in [(0.0,2.35,r"$\bar q^{\prime}$"),(0.0,-2.4,r"$q$"),
+        (1.4,-0.3,r"$W^{\prime +}$"),(2.6,0.85,r"$Z$"),(3.25,-0.55,r"$W^+$"),
+        (5.05,2.3,r"$\ell^+$"),(5.05,0.8,r"$\ell^-$"),
+        (5.05,-0.8,r"$\nu_{\ell}$"),(5.05,-2.3,r"$\ell^+$")]:
+        ax.text(x,y,label,fontsize=22,ha='left',va='center')
+    ax.text(2.8,-2.9,"Esquema de producción y decaimiento\nReferencia Wprime: 1 TeV, anchura estrecha",ha='center',fontsize=10)
+    ax.set(xlim=(-0.3,5.9),ylim=(-3.25,2.75)); ax.axis('off')
     for ext in ('pdf','png'):
         fig.savefig(output / f'wprime_decay.{ext}',bbox_inches='tight',dpi=300)
     plt.close(fig)

@@ -9,7 +9,7 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     folder = args.folder.expanduser().resolve()
-    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v4.zip").expanduser().resolve()
+    output = (args.output or folder.parent / "graficos_poster_autoencoder_10variables_v5.zip").expanduser().resolve()
     if not folder.is_dir():
         parser.error(f"Missing figure directory: {folder}")
     required = ["ROC.pdf", "scores_by_process.pdf", "architecture.pdf", "loss.pdf", "wprime_decay.pdf"]
