@@ -12,7 +12,7 @@ BASE_FEATURES = ["MET_pt", "M3l", "Z_deltaR", "Z_mass", "Lep_pt_sum"]
 EXTRA_FEATURES = ["Z_pt", "Lep1Z_pt", "Lep2Z_pt", "Lep3W_pt", "W_mt"]
 
 
-def generate(base, account=None):
+def generate(base, account=None, bins=BINS):
     base = Path(base).expanduser().resolve()
     def load(name):
         return yaml.safe_load((base / name).read_text())
@@ -22,7 +22,9 @@ def generate(base, account=None):
     targets = {"dyjets_ht_processing_config.yaml": processing,
                "dyjets_ht_root2h5_config.yaml": conversion}
     manifest = {}
-    for ht in BINS:
+    if not bins or len(set(bins)) != len(bins) or any(ht not in BINS for ht in bins):
+        raise ValueError("Choose distinct supported HT bins")
+    for ht in bins:
         folder = base / "Data" / f"DYJets_HT{ht}"
         files = sorted(folder.glob("*.root"))
         if not files:
@@ -79,5 +81,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config-dir", type=Path, default=Path.home() / "Open-Data")
     parser.add_argument("--account", default=None)
+    parser.add_argument("--bins", nargs="+", choices=BINS, default=list(BINS),
+                        help="Downloaded HT bins to use (e.g. --bins 70to100)")
     args = parser.parse_args()
-    generate(args.config_dir, args.account)
+    generate(args.config_dir, args.account, args.bins)

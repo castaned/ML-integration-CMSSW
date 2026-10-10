@@ -67,6 +67,28 @@ class PilotTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 module.generate(base)
 
+    def test_single_bin_does_not_require_other_downloads(self):
+        spec = importlib.util.spec_from_file_location("pilot", REPO / "scripts/setup_dyjets_ht_pilot.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            inputs = {
+                "sm_cocktail_processing_config.yaml": {"proxy": {}, "data_processing": {
+                    "slurm_params": {"account": "test"}}},
+                "sm_cocktail_root2h5_config.yaml": {"slurm_params": {}, "convertion": {"branches": []}},
+                "autoencoder_sm_cocktail_dy102_ptsum_config.yaml": {"data": {}, "model": {}},
+            }
+            for name, config in inputs.items():
+                (base / name).write_text(yaml.safe_dump(config))
+            folder = base / "Data/DYJets_HT70to100"
+            folder.mkdir(parents=True)
+            (folder / "sample.root").touch()
+            module.generate(base, bins=["70to100"])
+            config = yaml.safe_load((base / "dyjets_ht_processing_config.yaml").read_text())
+            self.assertEqual(config["data_processing"]["datasets"][0]["files"],
+                             [str(folder / "sample.root")])
+
 
 if __name__ == "__main__":
     unittest.main()

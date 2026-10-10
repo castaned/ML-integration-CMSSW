@@ -14,6 +14,16 @@ python scripts/setup_dyjets_ht_pilot.py
 export CONDA_SETUP_SCRIPT=/apps/miniconda3/etc/profile.d/conda.sh
 ```
 
+If only HT 70–100 has been downloaded, replace the generator command with:
+
+```bash
+python scripts/setup_dyjets_ht_pilot.py --bins 70to100
+```
+
+Only that bin is used; this is an HT-restricted DY sample, not inclusive DYJets.
+The input manifest records the bins actually used. Later additions require a
+separate run/configuration rather than overwriting these pilot results.
+
 Wait for earlier processing jobs to finish: processing rewrites mapping.json.
 Then submit filtering, keeping a copy of the old map:
 
