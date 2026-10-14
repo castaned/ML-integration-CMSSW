@@ -57,7 +57,8 @@ nav:
     - usage/01_usage.md
   - Practical Machine Learning in HEP (Yuca / Open Data):
     - practical-ml-hep/index.md
-    - Configuración del sistema: yuca-course/01_entorno.md
+    - Primer acceso y activación de 2FA: yuca-course/00_acceso.md
+    - Repositorio y entorno de trabajo: yuca-course/01_entorno.md
     - Datos abiertos y NanoAOD: yuca-course/02_datos.md
     - Clasificación Higgs, análisis y entrenamiento: practical-ml-hep/higgs.md
     - Autoencoder CMS: practical-ml-hep/autoencoder.md

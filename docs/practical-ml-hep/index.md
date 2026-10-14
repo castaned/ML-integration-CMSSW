@@ -6,11 +6,12 @@ Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca:
 
 ## Empezar aquí
 
-1. [Acceso a Yuca, repositorio y configuración del entorno](../yuca-course/01_entorno.md).
-2. [Datos abiertos, formato NanoAOD y revisión de archivos](../yuca-course/02_datos.md).
-3. [Ejemplo 1: selección y reconstrucción Higgs/ZZ, observables y clasificación](higgs.md).
-4. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
-5. [Modificaciones y bitácora de experimentos](experiments.md).
+1. [Primer acceso SSH y activación de la cuenta con 2FA](../yuca-course/00_acceso.md), una sola vez y preferentemente antes del taller.
+2. [Repositorio y entorno de trabajo](../yuca-course/01_entorno.md), con la cuenta ya activada.
+3. [Datos abiertos, formato NanoAOD y revisión de archivos](../yuca-course/02_datos.md).
+4. [Ejemplo 1: selección y reconstrucción Higgs/ZZ, observables y clasificación](higgs.md).
+5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
+6. [Modificaciones y bitácora de experimentos](experiments.md).
 
 No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. El instructor prepara dependencias y descargas antes de clase; cada alumno configura su sesión y su espacio de trabajo al inicio.
 
