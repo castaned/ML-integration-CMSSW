@@ -1,0 +1,14 @@
+data:
+  # Edit to the shared read-only file announced by your instructor.
+  input: /REPLACE/shared/atlas-higgs-challenge-2014-v2.csv.gz
+  max_events: 50000
+  features: [DER_mass_MMC, DER_mass_transverse_met_lep, DER_mass_vis, DER_pt_h, DER_deltar_tau_lep, DER_sum_pt, PRI_tau_pt, PRI_lep_pt, PRI_met, PRI_jet_num]
+split:
+  seed: 16
+model:
+  type: logistic
+  max_iter: 200
+  learning_rate: 0.001
+  hidden_dims: [32, 16]
+evaluation:
+  background_acceptance: 0.1

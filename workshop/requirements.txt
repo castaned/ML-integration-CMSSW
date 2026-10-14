@@ -1,0 +1,7 @@
+numpy
+pandas
+scikit-learn
+matplotlib
+PyYAML
+joblib
+# CMS exercise also uses the existing ml_training dependencies, including PyTorch, h5py and onnx.

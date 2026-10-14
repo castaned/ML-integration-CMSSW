@@ -1,6 +1,8 @@
 # The official documentation can be found in [ML-integration-CMSSW documentation](https://castaned.github.io/ML-integration-CMSSW)
 
 For the Yuca Open Data exercise, follow the [student course (in Spanish)](https://castaned.github.io/ML-integration-CMSSW/yuca-course/). It covers setup, NanoAOD processing, ROOT-to-HDF5 conversion, MLP training, and Standard Model autoencoder anomaly detection.
+
+The [Practical Machine Learning in HEP workshop](https://castaned.github.io/ML-integration-CMSSW/practical-ml-hep/) adds four hours of hands-on labs (Wednesday three hours, Thursday one hour): ATLAS Open Data Higgs classification and the CMS multilepton autoencoder. Runnable scripts and configurations are in `workshop/`; the instructor guide explains shared datasets and Yuca preparation.
 # Example of usage — Open Data mode
 
 This documents the **`open_data`** variant of the framework described in *General architecture* and *Complete workflow*.
