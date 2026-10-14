@@ -37,3 +37,8 @@ Esperamos `faltantes: []`. En el ejemplo se usan archivos simulados con `genWeig
 Si el instructor ofrece datos en una ruta compartida, usa esa ruta en `--data-root` en el paso siguiente. Debe contener las subcarpetas `fondo/` y `senal/`. No inventes ni copies archivos de otras cuentas sin permiso.
 
 Continua en [Procesamiento](03_procesamiento.md).
+
+
+## Siguiente paso del curso
+
+Para el programa presencial, continuar con [NanoAOD Higgs/ZZ: selección, reconstrucción y clasificación](../practical-ml-hep/higgs.md). El flujo ROOT→HDF5 del framework se conserva como referencia complementaria.

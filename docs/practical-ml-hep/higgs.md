@@ -7,7 +7,9 @@
 
 Ambas son simulaciones CMS a 13 TeV, UL16 NanoAODv9. No mezclar MiniAOD, variaciones TuneUp/TuneDown ni campañas distintas. El Higgs es parte del SM; en esta clasificación se denomina señal al proceso que queremos separar. A diferencia del autoencoder W′, no es una búsqueda de una partícula nueva.
 
-## Miércoles, primera hora: procesar eventos
+## Miércoles, primera hora: configurar el sistema y procesar eventos
+
+Comenzar con [Configuración del sistema](../yuca-course/01_entorno.md) (20 minutos) antes de abrir archivos.
 
 ### 1. Abrir Events y observar las colecciones (10 min)
 
@@ -28,7 +30,7 @@ cp workshop/configs/cms_fourleptons.yaml "$HOME/hep-workshop/configs/selection.y
 
 Editar `samples[].files`: poner las rutas absolutas a los ROOT de cada proceso. No escribir allí el archivo ya seleccionado. Se leen solo las ramas necesarias; la extracción usa bloques de 2000 eventos.
 
-### 2. Seleccionar y reconstruir (20 min)
+### 2. Seleccionar y reconstruir (15 min)
 
 La selección educativa exige exactamente cuatro leptones identificados: muones medium con aislamiento relativo ≤0.25 y |η|≤2.4; electrones cutBased≥2 y |η|≤2.5. Todos tienen pT≥5 GeV; ordenados por pT cumplen 20/10/5/5 GeV.
 
@@ -48,6 +50,8 @@ La tabla contiene doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ
 
 **Preguntas:** ¿dónde aparece la masa del Higgs? ¿Por qué necesitamos emparejamiento? ¿Qué ocurre al exigir dos Z cercanos a 91 GeV?
 
+## Miércoles, segunda hora: entrenar y modificar
+
 ### 4. Entrenar con NUESTRA extracción (15 min)
 
 ```bash
@@ -62,7 +66,7 @@ sbatch --account=CUENTA_DEL_CURSO --output="$HOME/hep-workshop/logs/%j.out"   wo
 
 El CSV es **un producto del análisis del alumno**, no el dato de origen. Sirve de interfaz entre reconstrucción y ML; puede sustituirse por HDF5 en una extensión. Entrenamiento/validación/test: 60/20/20 estratificado, semilla 16; escalado ajustado solo con entrenamiento. Por defecto se evalúa únicamente validación. Abrir `classification.pdf` y `metrics.json`.
 
-## Miércoles, segunda hora: cambiar una decisión
+### 5. Cambiar una decisión (25 min)
 
 Elegir una variación por equipo, con configuración y carpeta nuevas:
 

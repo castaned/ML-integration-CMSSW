@@ -55,17 +55,15 @@ nav:
     - framework/04_framework-setup.md
   - Example of usage:
     - usage/01_usage.md
-  - Curso Yuca (Open Data):
-    - yuca-course/index.md
-    - yuca-course/01_entorno.md
-    - yuca-course/02_datos.md
-    - yuca-course/03_procesamiento.md
-    - yuca-course/04_clasificador.md
-    - yuca-course/05_autoencoder.md
-    - yuca-course/06_problemas.md
-  - Practical Machine Learning in HEP:
+  - Practical Machine Learning in HEP (Yuca / Open Data):
     - practical-ml-hep/index.md
-    - practical-ml-hep/instructor.md
-    - practical-ml-hep/higgs.md
-    - practical-ml-hep/autoencoder.md
-    - practical-ml-hep/experiments.md
+    - Configuración del sistema: yuca-course/01_entorno.md
+    - Datos abiertos y NanoAOD: yuca-course/02_datos.md
+    - Clasificación Higgs, análisis y entrenamiento: practical-ml-hep/higgs.md
+    - Autoencoder CMS: practical-ml-hep/autoencoder.md
+    - Bitácora y ejercicios: practical-ml-hep/experiments.md
+    - Problemas frecuentes: yuca-course/06_problemas.md
+    - Preparación del instructor: practical-ml-hep/instructor.md
+    - Referencia del procesamiento ROOT y HDF5: yuca-course/03_procesamiento.md
+    - Referencia del clasificador del framework: yuca-course/04_clasificador.md
+    - Referencia del autoencoder del framework: yuca-course/05_autoencoder.md

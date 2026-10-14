@@ -31,7 +31,7 @@ If you are new to CMS computing or ML, follow these steps:
 
 ## Critical Requirements
 
-For the [Yuca Open Data course](yuca-course/index.md) and [Practical ML workshop](practical-ml-hep/index.md), a CERN account is not required. Use the Yuca access and shared data supplied by your instructor. The requirements below apply to the CERN infrastructure workflow.
+For the [Practical Machine Learning in HEP course on Yuca with Open Data](practical-ml-hep/index.md), a CERN account is not required. Use the Yuca access and shared data supplied by your instructor. The requirements below apply to the CERN infrastructure workflow.
 
 
 !!! warning "Before You Begin"
