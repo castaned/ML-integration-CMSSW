@@ -1,44 +1,58 @@
-# 2. Datos NanoAOD
+# Datos compartidos: entender NanoAOD
 
-Coloca los ROOT autorizados para el curso en dos carpetas, o usa una ruta compartida de solo lectura indicada por el instructor:
+**No debes descargar los datasets.** Los archivos originales del curso estarán disponibles en una carpeta compartida de Yuca. Esa carpeta se utiliza para lectura; las selecciones, tablas y modelos se guardan en tu cuenta.
 
-```text
-$HOME/Open-Data/Data/
-  fondo/*.root
-  senal/*.root
+## 1. Identificar la ruta del curso
+
+Sustituir `/RUTA/COMPARTIDA/NanoAOD` por la ruta anunciada durante el curso. Es un marcador, no una ruta que ya hayamos verificado:
+
+```bash
+export COURSE_DATA=/RUTA/COMPARTIDA/NanoAOD
+ls "$COURSE_DATA/Higgs125"
+ls "$COURSE_DATA/ZZ4L"
 ```
 
-No subas los ROOT a Git. Para la primera prueba basta un archivo por clase; el generador de configuraciones toma uno por defecto y puede tomar todos con `--max-files 0`.
+Se esperan archivos `.root` de Higgs125→ZZ→4L y ZZ→4L. Los registros CERN Open Data permiten conocer su procedencia; no son instrucciones para descargarlos durante la clase.
 
-Comprueba que son arboles NanoAOD y tienen las ramas que usa `filterNanoAOD.py`:
+## 2. Comprobar lectura y entender Events
+
+Desde una terminal de tu propia cuenta:
 
 ```bash
 python - <<'PY'
+import os
 from pathlib import Path
 import uproot
-
-base = Path.home() / "Open-Data/Data"
-required = {"Electron_pt", "Electron_eta", "Electron_phi", "Electron_cutBased",
-            "Muon_pt", "Muon_eta", "Muon_phi", "Muon_ip3d", "Muon_highPtId",
-            "MET_pt", "MET_phi", "HLT_Mu50", "HLT_Ele32_WPTight_Gsf"}
-for name in ("fondo", "senal"):
-    files = sorted((base / name).glob("*.root"))
-    assert files, f"Sin ROOT en {base / name}"
+base = Path(os.environ['COURSE_DATA'])
+for sample in ('Higgs125', 'ZZ4L'):
+    files = sorted((base / sample).glob('*.root'))
+    if not files:
+        raise RuntimeError(f'No hay ROOT visibles en {base / sample}')
     with uproot.open(files[0]) as source:
-        tree = source["Events"]
-        print(name, files[0].name, "eventos:", tree.num_entries)
-        print("  faltantes:", sorted(required - set(tree.keys())))
-        print("  genWeight:", "genWeight" in tree)
+        tree = source['Events']
+        print(sample, 'archivo:', files[0].name, 'eventos:', tree.num_entries)
+        print(tree.arrays(['nMuon', 'nElectron', 'MET_pt'], entry_stop=3))
 PY
 ```
 
-Esperamos `faltantes: []`. En el ejemplo se usan archivos simulados con `genWeight`; el procesador decide por esa rama si debe aplicar un JSON de luminosidades a datos reales. La seleccion de eventos se registra principalmente con banderas como `3Lep_pass`, `Z_pass` y `W_pass`; no asumas que el numero de filas se reducira.
+Cada entrada de Events corresponde a un evento; las colecciones Electron y Muon contienen cantidades variables de partículas. Las masas de candidatos no se toman como etiquetas: se construirán a partir de los leptones seleccionados.
 
-Si el instructor ofrece datos en una ruta compartida, usa esa ruta en `--data-root` en el paso siguiente. Debe contener las subcarpetas `fondo/` y `senal/`. No inventes ni copies archivos de otras cuentas sin permiso.
+Si no aparecen archivos o no puedes abrirlos, detener el procesamiento y solicitar ayuda con la ruta o los permisos. No copiar los datasets a tu HOME para intentar resolver un fallo de acceso.
 
-Continua en [Procesamiento](03_procesamiento.md).
+## 3. Separar entradas compartidas de salidas personales
 
+```text
+Carpeta compartida del curso (lectura)
+  Higgs125/*.root
+  ZZ4L/*.root
 
-## Siguiente paso del curso
+Tu cuenta: $HOME/hep-workshop/ (escritura)
+  configs/       YAML personales
+  extraction/    observables y conteos de selección
+  logs/          registros de trabajos
+  results/       modelos, métricas y gráficas
+```
 
-Para el programa presencial, continuar con [NanoAOD Higgs/ZZ: selección, reconstrucción y clasificación](../practical-ml-hep/higgs.md). El flujo ROOT→HDF5 del framework se conserva como referencia complementaria.
+No subir los ROOT al repositorio ni modificar archivos compartidos. Cada experimento debe tener una carpeta de salida nueva para conservar la referencia.
+
+Continuar con [Análisis de NanoAOD y clasificación Higgs](../practical-ml-hep/higgs.md): seleccionar leptones → reconstruir candidatos → extraer observables → entrenar y evaluar.

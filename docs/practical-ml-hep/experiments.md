@@ -87,7 +87,7 @@ python workshop/collect_results.py \
 
 El CSV incluye tareas pendientes y deltas respecto a la referencia. Rechaza parejas que difieren en más parámetros/datos/semilla que lo asignado, y excluye resultados de test Higgs. Usar un nombre nuevo al actualizar la tabla; no sobrescribe archivos.
 
-Cada grupo comparte su CSV y sus dos configuraciones. El instructor puede reunir los CSV en una hoja común; para recopilar directamente desde YAML de varios alumnos, las carpetas deben tener nombres únicos y sus rutas de resultados deben ser accesibles. No abrir permisos generales del HOME para hacerlo.
+Cada grupo comparte su CSV y sus dos configuraciones. Compartir únicamente el CSV y las configuraciones solicitadas para completar la tabla común. No es necesario compartir permisos de tu HOME ni copiar datasets.
 
 ## Documento de conclusiones
 

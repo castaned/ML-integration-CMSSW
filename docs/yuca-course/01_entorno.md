@@ -42,26 +42,17 @@ python -c "import ROOT; print(ROOT.gROOT.GetVersion())"
 
 Si el módulo ha cambiado, usar la versión que confirme el instructor. El módulo ROOT de Yuca no agrega automáticamente PyROOT al PYTHONPATH.
 
-## Crear un entorno personal si aún no existe
+## Tu espacio personal
 
-Preparación previa, fuera del tiempo de clase y solo en una instalación personal autorizada:
-
-```bash
-source /apps/miniconda3/etc/profile.d/conda.sh
-conda create -n ml-open-data python=3.10 -y
-conda activate ml-open-data
-python -m pip install -r workshop/requirements.txt
-python -m pip install h5py 'torch>=2.5,<3' onnx
-python -m pip check
-```
-
-El procesamiento completo del framework añade `tables`; su clasificador original también usa Ray y otras dependencias indicadas en la documentación de referencia. No instalar todos estos paquetes durante el taller si se usa un entorno ya verificado. Evitar `pip install --user`.
-
-Si `conda activate` pide `conda init`, volver a ejecutar `source /apps/miniconda3/etc/profile.d/conda.sh`. Guardar las versiones para reproducibilidad:
+Todos los archivos que generes deben quedar en tu cuenta:
 
 ```bash
+mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs" \
+  "$HOME/hep-workshop/extraction" "$HOME/hep-workshop/results"
 python -m pip freeze > "$HOME/hep-workshop/pip-freeze.txt"
 ```
+
+No instalar paquetes ni modificar los datos compartidos durante el ejercicio. Si el entorno no está disponible o falta una biblioteca, solicitar ayuda antes de continuar.
 
 La cuenta Slurm del ejemplo es `p002`. Si tu proyecto usa otra, reemplazala en los comandos y en la generacion de configuraciones. Continua en [Datos](02_datos.md).
 

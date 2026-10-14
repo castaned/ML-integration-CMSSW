@@ -13,7 +13,7 @@ Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca:
 5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
 6. [Modificaciones y bitácora de experimentos](experiments.md).
 
-No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. El instructor prepara dependencias y descargas antes de clase; cada alumno configura su sesión y su espacio de trabajo al inicio.
+No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. Los datos del curso ya estarán disponibles en una carpeta compartida: no es necesario descargarlos. Cada participante configura su sesión y su espacio personal al inicio.
 
 ## Programa: miércoles y jueves
 
@@ -24,7 +24,7 @@ No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas co
 | Miércoles, hora 3 | 10 min anomalías; 10 min datos CMS; 25 min entrenamiento; 15 min diagnóstico | Referencia de autoencoder |
 | Jueves, hora 1 | 10 min repaso; 25 min una variación; 15 min comparación; 10 min presentación | Tabla y conclusiones de cada equipo |
 
-Las colas pueden afectar los tiempos: el instructor debe probar las asignaciones antes del taller y conservar resultados de referencia. No se garantiza un tiempo de entrenamiento universal. Cada equipo realiza una mejora; los ejercicios restantes son extensiones.
+Las colas pueden afectar los tiempos: consultar el estado de los trabajos y sus registros. No se garantiza un tiempo de entrenamiento universal. Cada equipo realiza una mejora; los ejercicios restantes son extensiones.
 
 ## Dos preguntas físicas
 
@@ -35,14 +35,13 @@ Son simulaciones abiertas, no etiquetas de procesos medidas en colisiones reales
 
 ## Antes de empezar
 
-El instructor comunica cuenta Slurm, entorno conda y dos rutas compartidas: carpeta de NanoAOD Higgs/ZZ y YAML de referencia del autoencoder CMS con rutas absolutas. Los alumnos leen esos datos y escriben únicamente en su propio HOME.
+Utilizar la cuenta Slurm, el entorno conda y las rutas compartidas anunciadas para el curso. Los NanoAOD Higgs/ZZ y los datos CMS del autoencoder se leen desde allí. Guardar configuraciones, variables extraídas, registros y resultados únicamente en $HOME/hep-workshop de tu propia cuenta.
 
 Los comandos de inicio están en [Configuración del sistema](../yuca-course/01_entorno.md), que es el primer capítulo de este mismo curso. No se requiere una cuenta CERN para leer estas muestras públicas. La práctica Higgs usa uproot para leer ROOT; el flujo de referencia del framework utiliza además PyROOT.
 
 ## Ruta de aprendizaje
 
 - [Configuración del sistema: primer paso para el alumno](../yuca-course/01_entorno.md)
-- [Preparación del instructor](instructor.md)
 - [Miércoles, horas 1 y 2: Higgs frente a fondo](higgs.md)
 - [Miércoles, hora 3, y jueves: autoencoder CMS](autoencoder.md)
 - [Bitácora de experimentos](experiments.md)

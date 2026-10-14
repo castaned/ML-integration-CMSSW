@@ -13,10 +13,10 @@ Comenzar con [Configuración del sistema](../yuca-course/01_entorno.md) (20 minu
 
 ### 1. Abrir Events y observar las colecciones (10 min)
 
-El instructor proporciona los ROOT originales en una carpeta compartida. Desde la raíz del repositorio:
+Los ROOT originales ya están disponibles en la carpeta compartida del curso; no descargarlos ni modificarlos. Desde la raíz del repositorio:
 
 ```bash
-export NANO_FILE=/RUTA/COMPARTIDA/Higgs125/ARCHIVO.root
+export NANO_FILE="$COURSE_DATA/Higgs125/ARCHIVO.root"
 python - <<'PY'
 import os, uproot
 with uproot.open(os.environ['NANO_FILE']) as f:

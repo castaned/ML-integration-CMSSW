@@ -64,7 +64,3 @@ nav:
     - Autoencoder CMS: practical-ml-hep/autoencoder.md
     - Bitácora y ejercicios: practical-ml-hep/experiments.md
     - Problemas frecuentes: yuca-course/06_problemas.md
-    - Preparación del instructor: practical-ml-hep/instructor.md
-    - Referencia del procesamiento ROOT y HDF5: yuca-course/03_procesamiento.md
-    - Referencia del clasificador del framework: yuca-course/04_clasificador.md
-    - Referencia del autoencoder del framework: yuca-course/05_autoencoder.md
