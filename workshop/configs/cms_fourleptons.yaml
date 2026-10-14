@@ -1,0 +1,18 @@
+max_events_per_file: 100000
+samples:
+  - name: Higgs125
+    label: s
+    record: https://opendata.cern.ch/record/37728
+    files: [/REPLACE/shared/Higgs125/FILE.root]
+  - name: ZZ4L
+    label: b
+    record: https://opendata.cern.ch/record/75589
+    files: [/REPLACE/shared/ZZ4L/FILE.root]
+selection:
+  lepton_pt_min: 5
+  ordered_pt: [20, 10, 5, 5]
+  muon_iso_max: 0.25
+  electron_cutbased_min: 2
+  z1_mass: [40, 120]
+  z2_mass: [12, 120]
+  fourlepton_mass: [70, 180]

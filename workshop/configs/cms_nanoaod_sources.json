@@ -1,0 +1,64 @@
+{
+  "Higgs125": {
+    "record": "https://opendata.cern.ch/record/37728",
+    "doi": "10.7483/OPENDATA.CMS.4GPD.HQ5T",
+    "title": "/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v2/NANOAODSIM",
+    "files": [
+      {
+        "availability": "online",
+        "bucket": "b5a9ba36-e6a9-4ddb-bc0d-30f5415b0fb6",
+        "checksum": "adler32:5387cdcc",
+        "file_id": "71753ebe-bad9-40e4-bb50-b3ed3ea9139b",
+        "filename": "34976A9F-8C57-044D-BB81-41704D8B017F.root",
+        "key": "CMS_mc_RunIISummer20UL16NanoAODv9_GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8_NANOAODSIM_106X_mcRun2_asymptotic_v17-v2_260000_file_index.json_0",
+        "size": 9521067,
+        "tags": {},
+        "uri": "root://eospublic.cern.ch//eos/opendata/cms/mc/RunIISummer20UL16NanoAODv9/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v17-v2/260000/34976A9F-8C57-044D-BB81-41704D8B017F.root",
+        "version_id": "68d7853b-7c3d-49ca-8347-0584314cfc0c"
+      },
+      {
+        "availability": "online",
+        "bucket": "b5a9ba36-e6a9-4ddb-bc0d-30f5415b0fb6",
+        "checksum": "adler32:6d1bea6b",
+        "file_id": "7bd65ae2-e737-421b-9ecb-3d5917057cdc",
+        "filename": "BE61D0C8-00BB-854D-8295-1EE8C6D6AC76.root",
+        "key": "CMS_mc_RunIISummer20UL16NanoAODv9_GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8_NANOAODSIM_106X_mcRun2_asymptotic_v17-v2_260000_file_index.json_6",
+        "size": 14635769,
+        "tags": {},
+        "uri": "root://eospublic.cern.ch//eos/opendata/cms/mc/RunIISummer20UL16NanoAODv9/GluGluHToZZTo4L_M125_TuneCP5_13TeV_powheg2_JHUGenV7011_pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v17-v2/260000/BE61D0C8-00BB-854D-8295-1EE8C6D6AC76.root",
+        "version_id": "5f044eed-e37e-49f2-94fa-42fc906fbd17"
+      }
+    ]
+  },
+  "ZZ4L": {
+    "record": "https://opendata.cern.ch/record/75589",
+    "doi": "10.7483/OPENDATA.CMS.3Z2W.O02W",
+    "title": "/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/RunIISummer20UL16NanoAODv9-106X_mcRun2_asymptotic_v17-v1/NANOAODSIM",
+    "files": [
+      {
+        "availability": "online",
+        "bucket": "41433934-4186-4206-ac2f-3fabc454e983",
+        "checksum": "adler32:418992dc",
+        "file_id": "15751cdf-a281-4ef2-aeac-8f5c0ce6305a",
+        "filename": "864198CF-1DF0-3C44-ACF1-EA0B8570B61C.root",
+        "key": "CMS_mc_RunIISummer20UL16NanoAODv9_ZZTo4L_TuneCP5_13TeV_powheg_pythia8_NANOAODSIM_106X_mcRun2_asymptotic_v17-v1_2520000_file_index.json_7",
+        "size": 105202156,
+        "tags": {},
+        "uri": "root://eospublic.cern.ch//eos/opendata/cms/mc/RunIISummer20UL16NanoAODv9/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v17-v1/2520000/864198CF-1DF0-3C44-ACF1-EA0B8570B61C.root",
+        "version_id": "e2ec73b5-56f8-47b1-97a0-7676cfe247fe"
+      },
+      {
+        "availability": "online",
+        "bucket": "41433934-4186-4206-ac2f-3fabc454e983",
+        "checksum": "adler32:d23b6a21",
+        "file_id": "8a60d348-bd3e-45fd-9e9d-9f9a51971f7a",
+        "filename": "7CF0825F-F24D-B848-A7D5-FEE7AF24A01E.root",
+        "key": "CMS_mc_RunIISummer20UL16NanoAODv9_ZZTo4L_TuneCP5_13TeV_powheg_pythia8_NANOAODSIM_106X_mcRun2_asymptotic_v17-v1_2520000_file_index.json_5",
+        "size": 117550846,
+        "tags": {},
+        "uri": "root://eospublic.cern.ch//eos/opendata/cms/mc/RunIISummer20UL16NanoAODv9/ZZTo4L_TuneCP5_13TeV_powheg_pythia8/NANOAODSIM/106X_mcRun2_asymptotic_v17-v1/2520000/7CF0825F-F24D-B848-A7D5-FEE7AF24A01E.root",
+        "version_id": "591c90fe-3664-427d-be7b-33538b043b74"
+      }
+    ]
+  }
+}

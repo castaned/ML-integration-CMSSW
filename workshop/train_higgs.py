@@ -57,6 +57,8 @@ def run(config, output, final=False):
     seed = int(config['split']['seed'])
     frame = pd.read_csv(os.path.expandvars(os.path.expanduser(data['input'])))
     frame, x, y, (train, val, test) = prepare(frame, data['features'], seed, int(data['max_events']))
+    if any(np.count_nonzero(y[part] == label) < 20 for part in (val,test) for label in (0,1)):
+        raise ValueError('Fewer than 20 events of a class in validation/test. Process more NanoAOD before training.')
     kind = settings['type']
     if kind == 'logistic':
         estimator = LogisticRegression(max_iter=int(settings['max_iter']), random_state=seed)

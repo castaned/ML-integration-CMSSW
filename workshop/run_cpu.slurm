@@ -12,6 +12,7 @@ export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 export OPENBLAS_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 export MKL_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 case "$1" in
+    extract) python workshop/extract_fourleptons.py -f "$2" --output "$3" ;;
     higgs) python workshop/train_higgs.py -f "$2" --output "$3" ;;
     higgs-final) python workshop/train_higgs.py -f "$2" --output "$3" --final ;;
     autoencoder) python workshop/train_autoencoder.py -f "$2" ;;
