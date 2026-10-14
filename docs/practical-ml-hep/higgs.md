@@ -68,6 +68,8 @@ El CSV es **un producto del análisis del alumno**, no el dato de origen. Sirve 
 
 ### 5. Cambiar una decisión (25 min)
 
+Para la actividad común de comparación, seguir los [cuatro escenarios YAML por grupos](experiments.md): capacidad, aprendizaje, lote e iteraciones. Todos parten de la misma referencia MLP. Las alternativas siguientes son extensiones del análisis, fuera de esa comparación controlada.
+
 Elegir una variación por equipo, con configuración y carpeta nuevas:
 
 | Cambio | Acción | Qué discutir |

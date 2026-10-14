@@ -43,6 +43,8 @@ El ejecutor actual también produce ROC y eficiencia W′ al finalizar. **No usa
 
 ## Jueves: variar, comparar y explicar
 
+La actividad principal usa los [cuatro grupos YAML y la tabla común](experiments.md). Cada equipo ejecuta referencia y variación asignada; el escenario 4 estudia la dimensión latente. Los cambios sugeridos a continuación son extensiones.
+
 Copiar el YAML de referencia y cambiar `data.output_path` a una carpeta nueva, por ejemplo `results/ae_latent4`. Elegir una única modificación:
 
 | Ejercicio | Parámetro | Discusión |

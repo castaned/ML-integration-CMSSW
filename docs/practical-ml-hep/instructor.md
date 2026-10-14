@@ -64,3 +64,8 @@ Equipos de dos participantes. Asignar una variación diferente a cada equipo; co
 | Limitaciones | No confunde separación ML con descubrimiento |
 
 El acceso a Yuca y los datos de los estudiantes se preparan localmente: la documentación publicada no implica que estas acciones ya se hayan ejecutado en el clúster.
+
+
+## Comparación final de cuatro grupos
+
+Asignar los [cuatro escenarios controlados](experiments.md) antes del entrenamiento. Preparar una tabla común importando la plantilla CSV enlazada en esa página. Cada grupo registra referencia, variación, métrica de validación, tiempo e interpretación; el script collect_results.py automatiza el registro. En el cierre pedir hipótesis, observación y limitación. No elegir la red por el mayor AUC W′ después de múltiples inspecciones.
