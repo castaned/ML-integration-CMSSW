@@ -4,6 +4,14 @@ Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca:
 
 **Este es el curso Yuca Open Data, con el nombre Practical Machine Learning in HEP.** Es una única ruta de aprendizaje: configuración del sistema → datos abiertos → análisis de NanoAOD → extracción de observables → entrenamiento → evaluación.
 
+## Flujo del análisis en Yuca
+
+![Flujo del análisis: datos compartidos, selección, observables, entrenamiento, evaluación y comparación](../assets/workshop/flujo_analisis_yuca.svg)
+
+Los archivos de entrada se leen desde la carpeta compartida. Cada participante guarda el procesamiento y los resultados en su cuenta personal, y después comparte las figuras y métricas de su grupo.
+
+[Descargar PNG](../assets/workshop/flujo_analisis_yuca.png) · [Descargar SVG vectorial](../assets/workshop/flujo_analisis_yuca.svg)
+
 ## Empezar aquí
 
 1. [Primer acceso SSH y activación de la cuenta con 2FA](../yuca-course/00_acceso.md), una sola vez y preferentemente antes del taller.
