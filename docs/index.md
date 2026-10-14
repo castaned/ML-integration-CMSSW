@@ -24,12 +24,15 @@ All within CERN's computing infrastructure, with minimal prior ML experience req
 
 If you are new to CMS computing or ML, follow these steps:
 
-1. **[System Overview](getting-started/overview.md)** - Understand the complete workflow and the architecture of the framework.
-2. **[CERN Access Setup](cern-systems/lxplus-access.md)** - Configure LXPLUS access, VOMS/GRID certificates, and environment.
-3. **[Dataset Processing](data-processing/framework-setup.md)** - Process your NanoAOD files.
-4. **[ML Training](ml/conversion.md)** - Train ML models using the prepared datasets.
+1. **[System Overview](getting-started/01_overview.md)** - Understand the complete workflow and the architecture of the framework.
+2. **[CERN Access Setup](cern-systems/01_lxplus.md)** - Configure LXPLUS access, VOMS/GRID certificates, and environment.
+3. **[Dataset Processing](framework/04_framework-setup.md)** - Process your NanoAOD files.
+4. **[ML Training](framework/03_ml.md)** - Train ML models using the prepared datasets.
 
 ## Critical Requirements
+
+For the [Yuca Open Data course](yuca-course/index.md) and [Practical ML workshop](practical-ml-hep/index.md), a CERN account is not required. Use the Yuca access and shared data supplied by your instructor. The requirements below apply to the CERN infrastructure workflow.
+
 
 !!! warning "Before You Begin"
     You **must** have:
@@ -46,3 +49,8 @@ If you are new to CMS computing or ML, follow these steps:
 - Analysts needing a reproducible ML pipeline
 - Anyone converting CMS datasets into ML-ready formats
 
+
+
+## Practical Machine Learning in HEP
+
+[Taller en Yuca: clasificación de Higgs y autoencoder CMS](practical-ml-hep/index.md). Miércoles tres horas y jueves una hora, con ejercicios y guía de preparación.

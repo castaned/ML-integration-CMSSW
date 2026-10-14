@@ -27,3 +27,8 @@ Los resultados numericos del ejemplo no son una medicion de fisica. Una puntuaci
 
 !!! note "Trabajo de cada estudiante"
     Ejecuta el tutorial primero en `opendata_dev`. Para desarrollar cambios, crea despues una rama propia (`git switch -c estudiante-usuario-dev`) y propone una pull request; no hagas push directo a la rama compartida.
+
+
+## Taller práctico adicional
+
+[Practical Machine Learning in HEP](../practical-ml-hep/index.md): clasificación Higgs con ATLAS Open Data y autoencoder CMS, miércoles tres horas y jueves una hora.
