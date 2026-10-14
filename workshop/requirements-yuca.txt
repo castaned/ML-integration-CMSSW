@@ -1,0 +1,5 @@
+# Personal Yuca environment for both course exercises.
+-r requirements.txt
+h5py
+onnx
+# Install CPU PyTorch separately, using the official PyTorch CPU package index.
