@@ -2,7 +2,7 @@
 
 Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca: **clasificación de Higgs con CMS NanoAOD** y **detección de anomalías con CMS Open Data**. Cada equipo modifica un modelo, registra sus resultados y justifica una decisión física.
 
-**Este es el curso Yuca Open Data, con el nombre Practical Machine Learning in HEP.** Es una única ruta de aprendizaje: configuración del sistema → datos abiertos → análisis de NanoAOD → extracción de observables → entrenamiento → evaluación.
+**Este es el curso Yuca Open Data, con el nombre Practical Machine Learning in HEP.** Es una única ruta de aprendizaje: configuración del sistema → datos abiertos → análisis de NanoAOD → extracción de observables y gráficas → HDF5 → entrenamiento → evaluación.
 
 ## Flujo del análisis en Yuca
 
@@ -17,7 +17,7 @@ Los archivos de entrada se leen desde la carpeta compartida. Cada participante g
 1. [Primer acceso SSH y activación de la cuenta con 2FA](../yuca-course/00_acceso.md), una sola vez y preferentemente antes del taller.
 2. [Clonar el repositorio, crear tu entorno conda e instalar dependencias](../yuca-course/01_entorno.md), con la cuenta ya activada.
 3. [Datos abiertos, formato NanoAOD y revisión de archivos](../yuca-course/02_datos.md).
-4. [Ejemplo 1: selección y reconstrucción Higgs/ZZ, observables y clasificación](higgs.md).
+4. [Ejemplo 1: procesamiento Higgs/ZZ, gráficas, HDF5 y clasificación](higgs.md).
 5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
 6. [Modificaciones y bitácora de experimentos](experiments.md).
 7. [Entrega en carpeta compartida y comparación colectiva](delivery.md).

@@ -35,9 +35,9 @@ python workshop/student.py extract
 
 ### 3. Examinar los observables (15 min)
 
-La extracción crea `events.csv`, `cutflow.json`, `provenance.json`, la copia de configuración y `observables.pdf/png`. El cutflow informa entradas, rechazos por etapa y seleccionados; no es una tabla acumulativa. Verificar cuántos eventos quedan en cada clase. El entrenador exige al menos 20 eventos de cada clase en validación y test; es un mínimo educativo, no garantía de precisión estadística.
+El mismo comando realiza **procesamiento → gráficas → conversión a HDF5**, sin intervención adicional. Produce `observables.pdf/png`, `events.h5`, `cutflow.json`, `provenance.json` y la copia de configuración. No ejecutar una conversión aparte. El cutflow informa entradas, rechazos por etapa y seleccionados; no es una tabla acumulativa. Verificar cuántos eventos quedan en cada clase. El entrenador exige al menos 20 eventos de cada clase en validación y test; es un mínimo educativo, no garantía de precisión estadística.
 
-La tabla contiene doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ2, suma pT leptónica, los cuatro pT individuales y MET. `Label` viene del proceso simulado de origen; `EventId` conserva la procedencia y nunca es una variable de entrenamiento. No se usan ramas de verdad de generador como entradas.
+El archivo HDF5 contiene una tabla de eventos con doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ2, suma pT leptónica, los cuatro pT individuales y MET. `Label` viene del proceso simulado de origen; `EventId` conserva la procedencia y nunca es una variable de entrenamiento. No se usan ramas de verdad de generador como entradas.
 
 **Preguntas:** ¿dónde aparece la masa del Higgs? ¿Por qué necesitamos emparejamiento? ¿Qué ocurre al exigir dos Z cercanos a 91 GeV?
 
@@ -52,7 +52,7 @@ python workshop/student.py train --task higgs --role baseline
 squeue -u "$USER"
 ```
 
-El modelo común es una red MLP. El CSV es un producto del análisis NanoAOD realizado en el paso anterior. Entrenamiento/validación/test: 60/20/20 estratificado; escalado ajustado solo con entrenamiento. El programa evalúa validación y guarda curvas y métricas en tu carpeta personal.
+El modelo común es una red MLP. El HDF5 es un producto del análisis NanoAOD realizado en el paso anterior, como en la práctica del autoencoder. Entrenamiento/validación/test: 60/20/20 estratificado; escalado ajustado solo con entrenamiento. El programa evalúa validación y guarda curvas y métricas en tu carpeta personal.
 
 ### 5. Variar un parámetro del YAML (25 min)
 

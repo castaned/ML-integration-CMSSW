@@ -32,4 +32,4 @@ Tu cuenta: $HOME/hep-workshop/ (escritura)
 
 No subir los ROOT al repositorio ni modificar archivos compartidos. Cada experimento debe tener una carpeta de salida nueva para conservar la referencia.
 
-Continuar con [Análisis de NanoAOD y clasificación Higgs](../practical-ml-hep/higgs.md): seleccionar leptones → reconstruir candidatos → extraer observables → entrenar y evaluar.
+Continuar con [Análisis de NanoAOD y clasificación Higgs](../practical-ml-hep/higgs.md): seleccionar leptones → reconstruir candidatos → generar gráficas y HDF5 → entrenar y evaluar.
