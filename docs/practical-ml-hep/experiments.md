@@ -99,3 +99,8 @@ Cada grupo completa estas cuatro frases en un documento común:
 4. No podemos concluir… porque…
 
 Cierre del curso: ¿qué configuración elegiríamos y por qué?, ¿vale la pena su coste?, ¿qué se repetiría con más semillas o datos? Una variación que no mejora también es un resultado útil si se interpreta y documenta.
+
+
+## Compartir los resultados del grupo
+
+Continuar con [Entrega y comparación colectiva](delivery.md): generar el paquete, subir pocas figuras representativas a la carpeta compartida del curso y completar la hoja Higgs o autoencoder. Los entrenamientos permanecen en tu cuenta; solo se comparte la selección de resultados.

@@ -12,6 +12,7 @@ Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca:
 4. [Ejemplo 1: selección y reconstrucción Higgs/ZZ, observables y clasificación](higgs.md).
 5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
 6. [Modificaciones y bitácora de experimentos](experiments.md).
+7. [Entrega en carpeta compartida y comparación colectiva](delivery.md).
 
 No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. Los datos del curso ya estarán disponibles en una carpeta compartida: no es necesario descargarlos. Cada participante configura su sesión y su espacio personal al inicio.
 
