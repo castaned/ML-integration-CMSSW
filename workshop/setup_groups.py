@@ -5,7 +5,7 @@ from pathlib import Path
 import yaml
 
 
-def generate(reference, directory, results, task):
+def generate(reference, directory, results, task, selected_group=None):
     base = yaml.safe_load(Path(reference).expanduser().read_text())
     directory = Path(directory).expanduser().resolve()
     results = Path(results).expanduser().resolve()
@@ -21,6 +21,7 @@ def generate(reference, directory, results, task):
         raise ValueError('task must be higgs or autoencoder')
     directory.mkdir(parents=True)
     for group, (parameter,value) in enumerate(changes,1):
+        if selected_group is not None and group!=selected_group:continue
         for role in ('baseline','variation'):
             config = copy.deepcopy(base)
             name=f'{task}_group{group}_{role}'
