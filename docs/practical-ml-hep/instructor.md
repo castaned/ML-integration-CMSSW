@@ -2,18 +2,17 @@
 
 El taller ocupa **miércoles 3 horas y jueves 1 hora**. Preparar datos y entorno antes de clase; no pedir a cada alumno descargas ROOT ni crear el conjunto CMS durante la sesión.
 
-## Datos ATLAS: descargar una vez
-
-En tu copia `opendata_dev`, ejecutar en una sesión autorizada para transferencia:
+## NanoAOD Higgs/ZZ: descargar originales una vez
 
 ```bash
-python workshop/download_higgs.py \
-  --output "$HOME/Open-Data/Workshop/atlas-higgs-challenge-2014-v2.csv.gz"
+python workshop/download_cms.py --output "$HOME/Open-Data/Workshop/NanoAOD"
 ```
 
-Fuente: [CERN Open Data 328](https://opendata.cern.ch/record/328), DOI `10.7483/OPENDATA.ATLAS.ZBP2.M5T8`. Archivo comprimido 65 630 848 bytes; Adler32 `e4717bbe`, verificado contra el registro. CSV completo: 818 238 eventos. El programa verifica tamaño y checksum, registra procedencia y evita sobrescribir archivos. Una descarga incompleta conserva `.part`; comprobar la causa antes de reintentar con una ruta nueva.
+Los archivos más pequeños de ZZ dieron solo 20 eventos seleccionados en la primera prueba; el piloto usa dos archivos de fondo mayores. Revisar la estadística después de los cortes es parte de la preparación.
 
-La práctica usa una selección de 50 000 eventos para reducir el tiempo. Es el dataset del Higgs ML Challenge, no NanoAOD CMS. Son etiquetas binarias; no se identifican por separado los fondos del archivo.
+El manifiesto `workshop/configs/cms_nanoaod_sources.json` contiene dos ROOT originales pequeños por proceso, URLs del portal, tamaño y Adler32. La descarga verifica ambos y conserva la procedencia. Total aproximado: 247 MB. Es un piloto educativo; inspeccionar el número seleccionado y ampliar archivos del mismo registro si hace falta.
+
+Registros: [Higgs125→ZZ→4L](https://opendata.cern.ch/record/37728) y [ZZ→4L](https://opendata.cern.ch/record/75589), CMS UL16 NanoAODv9. Comunicar rutas absolutas y permisos de lectura a los alumnos. Ellos ejecutan selección y extracción en carpetas propias; no proporcionar solo la tabla final. Guardar una extracción de respaldo identificada como referencia del instructor si la cola falla.
 
 ## Datos CMS: reutilizar los HDF5 validados
 
@@ -26,7 +25,7 @@ python scripts/check_dyjets_ht_pilot.py \
 
 Las rutas conocidas del piloto están bajo `/lustre/home/acastaneda/Open-Data/Processed/`: DYJets en `h5_dyjets_ht/DYJets` y WZ/ZZ en `h5_sm_cocktail/`. La ruta W′ debe tomarse de la configuración verificada, no inferirse del nombre de una carpeta.
 
-Preparar una copia llamada `autoencoder_reference.yaml` con todas las entradas **absolutas**, con las mismas características/etiquetas y una salida que los alumnos reemplazarán. Si se mueven/copían archivos, conservar nombres y contenidos y repetir el preflight. Confirmar lectura con una cuenta de alumno. Solicitar al soporte una ubicación compartida autorizada; no abrir permisos de todo el HOME ni compartir credenciales. Anunciar ruta CSV, ruta YAML, cuenta Slurm y entorno conda.
+Preparar una copia llamada `autoencoder_reference.yaml` con todas las entradas **absolutas**, con las mismas características/etiquetas y una salida que los alumnos reemplazarán. Si se mueven/copían archivos, conservar nombres y contenidos y repetir el preflight. Confirmar lectura con una cuenta de alumno. Solicitar al soporte una ubicación compartida autorizada; no abrir permisos de todo el HOME ni compartir credenciales. Anunciar ruta NanoAOD, ruta YAML, cuenta Slurm y entorno conda.
 
 ## Entorno y recursos
 
@@ -35,15 +34,15 @@ Usar un entorno probado con Python ≥3.10. Dependencias Higgs en `workshop/requ
 ```bash
 source /apps/miniconda3/etc/profile.d/conda.sh
 conda activate ml-open-data
-python -c "import pandas, sklearn, yaml, torch, h5py, onnx; print('OK')"
+python -c "import pandas, sklearn, yaml, uproot, awkward, torch, h5py, onnx; print('OK')"
 ```
 
 El ejecutor acepta `WORKSHOP_CONDA_ENV` y `CONDA_SETUP_SCRIPT`. Cuenta Slurm se pasa con `sbatch --account=...`; no imponer la cuenta del instructor a todos los participantes. Reserva inicial: 2 CPU, 6 GB, 30 minutos; hacer un ensayo con la cola real y ajustar si hace falta. No prometer GPU ni ejecución instantánea.
 
 ## Ensayo completo previo
 
-1. Descargar y verificar el CSV.
-2. Probar regresión logística, boosted y MLP con 50 000 eventos y guardar tiempos/avisos.
+1. Descargar/verificar NanoAOD y probar lectura de Events.
+2. Procesar cuatro leptones, revisar cutflow y probar el clasificador con la tabla extraída; guardar tiempos/avisos.
 3. Probar el YAML CMS con una cuenta de alumno, ejecutar preflight y entrenar una referencia completa.
 4. Comprobar que los PDFs/PNGs abren desde Open OnDemand y que cada equipo tiene directorio personal.
 5. Preparar resultados de respaldo si la cola no permite completar un entrenamiento durante la hora. Identificarlos como resultados del instructor.
@@ -58,7 +57,7 @@ Equipos de dos participantes. Asignar una variación diferente a cada equipo; co
 
 | Criterio | Evidencia |
 | --- | --- |
-| Procedencia física | Distingue simulación ATLAS/CMS y señal/fondo |
+| Procedencia física | Identifica procedencia CMS y señal/fondo |
 | Reproducibilidad | Configuraciones, semilla y carpetas propias |
 | Comparación justa | Una modificación y particiones constantes |
 | Interpretación | AUC/eficiencia/aceptación con definición y pesos |

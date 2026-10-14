@@ -1,15 +1,15 @@
 # Practical Machine Learning in HEP
 
-Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca: **clasificación de Higgs con ATLAS Open Data** y **detección de anomalías con CMS Open Data**. Cada equipo modifica un modelo, registra sus resultados y justifica una decisión física.
+Dos jornadas: miércoles de tres horas y jueves de una hora en el clúster Yuca: **clasificación de Higgs con CMS NanoAOD** y **detección de anomalías con CMS Open Data**. Cada equipo modifica un modelo, registra sus resultados y justifica una decisión física.
 
-Este taller complementa el [curso Yuca de Open Data](../yuca-course/index.md). Aquí empezamos con datos preparados; el curso anterior explica la selección NanoAOD y conversión ROOT a HDF5.
+Este taller complementa el [curso Yuca de Open Data](../yuca-course/index.md). Aquí los alumnos parten de NanoAOD, seleccionan leptones, reconstruyen candidatos y extraen observables antes de entrenar. El curso anterior explica además la conversión ROOT a HDF5.
 
 ## Programa: miércoles y jueves
 
 | Jornada | Distribución del tiempo | Producto del alumno |
 | --- | --- | --- |
-| Miércoles, hora 1 | 10 min física/datos; 10 min entorno; 25 min clasificador; 15 min interpretación | ROC de validación y referencia |
-| Miércoles, hora 2 | 10 min repaso; 30 min una mejora; 10 min test final; 10 min discusión | Comparación y evaluación final Higgs |
+| Miércoles, hora 1 | 10 min entorno y Events; 20 min selección; 15 min extracción; 15 min primer entrenamiento | Cutflow, masas reconstruidas y referencia |
+| Miércoles, hora 2 | 10 min diagnóstico; 30 min variar selección/variables; 10 min test final; 10 min discusión | Comparación y evaluación final Higgs |
 | Miércoles, hora 3 | 10 min anomalías; 10 min datos CMS; 25 min entrenamiento; 15 min diagnóstico | Referencia de autoencoder |
 | Jueves, hora 1 | 10 min repaso; 25 min una variación; 15 min comparación; 10 min presentación | Tabla y conclusiones de cada equipo |
 
@@ -17,14 +17,14 @@ Las colas pueden afectar los tiempos: el instructor debe probar las asignaciones
 
 ## Dos preguntas físicas
 
-1. **Supervisado:** ¿podemos distinguir Higgs → ττ de eventos que producen una firma parecida? Usamos simulación oficial ATLAS, con etiquetas de señal/fondo del [registro CERN Open Data 328](https://opendata.cern.ch/record/328). El fondo mezcla Z→ττ, pares de top y W. Este archivo etiqueta señal/fondo, no el proceso individual: no permite una clasificación multiclase de esos fondos.
-2. **No supervisado:** ¿qué eventos se reconstruyen mal después de aprender una referencia del sector electrodébil del SM? Usamos DYJets HT 70–100, WZ y ZZ de CMS; W′→WZ→3ℓν de 1 TeV es una referencia de evaluación.
+1. **Supervisado:** Higgs de 125 GeV→ZZ*→4 leptones frente a ZZ→4 leptones. Ambas muestras son NanoAODv9 UL16 de CMS. El alumno realiza la selección y construye masas y momentos antes de entrenar.
+2. **No supervisado:** DYJets HT 70–100, WZ y ZZ de CMS como referencia electrodébil multileptónica; W′→WZ→3ℓν como referencia de evaluación.
 
-Son **simulaciones abiertas**, no etiquetas de procesos medidas en colisiones reales. No combinamos eventos ATLAS y CMS en un mismo entrenamiento.
+Son simulaciones abiertas, no etiquetas de procesos medidas en colisiones reales. La práctica usa una selección educativa simplificada, no reproduce el análisis oficial CMS. El CSV ATLAS anterior queda como extensión opcional.
 
 ## Antes de empezar
 
-El instructor comunica cuenta Slurm, entorno conda y dos rutas compartidas: CSV de ATLAS y YAML de referencia CMS con rutas absolutas. Los alumnos leen esos datos y escriben únicamente en su propio HOME.
+El instructor comunica cuenta Slurm, entorno conda y dos rutas compartidas: carpeta de NanoAOD Higgs/ZZ y YAML de referencia del autoencoder CMS con rutas absolutas. Los alumnos leen esos datos y escriben únicamente en su propio HOME.
 
 Desde una terminal de Yuca:
 
@@ -34,7 +34,7 @@ conda activate ml-open-data
 git clone --branch opendata_dev https://github.com/castaned/ML-integration-CMSSW.git "$HOME/ML-integration-CMSSW"
 cd "$HOME/ML-integration-CMSSW"
 mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs"
-python -c "import pandas, sklearn, yaml, torch, h5py, onnx; print('Entorno listo')"
+python -c "import pandas, sklearn, yaml, uproot, awkward, torch, h5py, onnx; print('Entorno listo')"
 ```
 
 Si ya tienes el repositorio: entrar en él, comprobar `git branch --show-current` y ejecutar `git pull --ff-only origin opendata_dev`. No clonar encima de una carpeta existente. Si falta una dependencia, avisar al instructor; no modificar un entorno compartido durante la clase. Estos ejercicios preparados no requieren ROOT.

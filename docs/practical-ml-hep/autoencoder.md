@@ -4,7 +4,10 @@
 
 El autoencoder aprende eventos multileptónicos asociados al sector electrodébil del SM, usando DYJets HT 70–100, WZ y ZZ. W′→WZ→3ℓν, de 1 TeV, se usa como referencia de nueva física **solo para evaluación**. Las muestras son simulaciones abiertas CMS; no se entrena con W′.
 
-### 1. Crear una configuración personal (10 min)
+### 1. De NanoAOD a una configuración personal (10 min)
+
+La selección de tres leptones del repositorio produce candidatos Z/W y observables por canal. Revisar con el instructor `example_files/main_process/filterNanoAOD.py`, las ramas de entrada, la selección y su cutflow. El flujo original y sus comandos Slurm se encuentran en [procesamiento NanoAOD](../yuca-course/03_procesamiento.md). Por el límite de cuatro horas, cada equipo procesa NanoAOD en la práctica Higgs; en autoencoder se reutiliza el HDF5 obtenido con el flujo CMS ya validado. Reprocesar un archivo WZ es una extensión, no confundir ese HDF5 con datos de origen.
+
 
 El instructor proporciona un YAML **verificado**, con las rutas absolutas de sus HDF5 compartidos. No sustituirlas por rutas del HOME del alumno.
 
