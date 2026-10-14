@@ -21,3 +21,5 @@ Requirements: `requirements.txt` for Higgs, plus the existing CMS ML dependencie
 `extract_fourleptons.py`: educational selection and reconstructed observables, rejection counts and provenance.
 Configs: `cms_fourleptons.yaml` (selection), `cms_higgs_classifier.yaml` (training).
 This is a simplified exercise, not the official CMS Higgs selection.
+
+The extraction command performs selection, observable plots and HDF5 export together. It writes `events.h5` (flat arrays via h5py). Higgs training reads HDF5 by default, as does the CMS autoencoder. CSV reading remains available for the optional ATLAS exercise and older results.

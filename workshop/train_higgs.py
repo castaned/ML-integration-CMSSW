@@ -22,6 +22,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import yaml
+from event_io import read_events_h5
 
 FORBIDDEN = {'EventId', 'Weight', 'Label', 'KaggleSet', 'KaggleWeight'}
 
@@ -56,7 +57,8 @@ def run(config, output, final=False):
         raise FileExistsError('Use a new output directory for each experiment')
     data, settings = config['data'], config['model']
     seed = int(config['split']['seed'])
-    frame = pd.read_csv(os.path.expandvars(os.path.expanduser(data['input'])))
+    input_path=Path(os.path.expandvars(os.path.expanduser(data['input'])))
+    frame = read_events_h5(input_path) if input_path.suffix.lower() in ('.h5','.hdf5') else pd.read_csv(input_path)
     frame, x, y, (train, val, test) = prepare(frame, data['features'], seed, int(data['max_events']))
     if any(np.count_nonzero(y[part] == label) < 20 for part in (val,test) for label in (0,1)):
         raise ValueError('Fewer than 20 events of a class in validation/test. Process more NanoAOD before training.')

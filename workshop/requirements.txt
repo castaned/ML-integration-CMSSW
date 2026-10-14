@@ -6,4 +6,5 @@ PyYAML
 joblib
 uproot
 awkward
+h5py
 # CMS exercise also uses the existing ml_training dependencies, including PyTorch, h5py and onnx.

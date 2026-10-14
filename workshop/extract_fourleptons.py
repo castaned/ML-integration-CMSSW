@@ -9,6 +9,7 @@ import awkward as ak
 import pandas as pd
 import uproot
 import yaml
+from event_io import write_events_h5
 
 
 def vector(pt, eta, phi, mass):
@@ -110,7 +111,6 @@ def extract(config, output):
     frame = pd.DataFrame(rows)
     if not frame.EventId.is_unique: raise ValueError('Duplicate event provenance IDs')
     output.mkdir(parents=True)
-    frame.to_csv(output/'events.csv',index=False)
     (output/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     (output/'cutflow.json').write_text(json.dumps(flows,indent=2))
     (output/'provenance.json').write_text(json.dumps(provenance,indent=2))
@@ -124,6 +124,8 @@ def extract(config, output):
             if len(values): ax.hist(values,bins=np.linspace(*interval,31),density=True,histtype='step',label=name)
         ax.set(xlabel=feature+' [GeV]',ylabel='Unit-area density'); ax.legend()
     fig.tight_layout();fig.savefig(output/'observables.pdf');fig.savefig(output/'observables.png',dpi=180);plt.close(fig)
+    write_events_h5(frame,output/'events.h5')
+    print('Training input:',output/'events.h5')
     print(json.dumps(flows,indent=2))
     print(frame.Label.value_counts().to_dict())
     return frame

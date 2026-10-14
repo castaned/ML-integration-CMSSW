@@ -33,7 +33,7 @@ def prepare(settings_path,group,workspace=WORKSPACE):
     if selection_path.exists():raise FileExistsError(selection_path)
     selection_path.write_text(yaml.safe_dump(selection,sort_keys=False))
     classifier=yaml.safe_load((REPO/'workshop/configs/cms_higgs_classifier.yaml').read_text())
-    classifier['data']['input']=str(workspace/'extraction/baseline/events.csv')
+    classifier['data']['input']=str(workspace/'extraction/baseline/events.h5')
     classifier_path=configs/'classifier.yaml'
     if classifier_path.exists():raise FileExistsError(classifier_path)
     classifier_path.write_text(yaml.safe_dump(classifier,sort_keys=False))

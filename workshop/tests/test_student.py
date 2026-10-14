@@ -25,7 +25,7 @@ class StudentTests(unittest.TestCase):
             self.assertEqual(state['account'],'test_account')
             path=state['configs']['higgs']['variation']
             c=yaml.safe_load(Path(path).read_text())
-            self.assertEqual(c['data']['input'],str(root/'student/extraction/baseline/events.csv'))
+            self.assertEqual(c['data']['input'],str(root/'student/extraction/baseline/events.h5'))
             self.assertTrue((root/'student/course_state.json').exists())
             with self.assertRaises(FileExistsError):prepare(settings,2,root/'student')
 
