@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import time
 
 import joblib
 import matplotlib
@@ -68,12 +69,15 @@ def run(config, output, final=False):
     elif kind == 'mlp':
         estimator = MLPClassifier(hidden_layer_sizes=tuple(settings['hidden_dims']),
             learning_rate_init=float(settings['learning_rate']), max_iter=int(settings['max_iter']),
+            batch_size=int(settings.get('batch_size', 128)),
             early_stopping=True, validation_fraction=0.15, random_state=seed)
     else:
         raise ValueError('model.type must be logistic, boosted or mlp')
     # Fit imputation and standardization ONLY on training. Missingness is informative.
     model = make_pipeline(SimpleImputer(strategy='median', add_indicator=True), StandardScaler(), estimator)
+    started = time.perf_counter()
     model.fit(x[train], y[train])
+    fit_seconds = time.perf_counter() - started
     val_score = model.predict_proba(x[val])[:, 1]
     acceptance = float(config['evaluation']['background_acceptance'])
     if not 0 < acceptance < 1:
@@ -84,6 +88,7 @@ def run(config, output, final=False):
     truth = y[indices]
     predicted = scores >= threshold
     metrics = {'evaluation_set': 'test' if final else 'validation', 'model': kind,
+        'fit_seconds': fit_seconds, 'iterations_run': int(np.max(getattr(estimator, 'n_iter_', 0))),
         'roc_auc_unweighted': float(roc_auc_score(truth, scores)),
         'average_precision_unweighted': float(average_precision_score(truth, scores)),
         'threshold_from_validation': threshold, 'target_validation_background_acceptance': acceptance,

@@ -2,6 +2,7 @@ import copy
 import csv
 import json
 import os
+import time
 from pathlib import Path
 
 import h5py
@@ -384,6 +385,7 @@ def run_autoencoder(config, output_path):
     best_loss = float("inf")
     best_state = None
     stale = 0
+    training_started = time.perf_counter()
     for epoch in range(int(settings["epochs"])):
         model.train()
         losses = []
@@ -417,6 +419,7 @@ def run_autoencoder(config, output_path):
     if best_state is None:
         raise ValueError("epochs must be positive")
     model.load_state_dict(best_state)
+    training_seconds = time.perf_counter() - training_started
 
     val_scores = _scores(model, val, device, batch_size)
     quantile = float(detection["normal_quantile"])
@@ -457,6 +460,8 @@ def run_autoencoder(config, output_path):
                 anomaly_scores, qcd_scores, labels, scores, output_dir, name,
                 mixed_normal, val_ids, test_ids, process_names, evaluation_weights)
     metrics = {"normal_train": len(train), "normal_validation": len(val), "normal_test": len(test),
+               "best_validation_loss": float(best_loss), "epochs_run": len(history['train_loss']),
+               "training_seconds": training_seconds,
                "signal_test": len(anomaly), "normal_quantile": quantile, "threshold": threshold,
                "normal_test_fpr": float(np.mean(normal_scores >= threshold)),
                "balanced_normal_test_fpr": float(np.mean([
