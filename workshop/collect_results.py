@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 
-def collect(config_dirs, output):
+def collect(config_dirs, output, group=None):
     rows=[]
     signatures={}
     for directory in config_dirs:
@@ -15,6 +15,7 @@ def collect(config_dirs, output):
             config=yaml.safe_load(path.read_text())
             tag=config.get('workshop')
             if not tag: continue
+            if group is not None and int(tag['group'])!=group:continue
             root=Path(tag['results_path']).expanduser()
             task=tag['task']
             metric=root/('metrics.json' if task=='higgs' else f'metrics_{config["model"]["name"]}.json')
@@ -68,4 +69,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--config-dirs',nargs='+',required=True)
     p.add_argument('--output',required=True)
-    a=p.parse_args();collect(a.config_dirs,a.output)
+    p.add_argument('--group',type=int,choices=range(1,5))
+    a=p.parse_args();collect(a.config_dirs,a.output,a.group)
