@@ -15,14 +15,14 @@ Los archivos de entrada se leen desde la carpeta compartida. Cada participante g
 ## Empezar aquí
 
 1. [Primer acceso SSH y activación de la cuenta con 2FA](../yuca-course/00_acceso.md), una sola vez y preferentemente antes del taller.
-2. [Repositorio y entorno de trabajo](../yuca-course/01_entorno.md), con la cuenta ya activada.
+2. [Clonar el repositorio, crear tu entorno conda e instalar dependencias](../yuca-course/01_entorno.md), con la cuenta ya activada.
 3. [Datos abiertos, formato NanoAOD y revisión de archivos](../yuca-course/02_datos.md).
 4. [Ejemplo 1: selección y reconstrucción Higgs/ZZ, observables y clasificación](higgs.md).
 5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
 6. [Modificaciones y bitácora de experimentos](experiments.md).
 7. [Entrega en carpeta compartida y comparación colectiva](delivery.md).
 
-No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. Los datos del curso ya estarán disponibles en una carpeta compartida: no es necesario descargarlos. Cada participante configura su sesión y su espacio personal al inicio.
+No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas compartidas y la lectura de Events. Los datos del curso ya estarán disponibles en una carpeta compartida: no es necesario descargarlos. Cada participante crea su entorno conda, instala las bibliotecas, verifica la instalación y prepara su espacio personal antes de las prácticas.
 
 ## Programa: miércoles y jueves
 
@@ -33,7 +33,7 @@ No empezar ejecutando entrenamientos: comprobar primero el entorno, las rutas co
 | Miércoles, hora 3 | 10 min anomalías; 10 min datos CMS; 25 min entrenamiento; 15 min diagnóstico | Referencia de autoencoder |
 | Jueves, hora 1 | 10 min repaso; 25 min una variación; 15 min comparación; 10 min presentación | Tabla y conclusiones de cada equipo |
 
-Las colas pueden afectar los tiempos: consultar el estado de los trabajos y sus registros. No se garantiza un tiempo de entrenamiento universal. Cada equipo realiza una mejora; los ejercicios restantes son extensiones.
+Las colas pueden afectar los tiempos: consultar el estado de los trabajos y sus registros. La instalación inicial depende de las descargas y puede ocupar más tiempo que el previsto; completar el capítulo de configuración antes de entrar a los ejemplos. No se garantiza un tiempo de entrenamiento universal. Cada equipo realiza una mejora; los ejercicios restantes son extensiones.
 
 ## Dos preguntas físicas
 
@@ -44,7 +44,7 @@ Son simulaciones abiertas, no etiquetas de procesos medidas en colisiones reales
 
 ## Antes de empezar
 
-Utilizar la cuenta Slurm, el entorno conda y las rutas compartidas anunciadas para el curso. Los NanoAOD Higgs/ZZ y los datos CMS del autoencoder se leen desde allí. Guardar configuraciones, variables extraídas, registros y resultados únicamente en $HOME/hep-workshop de tu propia cuenta.
+Utilizar la cuenta Slurm y las rutas compartidas anunciadas para el curso, y el entorno conda personal creado siguiendo el capítulo de configuración. Los NanoAOD Higgs/ZZ y los datos CMS del autoencoder se leen desde allí. Guardar configuraciones, variables extraídas, registros y resultados únicamente en $HOME/hep-workshop de tu propia cuenta.
 
 Los comandos de inicio están en [Configuración del sistema](../yuca-course/01_entorno.md), que es el primer capítulo de este mismo curso. No se requiere una cuenta CERN para leer estas muestras públicas. La práctica Higgs usa uproot para leer ROOT; el flujo de referencia del framework utiliza además PyROOT.
 

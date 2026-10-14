@@ -16,31 +16,46 @@ git status -sb
 
 La rama debe ser `opendata_dev`. Si el repositorio ya existe, usa `git pull --ff-only origin opendata_dev` desde esa rama. Si `git status -sb` muestra cambios locales, revisalos antes de actualizar.
 
-## Activar el entorno del curso
+## Crear tu entorno personal por primera vez
 
-El instructor comunica el nombre del entorno disponible y la cuenta Slurm. **Si el entorno ya existe, activarlo; no recrearlo ni reinstalar PyTorch.**
+Cada participante recibe una cuenta de Yuca y **crea su propio entorno conda**. La cuenta nueva no incluye el entorno del curso ya instalado. Ejecutar estos pasos una sola vez, desde la carpeta del repositorio:
 
 ```bash
 source /apps/miniconda3/etc/profile.d/conda.sh
+conda create -n ml-open-data python=3.10 -y
 conda activate ml-open-data
-mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs"
-python -c "import pandas, sklearn, yaml, uproot, awkward, torch, h5py, onnx; print('Entorno del curso listo')"
 ```
 
-Sustituir `ml-open-data` si el instructor proporciona otro nombre. Si falla un import, consultar al instructor antes de modificar un entorno compartido. Para los ejemplos preparados de Higgs y autoencoder no es necesario cargar PyROOT: los NanoAOD Higgs se leen con uproot.
+Si ya completaste esta creación en tu cuenta, activar el entorno existente en lugar de crearlo otra vez. No usar el entorno personal de otro participante.
 
-## ROOT para el procesamiento del framework
+## Instalar las dependencias del curso
 
-Este paso corresponde al filtro NanoAOD original del framework y a su conversión a HDF5:
+Con `ml-open-data` activo y dentro de `ML-integration-CMSSW`:
 
 ```bash
-module load root/6.24.08
-export PYTHONPATH="$(root-config --libdir):${PYTHONPATH:-}"
-export CONDA_SETUP_SCRIPT=/apps/miniconda3/etc/profile.d/conda.sh
-python -c "import ROOT; print(ROOT.gROOT.GetVersion())"
+python -m pip install -r workshop/requirements-yuca.txt
+python -m pip install 'torch>=2.5,<3' --index-url https://download.pytorch.org/whl/cpu
+python -m pip check
 ```
 
-Si el módulo ha cambiado, usar la versión que confirme el instructor. El módulo ROOT de Yuca no agrega automáticamente PyROOT al PYTHONPATH.
+Las prácticas se envían a nodos CPU. Se utiliza la distribución CPU de PyTorch del [índice oficial](https://pytorch.org/get-started/locally/). La instalación de bibliotecas se hace en tu entorno personal, no en una carpeta compartida. No utilizar `sudo` ni `pip install --user`.
+
+Este paso descarga bibliotecas de software; **los datasets del curso no se descargan**, se leen desde la carpeta compartida.
+
+## Verificar antes de continuar
+
+```bash
+python - <<'PY'
+import sys
+import pandas, sklearn, yaml, uproot, awkward
+import torch, h5py, onnx
+print('Python:', sys.version.split()[0])
+print('PyTorch:', torch.__version__)
+print('Entorno del curso listo')
+PY
+```
+
+Continuar solo si termina sin errores. Si no se encuentra conda, falla una instalación o falta una biblioteca, solicitar ayuda antes de procesar datos. No es necesario cargar ROOT/PyROOT para las prácticas principales: el ejemplo Higgs lee NanoAOD con uproot.
 
 ## Tu espacio personal
 
@@ -52,7 +67,17 @@ mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs" \
 python -m pip freeze > "$HOME/hep-workshop/pip-freeze.txt"
 ```
 
-No instalar paquetes ni modificar los datos compartidos durante el ejercicio. Si el entorno no está disponible o falta una biblioteca, solicitar ayuda antes de continuar.
+Después de completar la instalación y la verificación, mantener el entorno para las prácticas y no modificar los datos compartidos.
+
+## Al volver a iniciar sesión
+
+En sesiones posteriores no repetir la creación del entorno ni la instalación de paquetes. Ejecutar únicamente:
+
+```bash
+source /apps/miniconda3/etc/profile.d/conda.sh
+conda activate ml-open-data
+cd "$HOME/ML-integration-CMSSW"
+```
 
 ## Preparar tus configuraciones personales
 
