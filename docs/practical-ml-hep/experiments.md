@@ -21,42 +21,50 @@ El objetivo es explicar **qué cambió, qué mejoró y con qué coste**, no enco
 - Recursos Slurm iguales; registrar el tiempo como medida orientativa, no como benchmark de hardware.
 - Elegir parámetros con validación. El test Higgs se consulta una vez tras cerrar la comparación. La referencia W′ se discute al final como evaluación exploratoria y no se usa para elegir la red.
 
-Los ejercicios de selección de eventos y retirada de variables del capítulo Higgs son extensiones. No mezclarlos con los cuatro escenarios controlados: cambiarían además los datos o las entradas.
+La selección y los observables son comunes. Durante este ejercicio no se cambian: la comparación estudia únicamente parámetros de la red.
 
-## Generar los YAML de cada grupo
+## Trabajar solamente con el YAML de variación
 
-Después de preparar el YAML que apunta a la extracción personal Higgs:
-
-```bash
-python workshop/setup_groups.py --task higgs \
-  --reference "$HOME/hep-workshop/configs/classifier.yaml" \
-  --config-dir "$HOME/hep-workshop/configs/groups_higgs_$USER" \
-  --results-root "$HOME/hep-workshop/results/groups_higgs"
-```
-
-Este paso establece una referencia **MLP**, aunque el primer ejercicio haya usado regresión logística. No comparar la variación MLP con una referencia logística: ejecutar la referencia MLP generada. Se crean dos archivos por grupo: `higgs_group1_baseline.yaml` y `higgs_group1_variation.yaml`, y equivalentes para grupos 2–4.
-
-Para CMS, a partir del YAML personal previamente verificado:
+La preparación del entorno ya generó los archivos de tu grupo. Consultar sus ubicaciones:
 
 ```bash
-python workshop/setup_groups.py --task autoencoder \
-  --reference "$HOME/hep-workshop/configs/ae_baseline.yaml" \
-  --config-dir "$HOME/hep-workshop/configs/groups_ae_$USER" \
-  --results-root "$HOME/hep-workshop/results/groups_ae"
+python workshop/student.py files
 ```
 
-Cada alumno ejecuta **solo los dos YAML del grupo asignado**. No son dieciséis entrenamientos por alumno. El generador preserva datos y particiones, asigna salidas nuevas y guarda el escenario en `workshop`. No editar los metadatos de esa sección.
+En **Files** de Open OnDemand, abrir el YAML de `variation`, revisar el bloque `model`, cambiar solo el campo asignado y guardar. Los valores de la tabla son la propuesta de variación; no editar el YAML de `baseline`.
 
-Ejemplo grupo 1, desde la raíz del repositorio:
+| Sección | Acción del alumno |
+| --- | --- |
+| model, parámetro asignado | Editar en el YAML de variación |
+| model, otros campos | Mantener la referencia común |
+| data / split / evaluation / anomaly_detection | No modificar |
+| workshop / rutas / etiquetas | No modificar |
+| Python / Slurm | Ejecutar sin editar |
+
+Ejemplo del campo que cambia el grupo 2:
+
+```yaml
+model:
+  learning_rate: 0.0003
+```
+
+Esta muestra es solo un fragmento: conservar el resto de tu YAML. No reemplazarlo por este fragmento.
+
+Enviar los entrenamientos sin cambiar cuentas ni rutas en los comandos:
 
 ```bash
-sbatch --account=CUENTA_DEL_CURSO --output="$HOME/hep-workshop/logs/%j.out" \
-  workshop/run_cpu.slurm higgs \
-  "$HOME/hep-workshop/configs/groups_higgs_$USER/higgs_group1_baseline.yaml" \
-  "$HOME/hep-workshop/results/groups_higgs/higgs_group1_baseline"
+python workshop/student.py train --task higgs --role baseline
+python workshop/student.py train --task higgs --role variation
 ```
 
-Repetir con `variation` en las dos rutas. Para autoencoder usar el modo `autoencoder` y el YAML `autoencoder_group1_baseline.yaml` o `variation`; la salida se toma del propio YAML. Mantener todos los resultados anteriores.
+Para la segunda práctica cambiar únicamente el nombre de tarea indicado en los comandos:
+
+```bash
+python workshop/student.py train --task autoencoder --role baseline
+python workshop/student.py train --task autoencoder --role variation
+```
+
+Cada práctica requiere referencia y variación, no todos los escenarios. La interfaz impide cambiar datos o parámetros ajenos al escenario. No repetir un entrenamiento encima de sus resultados; conservarlos para la comparación.
 
 ## Tabla común para el cierre
 
@@ -80,12 +88,10 @@ Diferencia = variación − referencia. Por tanto, una diferencia positiva de AU
 Después de terminar los trabajos:
 
 ```bash
-python workshop/collect_results.py \
-  --config-dirs "$HOME/hep-workshop/configs/groups_higgs_$USER" "$HOME/hep-workshop/configs/groups_ae_$USER" \
-  --output "$HOME/hep-workshop/comparacion.csv"
+python workshop/student.py collect
 ```
 
-El CSV incluye tareas pendientes y deltas respecto a la referencia. Rechaza parejas que difieren en más parámetros/datos/semilla que lo asignado, y excluye resultados de test Higgs. Usar un nombre nuevo al actualizar la tabla; no sobrescribe archivos.
+El CSV incluye tareas pendientes y deltas respecto a la referencia. Rechaza parejas que difieren en más parámetros/datos/semilla que lo asignado, y excluye resultados de test Higgs. La interfaz crea automáticamente un nombre nuevo con fecha y hora; no sobrescribe archivos.
 
 Cada grupo comparte su CSV y sus dos configuraciones. Compartir únicamente el CSV y las configuraciones solicitadas para completar la tabla común. No es necesario compartir permisos de tu HOME ni copiar datasets.
 

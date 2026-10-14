@@ -2,38 +2,15 @@
 
 **No debes descargar los datasets.** Los archivos originales del curso estarán disponibles en una carpeta compartida de Yuca. Esa carpeta se utiliza para lectura; las selecciones, tablas y modelos se guardan en tu cuenta.
 
-## 1. Identificar la ruta del curso
+## 1. Observar los eventos
 
-Sustituir `/RUTA/COMPARTIDA/NanoAOD` por la ruta anunciada durante el curso. Es un marcador, no una ruta que ya hayamos verificado:
-
-```bash
-export COURSE_DATA=/RUTA/COMPARTIDA/NanoAOD
-ls "$COURSE_DATA/Higgs125"
-ls "$COURSE_DATA/ZZ4L"
-```
-
-Se esperan archivos `.root` de Higgs125→ZZ→4L y ZZ→4L. Los registros CERN Open Data permiten conocer su procedencia; no son instrucciones para descargarlos durante la clase.
-
-## 2. Comprobar lectura y entender Events
-
-Desde una terminal de tu propia cuenta:
+Las rutas compartidas ya quedaron registradas durante la preparación del entorno. Desde la raíz del repositorio, ejecutar sin cambiar el comando:
 
 ```bash
-python - <<'PY'
-import os
-from pathlib import Path
-import uproot
-base = Path(os.environ['COURSE_DATA'])
-for sample in ('Higgs125', 'ZZ4L'):
-    files = sorted((base / sample).glob('*.root'))
-    if not files:
-        raise RuntimeError(f'No hay ROOT visibles en {base / sample}')
-    with uproot.open(files[0]) as source:
-        tree = source['Events']
-        print(sample, 'archivo:', files[0].name, 'eventos:', tree.num_entries)
-        print(tree.arrays(['nMuon', 'nElectron', 'MET_pt'], entry_stop=3))
-PY
+python workshop/student.py inspect
 ```
+
+El programa abre un NanoAOD de cada proceso y muestra su número de eventos y ejemplos de electrones, muones y momento faltante. No es necesario elegir ni escribir el nombre de un archivo ROOT.
 
 Cada entrada de Events corresponde a un evento; las colecciones Electron y Muon contienen cantidades variables de partículas. Las masas de candidatos no se toman como etiquetas: se construirán a partir de los leptones seleccionados.
 

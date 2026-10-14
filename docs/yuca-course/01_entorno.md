@@ -54,6 +54,22 @@ python -m pip freeze > "$HOME/hep-workshop/pip-freeze.txt"
 
 No instalar paquetes ni modificar los datos compartidos durante el ejercicio. Si el entorno no está disponible o falta una biblioteca, solicitar ayuda antes de continuar.
 
-La cuenta Slurm del ejemplo es `p002`. Si tu proyecto usa otra, reemplazala en los comandos y en la generacion de configuraciones. Continua en [Datos](02_datos.md).
+## Preparar tus configuraciones personales
 
-Volver al [programa del curso](../practical-ml-hep/index.md). Después de revisar los datos, continuar con el [análisis y clasificación Higgs](../practical-ml-hep/higgs.md).
+Con la sesión y el entorno activos, ejecutar el comando de preparación comunicado para tu grupo. La configuración institucional contiene las rutas compartidas y la cuenta de cómputo; **no debes editarla**. Ejemplo de forma del comando (la ruta real se anunciará en el curso):
+
+```bash
+python workshop/student.py prepare --settings /RUTA/COMPARTIDA/course_settings.yaml --group 1
+```
+
+Esta preparación se realiza una sola vez. Genera automáticamente la selección común, los YAML de referencia y variación del grupo, las rutas de entrada y las salidas en tu cuenta. No completar manualmente nombres de ROOT, cuentas Slurm ni carpetas de resultados.
+
+Para ver cuáles son tus YAML:
+
+```bash
+python workshop/student.py files
+```
+
+**Solo se modifica el parámetro asignado dentro de `model` en el YAML de variación.** La referencia y las demás secciones permanecen fijas. Los comandos siguientes son iguales para todos los grupos.
+
+Continuar con [Entender los datos compartidos](02_datos.md).

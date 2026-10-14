@@ -13,22 +13,13 @@ Comenzar con [Configuración del sistema](../yuca-course/01_entorno.md) (20 minu
 
 ### 1. Abrir Events y observar las colecciones (10 min)
 
-Los ROOT originales ya están disponibles en la carpeta compartida del curso; no descargarlos ni modificarlos. Desde la raíz del repositorio:
+Los ROOT originales están en la carpeta compartida del curso. Las rutas se prepararon automáticamente al configurar tu sesión. Ejecutar desde la raíz del repositorio:
 
 ```bash
-export NANO_FILE="$COURSE_DATA/Higgs125/ARCHIVO.root"
-python - <<'PY'
-import os, uproot
-with uproot.open(os.environ['NANO_FILE']) as f:
-    t=f['Events']
-    print('Eventos:',t.num_entries)
-    print(t.keys(filter_name='Muon_*')[:20])
-    print(t.arrays(['nMuon','nElectron','MET_pt'],entry_stop=5))
-PY
-cp workshop/configs/cms_fourleptons.yaml "$HOME/hep-workshop/configs/selection.yaml"
+python workshop/student.py inspect
 ```
 
-Editar `samples[].files`: poner las rutas absolutas a los ROOT de cada proceso. No escribir allí el archivo ya seleccionado. Se leen solo las ramas necesarias; la extracción usa bloques de 2000 eventos.
+Leer la selección común en `configs/selection.yaml`, sin cambiarla. Los archivos Python implementan el análisis y se consultan para entender el procedimiento; no se editan durante este ejercicio.
 
 ### 2. Seleccionar y reconstruir (15 min)
 
@@ -39,7 +30,7 @@ Se forman dos pares de igual sabor y carga opuesta. Z1 es el par cuya masa está
 Esta selección omite correcciones, disparadores, identificación avanzada, FSR y estimaciones de fondos reducibles. No es la selección oficial H→ZZ de CMS.
 
 ```bash
-sbatch --account=CUENTA_DEL_CURSO --output="$HOME/hep-workshop/logs/%j.out"   workshop/run_cpu.slurm extract "$HOME/hep-workshop/configs/selection.yaml"   "$HOME/hep-workshop/extraction/baseline"
+python workshop/student.py extract
 ```
 
 ### 3. Examinar los observables (15 min)
@@ -52,45 +43,37 @@ La tabla contiene doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ
 
 ## Miércoles, segunda hora: entrenar y modificar
 
-### 4. Entrenar con NUESTRA extracción (15 min)
+### 4. Entrenar la red de referencia (15 min)
+
+La preparación personal ya generó el YAML con las entradas extraídas y las salidas de tu cuenta. No cambiar rutas ni seleccionar otro modelo. Ejecutar:
 
 ```bash
-cp workshop/configs/cms_higgs_classifier.yaml "$HOME/hep-workshop/configs/classifier.yaml"
+python workshop/student.py train --task higgs --role baseline
+squeue -u "$USER"
 ```
 
-Editar `data.input` con la ruta de `extraction/baseline/events.csv`.
+El modelo común es una red MLP. El CSV es un producto del análisis NanoAOD realizado en el paso anterior. Entrenamiento/validación/test: 60/20/20 estratificado; escalado ajustado solo con entrenamiento. El programa evalúa validación y guarda curvas y métricas en tu carpeta personal.
+
+### 5. Variar un parámetro del YAML (25 min)
+
+Seguir los [cuatro escenarios por grupo](experiments.md). Abrir con el editor de Open OnDemand el YAML de variación que muestra `student.py files`. Modificar únicamente el campo asignado dentro de `model` y guardar. No modificar Python, Slurm, datos, variables, semilla, etiquetas ni umbral.
 
 ```bash
-sbatch --account=CUENTA_DEL_CURSO --output="$HOME/hep-workshop/logs/%j.out"   workshop/run_cpu.slurm higgs "$HOME/hep-workshop/configs/classifier.yaml"   "$HOME/hep-workshop/results/classifier_baseline"
+python workshop/student.py train --task higgs --role variation
 ```
 
-El CSV es **un producto del análisis del alumno**, no el dato de origen. Sirve de interfaz entre reconstrucción y ML; puede sustituirse por HDF5 en una extensión. Entrenamiento/validación/test: 60/20/20 estratificado, semilla 16; escalado ajustado solo con entrenamiento. Por defecto se evalúa únicamente validación. Abrir `classification.pdf` y `metrics.json`.
+Los valores propuestos están en la guía de grupos. Comparar con la referencia usando validación; la referencia no se modifica. Cada carpeta de resultados conserva su configuración. El programa rechaza cambios ajenos al parámetro asignado y no sobrescribe un entrenamiento anterior.
 
-### 5. Cambiar una decisión (25 min)
-
-Para la actividad común de comparación, seguir los [cuatro escenarios YAML por grupos](experiments.md): capacidad, aprendizaje, lote e iteraciones. Todos parten de la misma referencia MLP. Las alternativas siguientes son extensiones del análisis, fuera de esa comparación controlada.
-
-Elegir una variación por equipo, con configuración y carpeta nuevas:
-
-| Cambio | Acción | Qué discutir |
-| --- | --- | --- |
-| Identificación/aislamiento | Cambiar `muon_iso_max` o pT en selection.yaml y repetir extracción | Cutflow, representatividad y estadística |
-| Variables | Retirar DER_m4l del clasificador | Dependencia de la separación respecto a la masa |
-| Modelo | `model.type: boosted` o `mlp` | Relaciones no lineales y sobreajuste |
-| Umbral | `background_acceptance: 0.05` | Eficiencia Higgs frente a rechazo del fondo |
-
-Comparaciones de modelos/variables: mantener eventos y semilla. Comparaciones de selección: cambian los eventos, por tanto no atribuir la mejora únicamente al modelo. Las métricas por sí solas no reflejan la pérdida de rendimiento por rechazar eventos antes de entrenar.
-
-Congelar una configuración después de comparar validación; luego una sola evaluación final:
+Una vez cerrada la comparación, congelar el YAML y hacer la evaluación final cuando se indique:
 
 ```bash
-sbatch --account=CUENTA_DEL_CURSO --output="$HOME/hep-workshop/logs/%j.out"   workshop/run_cpu.slurm higgs-final "$HOME/hep-workshop/configs/classifier.yaml"   "$HOME/hep-workshop/results/classifier_final"
+python workshop/student.py final
 ```
 
-El ejecutor reentrena con la misma partición/semilla y mantiene el umbral de validación. No volver a escoger parámetros después de ver test.
+El programa exige el mismo YAML de variación ya evaluado y guarda el test por separado. No volver a escoger parámetros después de mirar el test.
 
 ## Interpretación y entrega
 
-La práctica no aplica pesos de sección eficaz, genWeight, luminosidad ni correcciones: AUC y eficiencia describen la muestra seleccionada, no tasas físicas ni descubrimiento. La separación puede estar dominada por m4l; la ablación permite discutirlo. Los archivos pequeños sirven para aprender el flujo y no para una medida científica; si quedan pocos eventos, ampliar el conjunto antes de entrenar.
+La práctica no aplica pesos de sección eficaz, genWeight, luminosidad ni correcciones: AUC y eficiencia describen la muestra seleccionada, no tasas físicas ni descubrimiento. La separación puede estar dominada por m4l; discutir esta limitación sin cambiar las entradas del ejercicio controlado. Los archivos pequeños sirven para aprender el flujo y no para una medida científica; si quedan pocos eventos, ampliar el conjunto antes de entrenar.
 
 Entregar configuración de selección, cutflow, distribuciones, configuración ML y una comparación con explicación física. El ejercicio ATLAS CSV queda como extensión opcional; sus resultados anteriores no se aplican a este análisis CMS.

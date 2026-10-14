@@ -6,19 +6,14 @@ Los entrenamientos se ejecutan y guardan **en tu cuenta de Yuca**. Después cada
 
 Terminar referencia y variación del [escenario asignado](experiments.md), revisar los registros y conservar los YAML. Preparar un paquete por práctica, sin datasets ni pesos del modelo.
 
-Ejemplo para grupo 1:
+Preparar la entrega de tu grupo mediante comandos fijos:
 
 ```bash
-python workshop/package_group.py \
-  --config-dir "$HOME/hep-workshop/configs/groups_higgs_$USER" \
-  --group 1 --output "$HOME/hep-workshop/entrega_grupo1_higgs.zip"
-
-python workshop/package_group.py \
-  --config-dir "$HOME/hep-workshop/configs/groups_ae_$USER" \
-  --group 1 --output "$HOME/hep-workshop/entrega_grupo1_autoencoder.zip"
+python workshop/student.py package --task higgs
+python workshop/student.py package --task autoencoder
 ```
 
-Cambiar el número de grupo y el nombre del archivo según corresponda. El programa exige ambos entrenamientos terminados, verifica su comparación y no sobrescribe una entrega anterior.
+El programa identifica tu grupo y sus YAML, verifica ambos resultados y guarda paquetes con nombres únicos en tu carpeta personal. No escribir rutas de modelos ni nombres de grupo a mano.
 
 ## 2. Subir pocas figuras útiles
 

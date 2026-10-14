@@ -1,0 +1,5 @@
+# Institutional setup: not for student editing. Put a filled copy in the shared course directory.
+nanoaod_root: /REPLACE/shared/NanoAOD
+slurm_account: REPLACE_AUTHORIZED_ACCOUNT
+conda_env: ml-open-data
+autoencoder_reference: /REPLACE/shared/autoencoder_reference.yaml
