@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import platform
 import time
+import sys
 
 import joblib
 import matplotlib
@@ -23,8 +24,31 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import yaml
 from event_io import read_events_h5
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from ml_training.utilities.labels import normalize_class_id_map,encode_label,remap_class_names
 
-FORBIDDEN = {'EventId', 'Weight', 'Label', 'KaggleSet', 'KaggleWeight'}
+FORBIDDEN = {'EventId', 'Dataset_ID', 'Weight', 'Label', 'KaggleSet', 'KaggleWeight'}
+
+
+def dataset_labels(frame,data):
+    label=data.get('label','Dataset_ID' if 'Dataset_ID' in frame else 'Label')
+    if label=='Label':return frame,{}
+    if int(data.get('num_classes',2))!=2:raise ValueError('This workshop classifier is binary')
+    mapping=normalize_class_id_map(data['class_id_map'],2)
+    path=Path(os.path.expandvars(os.path.expanduser(data['label_mapping'])))
+    names={int(key):value for key,value in json.loads(path.read_text()).items()}
+    embedded=frame.attrs.get('dataset_map')
+    if embedded is not None and {int(k):v for k,v in embedded.items()}!=names:
+        raise ValueError('External dataset_map disagrees with the map stored in HDF5')
+    if not set(mapping)<=set(names):raise ValueError('class_id_map contains IDs absent from dataset_map')
+    raw=frame[label].to_numpy()
+    if not np.isfinite(raw).all() or np.any(raw!=raw.astype(np.int64)):
+        raise ValueError('Dataset_ID must contain integer identifiers')
+    if not set(np.unique(raw))<=set(names):raise ValueError('Dataset_ID absent from dataset_map')
+    encoded=np.array([encode_label(value,2,mapping) for value in raw])
+    frame=frame.copy()
+    frame['Label']=np.where(encoded==1,'s','b')
+    return frame,remap_class_names({key:names[key] for key in mapping},mapping)
 
 
 def prepare(frame, features, seed, max_events):
@@ -59,6 +83,7 @@ def run(config, output, final=False):
     seed = int(config['split']['seed'])
     input_path=Path(os.path.expandvars(os.path.expanduser(data['input'])))
     frame = read_events_h5(input_path) if input_path.suffix.lower() in ('.h5','.hdf5') else pd.read_csv(input_path)
+    frame,class_names=dataset_labels(frame,data)
     frame, x, y, (train, val, test) = prepare(frame, data['features'], seed, int(data['max_events']))
     if any(np.count_nonzero(y[part] == label) < 20 for part in (val,test) for label in (0,1)):
         raise ValueError('Fewer than 20 events of a class in validation/test. Process more NanoAOD before training.')
@@ -99,12 +124,17 @@ def run(config, output, final=False):
         'counts': {'train': len(train), 'validation': len(val), 'test': len(test)},
         'confusion_matrix': confusion_matrix(truth, predicted).tolist(),
         'features': data['features'], 'seed': seed,
+        'class_names':class_names,'class_id_map':data.get('class_id_map'),
         'weighting': 'Unweighted pedagogical classification; AP is sample-dependent, not physical purity',
         'versions': {'python': platform.python_version(), 'sklearn': sklearn.__version__, 'numpy': np.__version__}}
     output.mkdir(parents=True)
     (output / 'config.yaml').write_text(yaml.safe_dump(config, sort_keys=False))
     (output / 'metrics.json').write_text(json.dumps(metrics, indent=2))
-    joblib.dump({'pipeline': model, 'features': data['features'], 'threshold': threshold}, output / 'model.joblib')
+    if class_names:
+        import shutil
+        shutil.copy2(os.path.expandvars(os.path.expanduser(data['label_mapping'])),output/'dataset_map.json')
+    joblib.dump({'pipeline': model, 'features': data['features'], 'threshold': threshold,
+                 'class_names':class_names,'class_id_map':data.get('class_id_map')}, output / 'model.joblib')
     # Keep event IDs to make splits auditable without including IDs in model inputs.
     split_names = np.empty(len(frame), dtype=object)
     for name, part in zip(('train', 'validation', 'test'), (train, val, test)):
@@ -117,7 +147,7 @@ def run(config, output, final=False):
     axes[0].plot([0, 1], [0, 1], '--', color='gray')
     axes[0].set(xlabel='Background acceptance', ylabel='Higgs efficiency', title=metrics['evaluation_set'])
     axes[0].legend()
-    for label, name in ((0, 'Background'), (1, 'Higgs')):
+    for label, name in ((0, class_names.get(0,'Background')), (1, class_names.get(1,'Higgs'))):
         axes[1].hist(scores[truth == label], bins=np.linspace(0, 1, 31), density=True, histtype='step', label=name)
     axes[1].axvline(threshold, color='black', linestyle='--', label='Validation threshold')
     axes[1].set(xlabel='Classifier score', ylabel='Unit-area density')

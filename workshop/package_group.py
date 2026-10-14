@@ -44,6 +44,8 @@ def package(config_dir, group, output):
                 metrics=root/f'metrics_{name}.json'
                 figures=[root/f'loss_{name}.pdf',root/f'scores_by_process_{name}.pdf']
             shutil.copy2(metrics,dest/'metrics.json')
+            if (root/'dataset_map.json').exists():
+                shutil.copy2(root/'dataset_map.json',dest/'dataset_map.json')
             for figure in figures:
                 if not figure.exists():raise FileNotFoundError(figure)
                 shutil.copy2(figure,dest/figure.name)

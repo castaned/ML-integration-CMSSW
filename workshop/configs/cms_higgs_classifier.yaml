@@ -1,11 +1,15 @@
 data:
   input: /REPLACE/personal/extraction/events.h5
   max_events: 0
+  label: Dataset_ID
+  num_classes: 2
+  class_id_map: {1: 1, 2: 0}
+  label_mapping: /REPLACE/personal/extraction/dataset_map.json
   features: [DER_m4l, DER_mZ1, DER_mZ2, DER_pt4l, DER_ptZ1, DER_ptZ2, DER_sum_lepton_pt, PRI_lepton1_pt, PRI_lepton2_pt, PRI_lepton3_pt, PRI_lepton4_pt, PRI_met]
 split:
   seed: 16
 model:
-  type: logistic
+  type: mlp
   max_iter: 200
   learning_rate: 0.001
   hidden_dims: [32, 16]

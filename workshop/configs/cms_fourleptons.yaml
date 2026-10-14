@@ -1,11 +1,12 @@
 max_events_per_file: 100000
+dataset_map: {1: Higgs125, 2: ZZ4L}
 samples:
   - name: Higgs125
-    label: s
+    ID: 1
     record: https://opendata.cern.ch/record/37728
     files: [/REPLACE/shared/Higgs125/FILE.root]
   - name: ZZ4L
-    label: b
+    ID: 2
     record: https://opendata.cern.ch/record/75589
     files: [/REPLACE/shared/ZZ4L/FILE.root]
 selection:

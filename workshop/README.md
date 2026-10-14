@@ -23,3 +23,5 @@ Configs: `cms_fourleptons.yaml` (selection), `cms_higgs_classifier.yaml` (traini
 This is a simplified exercise, not the official CMS Higgs selection.
 
 The extraction command performs selection, observable plots and HDF5 export together. It writes `events.h5` (flat arrays via h5py). Higgs training reads HDF5 by default, as does the CMS autoencoder. CSV reading remains available for the optional ATLAS exercise and older results.
+
+The processing dataset_map uses the original framework ID-to-process convention. HDF5 stores Dataset_ID; dataset_map.json and data.class_id_map/data.label_mapping define binary MLP labels using ml_training.utilities.labels. Dataset_ID is never a feature.

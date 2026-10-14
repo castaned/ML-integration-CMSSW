@@ -63,11 +63,15 @@ def extract(config, output):
     output = Path(output).expanduser()
     if output.exists(): raise FileExistsError('Use a new extraction directory')
     cuts = config['selection']
+    # Same ID -> process-name convention as data_processing/mapping.json.
+    dataset_map={int(key):str(value) for key,value in config.get('dataset_map',{1:'Higgs125',2:'ZZ4L'}).items()}
+    if len(set(dataset_map.values()))!=len(dataset_map):raise ValueError('Dataset names must be unique')
+    name_to_id={name:identifier for identifier,name in dataset_map.items()}
     rows, flows, provenance = [], {}, []
     files_seen = set()
     for sample in config['samples']:
-        label = sample['label']
-        if label not in ('s','b'): raise ValueError('label must be s or b')
+        dataset_id=int(sample.get('ID',name_to_id[sample['name']]))
+        if dataset_map.get(dataset_id)!=sample['name']:raise ValueError('Sample ID/name disagrees with dataset_map')
         flow = {}
         for filename in sample['files']:
             path = Path(filename).expanduser().resolve()
@@ -83,7 +87,7 @@ def extract(config, output):
                 if missing: raise ValueError(f'{path}: missing {sorted(missing)}')
                 stop = min(tree.num_entries, int(config['max_events_per_file']))
                 provenance.append({'file': str(path), 'entries': tree.num_entries, 'processed': stop,
-                                   'record': sample['record'], 'label': label})
+                                   'record': sample['record'], 'Dataset_ID': dataset_id})
                 entry = 0
                 for arrays in tree.iterate(fields, entry_stop=stop, step_size=2000, library='ak'):
                     # Convert each small chunk once: avoid costly per-scalar Awkward access.
@@ -102,7 +106,7 @@ def extract(config, output):
                         row, stage = candidate(leptons,cuts)
                         flow[stage] = flow.get(stage,0)+1
                         if row is not None:
-                            row.update(PRI_met=float(event['MET_pt']),Label=label,
+                            row.update(PRI_met=float(event['MET_pt']),Dataset_ID=dataset_id,
                                        EventId=f'{sample["name"]}:{path.name}:{entry}')
                             rows.append(row)
                         entry += 1
@@ -114,20 +118,21 @@ def extract(config, output):
     (output/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     (output/'cutflow.json').write_text(json.dumps(flows,indent=2))
     (output/'provenance.json').write_text(json.dumps(provenance,indent=2))
+    (output/'dataset_map.json').write_text(json.dumps(dataset_map,indent=2))
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     fig,axes=plt.subplots(1,3,figsize=(12,4))
     for ax,feature,interval in zip(axes,('DER_m4l','DER_mZ1','DER_mZ2'),((70,180),(40,120),(12,120))):
-        for label,name in [('s','Higgs125'),('b','ZZ4L')]:
-            values=frame.loc[frame.Label==label,feature]
+        for identifier,name in dataset_map.items():
+            values=frame.loc[frame.Dataset_ID==identifier,feature]
             if len(values): ax.hist(values,bins=np.linspace(*interval,31),density=True,histtype='step',label=name)
         ax.set(xlabel=feature+' [GeV]',ylabel='Unit-area density'); ax.legend()
     fig.tight_layout();fig.savefig(output/'observables.pdf');fig.savefig(output/'observables.png',dpi=180);plt.close(fig)
-    write_events_h5(frame,output/'events.h5')
+    write_events_h5(frame,output/'events.h5',dataset_map=dataset_map)
     print('Training input:',output/'events.h5')
     print(json.dumps(flows,indent=2))
-    print(frame.Label.value_counts().to_dict())
+    print(frame.Dataset_ID.value_counts().rename(index=dataset_map).to_dict())
     return frame
 
 
