@@ -35,11 +35,33 @@ python workshop/student.py extract
 
 ### 3. Examinar los observables (15 min)
 
-El mismo comando realiza **procesamiento → gráficas → conversión a HDF5**, sin intervención adicional. Produce `observables.pdf/png`, `events.h5`, `cutflow.json`, `provenance.json` y la copia de configuración. No ejecutar una conversión aparte. El cutflow informa entradas, rechazos por etapa y seleccionados; no es una tabla acumulativa. Verificar cuántos eventos quedan en cada clase. El entrenador exige al menos 20 eventos de cada clase en validación y test; es un mínimo educativo, no garantía de precisión estadística.
+El mismo comando realiza **procesamiento → gráficas → conversión a HDF5**, sin intervención adicional. Produce `observables.pdf/png`, `events.h5`, `cutflow.json`, `provenance.json`, `dataset_map.json` y la copia de configuración. No ejecutar una conversión aparte. El cutflow informa entradas, rechazos por etapa y seleccionados; no es una tabla acumulativa. Verificar cuántos eventos quedan en cada clase. El entrenador exige al menos 20 eventos de cada clase en validación y test; es un mínimo educativo, no garantía de precisión estadística.
 
-El archivo HDF5 contiene una tabla de eventos con doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ2, suma pT leptónica, los cuatro pT individuales y MET. `Label` viene del proceso simulado de origen; `EventId` conserva la procedencia y nunca es una variable de entrenamiento. No se usan ramas de verdad de generador como entradas.
+El archivo HDF5 contiene una tabla de eventos con doce observables reconstruidos: m4l, mZ1, mZ2, pT4l, pTZ1, pTZ2, suma pT leptónica, los cuatro pT individuales y MET. `Dataset_ID` identifica el proceso de origen según `dataset_map.json`; `EventId` conserva la procedencia. Ninguno entra como variable de entrenamiento. No se usan ramas de verdad de generador como entradas.
 
 **Preguntas:** ¿dónde aparece la masa del Higgs? ¿Por qué necesitamos emparejamiento? ¿Qué ocurre al exigir dos Z cercanos a 91 GeV?
+
+## Identificadores de proceso y clases de la red
+
+El procesamiento utiliza el mismo convenio del framework original: un ID numérico por dataset y un mapa JSON de IDs a nombres. Para este ejemplo, el procesamiento produce automáticamente:
+
+```json
+{"1": "Higgs125", "2": "ZZ4L"}
+```
+
+Cada evento en HDF5 conserva su `Dataset_ID`. La copia del mapa queda junto a `events.h5` como `dataset_map.json` y también se guarda como metadato del HDF5.
+
+El YAML de entrenamiento define cómo traducir esos IDs a clases de la MLP:
+
+```yaml
+data:
+  label: Dataset_ID
+  num_classes: 2
+  class_id_map: {1: 1, 2: 0}
+  label_mapping: /ruta/personal/extraction/baseline/dataset_map.json
+```
+
+Este bloque es explicativo: las rutas se preparan automáticamente. **No se edita durante las variaciones.** El ID 1 (Higgs125) corresponde a clase 1, señal; el ID 2 (ZZ4L), a clase 0, fondo. Se reutilizan las funciones de etiquetas de `ml_training/utilities/labels.py`. La MLP recibe únicamente los observables, nunca el ID o la clase como entrada.
 
 ## Miércoles, segunda hora: entrenar y modificar
 

@@ -38,6 +38,7 @@ En **Files** de Open OnDemand, abrir el YAML de `variation`, revisar el bloque `
 | model, parámetro asignado | Editar en el YAML de variación |
 | model, otros campos | Mantener la referencia común |
 | data / split / evaluation / anomaly_detection | No modificar |
+| Dataset_ID / dataset_map / class_id_map | Preparados automáticamente, no modificar |
 | workshop / rutas / etiquetas | No modificar |
 | Python / Slurm | Ejecutar sin editar |
 
