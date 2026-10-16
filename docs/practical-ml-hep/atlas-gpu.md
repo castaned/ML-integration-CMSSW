@@ -1,52 +1,121 @@
-# ATLAS Higgs Challenge: redes profundas en GPU
+# ATLAS Higgs Challenge: tu primer laboratorio de redes neuronales
 
-Esta es la práctica principal del taller. Entrenaremos una red para separar Higgs → ττ de procesos de fondo, con el dataset del [ATLAS Higgs Challenge en CERN Open Data](https://opendata.cern.ch/record/328). Contiene 30 variables físicas ya extraídas; no es NanoAOD. El autoencoder CMS queda como ejemplo exploratorio de un flujo desde NanoAOD y de otra motivación para entrenar redes.
+**¿Puede una red reconocer eventos compatibles con un Higgs?** En esta práctica explorarás datos abiertos de ATLAS y probarás tus propias redes en Yuca.
 
-Los datos ya están en `/lustre/cursos/curso07/datos/ATLAS_HiggsChallenge/atlas-higgs-challenge-2014-v2.csv.gz`. No descargarlos ni modificarlos. Las configuraciones y salidas son personales.
+<div class="grid cards" markdown>
 
-## Entorno GPU de Yuca
+- **Una pregunta de física**
 
-Yuca utiliza AMD Instinct MI210: se necesita PyTorch con ROCm. El ambiente CPU o una instalación CUDA para NVIDIA no permiten usar estas GPU. Crear una sola vez el ambiente personal:
+    Separar Higgs → ττ de procesos que producen señales parecidas en el detector.
+
+- **30 variables por evento**
+
+    Masas, momentos, jets y energía faltante. La red combina esa información.
+
+- **Tú decides desde un YAML**
+
+    Número de capas, neuronas, aprendizaje, dropout y duración del entrenamiento.
+
+- **Un experimento, una carpeta**
+
+    Conserva cada configuración y sus resultados para compararlos después.
+
+</div>
+
+![Del dato abierto a tus experimentos](../assets/workshop/atlas_higgs_workflow.svg)
+
+## 1. Conoce el reto y sus muestras
+
+El [Higgs Challenge de ATLAS](https://opendata.cern.ch/record/328) fue una competición para identificar eventos simulados de Higgs. Estudia el decaimiento **H → ττ**, con un tau que produce un electrón o muón y otro que produce hadrones. También aparecen neutrinos, que no se detectan directamente.
+
+| Muestra | ¿Qué representa? | ¿Por qué interesa? |
+| --- | --- | --- |
+| **Señal: Higgs → ττ** | El proceso que queremos identificar | La red debería asignarle una puntuación alta |
+| **Fondo: Z → ττ** | Otro bosón que también produce taus | Se parece mucho a la señal |
+| **Fondo: pares de top** | Procesos con partículas top | Pueden producir objetos similares |
+| **Fondo: W + jets** | Eventos donde la identificación puede confundir un jet con un tau | También pueden imitar la señal |
+
+En el archivo, la etiqueta distingue señal (`s`) y fondo (`b`); no entrenaremos un clasificador separado para cada fondo.
+
+El archivo completo tiene **818 238 eventos**. Para practicar usamos los **250 000 eventos de la partición original de entrenamiento**: 200 000 para aprender y 50 000 para comprobar el progreso. Los eventos reservados para la evaluación final permanecen fuera del ajuste.
+
+!!! info "¿De dónde vienen los datos?"
+    [Página oficial y descripción de variables](https://opendata.cern.ch/record/328) · [Archivo original](https://opendata.cern.ch/record/328/files/atlas-higgs-challenge-2014-v2.csv.gz)
+
+    **En el taller ya están descargados en la carpeta compartida.** Tú no necesitas descargarlos. Este ejemplo empieza con una tabla de variables extraídas de simulaciones ATLAS. El autoencoder complementario muestra el recorrido desde NanoAOD de CMS.
+
+### ¿Qué le vamos a dar a la red?
+
+| Ejemplo de variable | Idea física |
+| --- | --- |
+| `DER_mass_MMC` | Una estimación de la masa del sistema de dos taus |
+| `DER_mass_vis` | Masa de los productos visibles del tau y del leptón |
+| `PRI_tau_pt` | Momento transversal del tau hadrónico reconstruido |
+| `PRI_met` | Energía transversal faltante, relacionada con partículas no detectadas |
+| `PRI_jet_num` | Número de jets registrado en el evento |
+| `DER_deltaeta_jet_jet` | Separación entre los dos jets en la dirección del haz |
+
+La red recibe números de este tipo y aprende a combinarlos. Las etiquetas dicen qué eventos simulados son señal o fondo; los identificadores y pesos no se usan como entradas de la red.
+
+## 2. Prepara tu YAML personal
+
+Completa primero el [acceso a Yuca](../yuca-course/00_acceso.md) y la [configuración de tu cuenta](../yuca-course/01_entorno.md). Para esta práctica se utiliza el ambiente GPU `ml-hep-gpu`; si aún no lo tienes, sigue una sola vez la [preparación del ambiente GPU](atlas-reference.md#entorno-gpu-de-yuca).
+
+**En la terminal**, desde tu repositorio:
 
 ```bash
-source /apps/miniconda3/etc/profile.d/conda.sh
-module load rocm/6.4.3
-conda create -n ml-hep-gpu python=3.10 pip -y
-conda activate ml-hep-gpu
-python -m pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/rocm6.4
-python -m pip install numpy pandas scikit-learn matplotlib pyyaml h5py
-```
-
-Para sesiones posteriores, cargar el módulo y activar `ml-hep-gpu`. El script de entrenamiento también lo hace dentro del trabajo GPU. Esta combinación fue comprobada en Yuca con una operación de matrices sobre MI210; cada cuenta debe poder solicitar los recursos de su proyecto.
-
-## Primer entrenamiento
-
-Desde la raíz de tu repositorio:
-
-```bash
+cd "$HOME/ML-integration-CMSSW"
 git pull --ff-only origin opendata_dev
 mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs"
 cp -n workshop/configs/atlas_higgs_gpu.yaml "$HOME/hep-workshop/configs/atlas_baseline01.yaml"
 ```
 
-Abrir `hep-workshop/configs/atlas_baseline01.yaml` en el editor de Files de Open OnDemand. Las capas, dropout y parámetros de entrenamiento están en YAML. Para la referencia, conservar los valores de la plantilla:
+En **Files de Open OnDemand**, abre `hep-workshop/configs/atlas_baseline01.yaml` con el editor. Este archivo controla tu experimento. Al principio conserva la plantilla completa.
+
+| Campo del YAML | ¿Qué puedes explorar? |
+| --- | --- |
+| `model.hidden_dims` | Cada número es una capa oculta y su cantidad de neuronas |
+| `model.dropout` | Qué fracción de activaciones se omite al entrenar para regularizar |
+| `training.learning_rate` | Tamaño de los pasos de aprendizaje |
+| `training.batch_size` | Eventos que se procesan juntos |
+| `training.epochs` | Máximo de pasadas por los datos de entrenamiento |
+| `training.patience` | Cuántas épocas esperar sin mejora en validación antes de parar |
+| `output.directory` | Carpeta personal donde se guardará esa corrida |
+
+**Ejemplo dentro del YAML, no en la terminal:**
 
 ```yaml
 model:
   hidden_dims: [128, 64, 32, 16]
   dropout: 0.1
-training:
-  device: cuda
-  epochs: 20
-  batch_size: 4096
-  learning_rate: 0.001
-  weight_decay: 0.0001
-  patience: 6
-  weighting: unweighted
-  cpu_threads: 4
 ```
 
-No pegar YAML en la terminal. `cuda` es también el nombre de la interfaz de PyTorch para GPU AMD con ROCm. Los recursos y el ambiente están preparados en el script; no editarlos como parte del experimento.
+Esta red tiene **cuatro capas ocultas**, con 128, 64, 32 y 16 neuronas. No necesitas modificar Python ni los scripts de envío. Conserva los campos de datos y particiones para comparar los mismos eventos.
+
+## 3. Mira las variables antes de entrenar
+
+Activa el ambiente y genera las comparaciones con **el mismo YAML**:
+
+```bash
+source /apps/miniconda3/etc/profile.d/conda.sh
+module load rocm/6.4.3
+conda activate ml-hep-gpu
+python workshop/plot_atlas.py -f "$HOME/hep-workshop/configs/atlas_baseline01.yaml"
+```
+
+En Files, abre `hep-workshop/plots/atlas_inputs01/variables_01.png`. Hay cinco imágenes, con seis variables cada una, y un PDF con todas. La carpeta y el número de intervalos se controlan en el bloque `plots` del YAML. Para regenerar, elige una carpeta nueva en `plots.directory`.
+
+Las distribuciones se normalizan a área uno para comparar formas y se amplía la zona central para que las colas largas no oculten sus diferencias. Por defecto se muestra hasta el percentil 99.5 de cada clase; `plots.upper_quantile: 1.0` permite ver el rango completo. El área se normaliza antes del recorte visual. Los valores ausentes se omiten en las gráficas; su frecuencia se guarda en `variable_summary.csv`. No representan cantidades físicas esperadas de señal y fondo.
+
+![Ejemplo de variables del conjunto de entrenamiento ATLAS](../assets/workshop/atlas_variables_01.png)
+
+*Ejemplo real del conjunto de entrenamiento: no se emplean eventos del conjunto privado. Los nombres y unidades de cada variable se explican en el registro oficial.*
+
+Antes de seguir, completa la [tabla de exploración de variables](atlas-experiments.md#antes-de-entrenar-que-informacion-tenemos). ¿Dónde se parecen señal y fondo? ¿Qué variables podrían ayudar a separarlos?
+
+## 4. Envía tu primera red a Yuca
+
+**En la terminal**, desde la raíz del repositorio:
 
 ```bash
 sbatch --output="$HOME/hep-workshop/logs/atlas_%j.out" \
@@ -54,90 +123,86 @@ sbatch --output="$HOME/hep-workshop/logs/atlas_%j.out" \
 squeue -u "$USER"
 ```
 
-El script solicita proyecto `curso07`, QOS `qoscurso07`, una MI210 y hasta 30 minutos. No acepta una caída silenciosa a CPU si se pidió GPU. La primera ejecución verifica el entrenador completo en tu cuenta; el tiempo real depende del entorno y la cola.
+El comando solicita una GPU y ejecuta tu YAML. La cuenta del curso y el ambiente ya están definidos en el script. Si el trabajo desaparece de la cola, revisa el registro: desaparecer no garantiza éxito.
 
-## Qué aprende y cómo evaluamos
+Al terminar, abre en Files:
 
-Usamos exclusivamente `KaggleSet=t`: 80% para entrenamiento y 20% para validación estratificada, con semilla fija. Los valores ausentes `-999` se reemplazan por medianas de entrenamiento y el escalado se ajusta solo sobre entrenamiento. La pérdida es entropía cruzada binaria sin pesos. Se guarda el mejor modelo según pérdida de validación; la paciencia limita el sobreajuste.
-
-`EventId`, `Label`, `Weight`, `KaggleWeight` y `KaggleSet` nunca entran en la red. Los pesos `KaggleWeight` se usan para evaluar AMS y se reescalan por clase para representar los rendimientos del conjunto `t` completo desde su fracción de validación.
-
-La primera corrida muestra **ROC-AUC sin pesos y AMS interna optimizada en validación**. Esta AMS es exploratoria: se elige el umbral sobre la misma validación. No es una medida independiente ni la puntuación histórica del challenge. Los conjuntos `b` y `v` no se usan para preprocesar, entrenar, elegir modelo o umbral; la evaluación privada se hará en una etapa separada con decisiones congeladas.
-
-## Leer los resultados
-
-```bash
-cat "$HOME/hep-workshop/results/atlas_gpu_baseline01/metrics.json"
+```text
+hep-workshop/results/atlas_gpu_baseline01/training_summary.png
 ```
 
-En Files abrir `hep-workshop/results/atlas_gpu_baseline01/training_summary.png`: pérdida de entrenamiento/validación por época, ROC y distribución de puntuaciones. También se guarda PDF, `history.csv`, `validation_scores.csv`, `splits.csv`, `config.yaml`, el preprocesamiento y `best_model.pt`.
+| Panel | Pregunta que debes hacerte |
+| --- | --- |
+| Pérdidas por época | ¿Mejora en entrenamiento y también en validación? |
+| Curva ROC | ¿Cuánta señal conserva para una aceptación dada de fondo? |
+| Puntuación de la red | ¿Señal y fondo reciben puntuaciones distintas? |
 
-Registrar AUC, AMS interna, mejor época, épocas ejecutadas, tiempo y GPU. Para un nuevo experimento, copiar el YAML, variar un solo parámetro y cambiar `output.directory` a una carpeta nueva. Los resultados existentes no se sobrescriben. Una red mayor no garantiza una mejora; conservar iguales los datos, particiones y semillas para comparar.
+Los números están en `metrics.json`, dentro de esa misma carpeta. **AUC:** separación global (mayor es mejor). **AMS interna:** indicador que combina señal y fondo seleccionados con sus pesos. Compara ambas; no tienen por qué mejorar juntas.
 
-El ejemplo CMS de [clasificación desde NanoAOD](higgs.md) permanece como material complementario; el [autoencoder](autoencoder.md) ilustra entrenamiento sin etiquetas de señal y error de reconstrucción.
+## 5. Copia, cambia y vuelve a entrenar
 
-## Experimentos de referencia medidos en Yuca
+Tu ciclo de trabajo será siempre:
 
-Estas corridas fueron realizadas con los mismos 200 000 eventos de entrenamiento y 50 000 de validación interna, semilla 16, lote 4096, aprendizaje 0.001 y dropout 0.1. La GPU fue una AMD Instinct MI210; CPU utilizó cuatro hilos. Son observaciones de una corrida por configuración, no promedios ni garantías de tiempo.
+**Copiar YAML → cambiar una idea → elegir carpeta nueva → entrenar → llenar la tabla → discutir.**
 
-| Red | Dispositivo | Épocas | Tiempo medido (s) | AUC validación | AMS interna |
-| --- | --- | ---: | ---: | ---: | ---: |
-| 128, 64, 32, 16 | CPU | 20 | 39.35 | 0.91048 | 3.5629 |
-| 128, 64, 32, 16 | GPU | 20 | 29.95 | 0.90999 | 3.5229 |
-| 512, 256, 128, 64 | CPU | 20 | 90.52 | 0.91184 | 3.5380 |
-| 512, 256, 128, 64 | GPU | 20 | 30.15 | 0.91112 | 3.4509 |
-| 1024, 1024, 512, 512, 256, 128, 64, 32 | GPU | 25 | 39.60 | 0.91140 | 3.5143 |
+Por ejemplo, para probar una red mayor:
 
-La aceleración CPU/GPU pasó de 1.31× a 3.00× al ampliar la red de cuatro capas. Más cálculo puede aprovechar mejor la GPU, pero más parámetros no garantizan mejor clasificación: la AUC aumentó ligeramente mientras AMS no mejoró. AUC resume todos los umbrales; AMS usa una selección con pesos físicos.
+```bash
+cp -n "$HOME/hep-workshop/configs/atlas_baseline01.yaml" "$HOME/hep-workshop/configs/atlas_02.yaml"
+```
 
-`fit_seconds` mide el bucle de entrenamiento y la evaluación final del mejor modelo; excluye la espera en cola, lectura inicial y preprocesamiento. No representa el tiempo total desde que se envía el trabajo. Para medir aceleración con más confianza, repetir al menos tres veces y comparar medianas con el mismo número de épocas. Registrar también nodo CPU, hilos, GPU, versión de PyTorch y arquitectura. Para estudiar estabilidad del modelo, variar las semillas de inicialización manteniendo las particiones fijas; el entrenador actual usa una misma semilla para ambas, por lo que cambiarla también cambia la partición y debe indicarse.
-
-### Profundidad y parada temprana
-
-La red de ocho capas se configuró con máximo 200 épocas y `patience: 15`. Su mínimo de pérdida de validación ocurrió en la época 10; se detuvo en la 25 y recuperó el modelo de la época 10. La curva de entrenamiento siguió bajando mientras validación subió: un patrón de sobreajuste.
-
-Para repetir ese ensayo, crear una copia completa del YAML personal y cambiar solo estos campos (sin eliminar los demás):
+Abre `atlas_02.yaml` en Files. Cambia `model.hidden_dims` a `[512, 256, 128, 64]` y, dentro del bloque `output`, cambia la carpeta:
 
 ```yaml
-model:
-  hidden_dims: [1024, 1024, 512, 512, 256, 128, 64, 32]
-  dropout: 0.1
-training:
-  epochs: 200
-  patience: 15
 output:
-  directory: $HOME/hep-workshop/results/atlas_gpu_deep_earlystop01
+  directory: $HOME/hep-workshop/results/atlas_02
 ```
 
-Guardar como `configs/atlas_gpu_deep_earlystop01.yaml` dentro de tu espacio personal y enviar desde la raíz del repositorio:
+Conserva el resto del archivo y guarda. **Cambiar el nombre del YAML no cambia automáticamente la carpeta de resultados.**
 
 ```bash
-sbatch --time=01:00:00 --output="$HOME/hep-workshop/logs/atlas_deep_%j.out" \
-  workshop/run_atlas_gpu.slurm "$HOME/hep-workshop/configs/atlas_gpu_deep_earlystop01.yaml"
+sbatch --output="$HOME/hep-workshop/logs/atlas_%j.out" \
+  workshop/run_atlas_gpu.slurm "$HOME/hep-workshop/configs/atlas_02.yaml"
 ```
 
-Si ya existe esa corrida, elegir un nombre nuevo. Un experimento posterior puede cambiar únicamente dropout de 0.1 a 0.3, conservando las capas y la parada temprana, para investigar regularización. No asumir una mejora antes de medirla.
+La carpeta nueva conservará el modelo, la copia del YAML utilizado, los números y las gráficas. Los experimentos anteriores no se sobrescriben.
 
-### Registro y conclusiones por equipo
+| Archivo personal | Carpeta de resultados |
+| --- | --- |
+| `configs/atlas_baseline01.yaml` | `results/atlas_gpu_baseline01/` |
+| `configs/atlas_02.yaml` | `results/atlas_02/` |
+| `configs/atlas_03.yaml` | `results/atlas_03/` |
 
-Copiar una fila por entrenamiento en la tabla compartida del curso:
+Empieza cambiando **un solo parámetro**. Después combina ideas si puedes explicar por qué lo haces.
 
-| Grupo/corrida | Capas | Dropout | Aprendizaje | Lote | Dispositivo/hilos | Mejor época | Épocas ejecutadas | Tiempo (s) | AUC | AMS interna | Conclusión |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | | | | | | |
+## 6. Experimentos por grupo y discusión
 
-Compartir el YAML, `metrics.json`, `history.csv` y `training_summary.png`, junto con una conclusión breve: qué cambió, cuánto costó, si mejoró AUC/AMS y qué muestran las pérdidas. Conservar los resultados en carpetas personales distintas; compartir solo las entregas solicitadas. No afirmar mejoras significativas por diferencias pequeñas de una única corrida.
+Cada grupo parte de la misma referencia y registra sus propios números en la **[bitácora del taller: tablas y preguntas](atlas-experiments.md)**.
 
-## Benchmarks publicados del Higgs Challenge
+| Grupo | Primer experimento | Pregunta |
+| --- | --- | --- |
+| 1 | Aumentar neuronas por capa | ¿Mejora lo suficiente para justificar el costo? |
+| 2 | Aumentar el número de capas | ¿Mayor profundidad ayuda o sobreajusta? |
+| 3 | Cambiar dropout de 0.1 a 0.3 | ¿Cambia la distancia entre entrenamiento y validación? |
+| 4 | Cambiar aprendizaje de 0.001 a 0.0003 | ¿Aprende más lentamente o llega a otro resultado? |
 
-La referencia histórica usa **AMS en el conjunto privado del challenge**, no AUC. La [publicación del challenge, tabla 2](https://proceedings.mlr.press/v42/cowa14.pdf), informa:
+**Parada temprana:** para permitir una corrida más larga, conserva los demás campos y usa `epochs: 200`, `patience: 15`. Se conserva el modelo con menor pérdida de validación. No es obligatorio llegar a 200 épocas.
 
-| Método | AMS privada histórica |
-| --- | ---: |
-| TMVA de referencia | 3.19956 |
-| MultiBoost de referencia | 3.40488 |
-| Solución ganadora, conjunto de redes profundas | 3.80581 |
+**CPU frente a GPU:** crea otra copia con `training.device: cpu` y una carpeta nueva. Envíala con el script CPU, que no reserva GPU:
 
-Usar aproximadamente **3.40** como referencia de partida histórica y **3.81** como referencia ganadora. El ganador combinaba modelos; no era simplemente una red individual más grande. Estos valores contextualizan el ejercicio, pero nuestra AMS interna de aproximadamente 3.45–3.56 no permite afirmar que superamos MultiBoost ni que estamos cerca del ganador: cambia el conjunto de evaluación y el umbral se optimizó sobre la propia validación.
+```bash
+sbatch --output="$HOME/hep-workshop/logs/atlas_cpu_%j.out" \
+  workshop/run_atlas_cpu.slurm "$HOME/hep-workshop/configs/atlas_cpu01.yaml"
+```
 
-Para una comparación numérica externa, congelar arquitectura, modelo, preprocesamiento y regla de selección antes de evaluar `KaggleSet=v`. Reproducir la definición oficial de AMS, su regularización y los pesos `KaggleWeight` de esa partición, sin reutilizar el reescalado de validación `t`. Documentar también si se entrena con una fracción de `t` o con todo `t`, y cualquier diferencia respecto al protocolo histórico. Nunca buscar el mejor umbral mirando las etiquetas privadas. El entrenador inicial todavía no realiza esta evaluación privada: hasta añadir esa etapa, reportar los números históricos y las métricas internas en tablas separadas.
+Este comando supone que ya copiaste y editaste el YAML completo con ese nombre. Usa el mismo número de épocas para comparar tiempos. El campo `fit_seconds` excluye la espera en cola y la preparación inicial. No necesitamos entrenamientos largos para aprender: las primeras corridas de Yuca tardaron decenas de segundos de cálculo.
+
+## 7. ¿Qué entregamos y contra qué comparamos?
+
+Cada grupo comparte su tabla, el YAML, `metrics.json`, `training_summary.png` y una conclusión breve. No es necesario entregar el modelo completo.
+
+Los benchmarks históricos del challenge son **AMS 3.40 (MultiBoost)** y **3.81 (ganador, conjunto de redes profundas)**. Nuestra AMS interna todavía no se compara directamente con ellos: usa otra evaluación. La [bitácora](atlas-experiments.md#referencia-externa-el-challenge-original) separa los resultados del curso de esos números publicados.
+
+Termina respondiendo: **¿qué cambiaste, qué mejoró o empeoró y cuánto tiempo costó?** Un resultado sin mejora también es un resultado útil.
+
+[Detalles opcionales: entorno, pesos, protocolo y resultados medidos en Yuca](atlas-reference.md) · [Exploración complementaria: autoencoder CMS](autoencoder.md)

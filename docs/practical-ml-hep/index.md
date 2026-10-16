@@ -20,7 +20,7 @@ Los archivos de entrada se leen desde la carpeta compartida. Cada participante g
 4. [Práctica principal: ATLAS Higgs Challenge en GPU, controlado por YAML](atlas-gpu.md).
    Material complementario: [procesamiento CMS Higgs/ZZ desde NanoAOD](higgs.md).
 5. [Ejemplo 2: autoencoder CMS multileptónico](autoencoder.md).
-6. [Modificaciones y bitácora de experimentos](experiments.md).
+6. [Tablas y preguntas para tus experimentos ATLAS](atlas-experiments.md).
 7. [Entrega en carpeta compartida y comparación colectiva](delivery.md).
 
 Antes de entrenar, comprobar el entorno, las rutas compartidas y el acceso a GPU. Los datos del curso ya estarán disponibles en una carpeta compartida: no es necesario descargarlos. Cada participante crea su entorno conda, instala las bibliotecas, verifica la instalación y prepara su espacio personal antes de las prácticas.
@@ -55,6 +55,6 @@ Los comandos de inicio están en [Configuración del sistema](../yuca-course/01_
 - [Práctica principal: ATLAS Higgs Challenge en GPU](atlas-gpu.md)
 - [Complemento: clasificación CMS desde NanoAOD](higgs.md)
 - [Exploración: autoencoder CMS](autoencoder.md)
-- [Bitácora de experimentos](experiments.md)
+- [Bitácora ATLAS: tablas por completar y preguntas](atlas-experiments.md)
 
 Código en [`workshop/`, rama opendata_dev](https://github.com/castaned/ML-integration-CMSSW/tree/opendata_dev/workshop). Uso de cómputo de alto rendimiento: clúster ACARUS de la Universidad de Sonora.
