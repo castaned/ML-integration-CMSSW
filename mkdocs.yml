@@ -60,7 +60,8 @@ nav:
     - Primer acceso y activación de 2FA: yuca-course/00_acceso.md
     - Repositorio y entorno de trabajo: yuca-course/01_entorno.md
     - Datos abiertos y NanoAOD: yuca-course/02_datos.md
-    - Clasificación Higgs, análisis y entrenamiento: practical-ml-hep/higgs.md
+    - ATLAS Higgs Challenge en GPU: practical-ml-hep/atlas-gpu.md
+    - Complemento CMS desde NanoAOD: practical-ml-hep/higgs.md
     - Autoencoder CMS: practical-ml-hep/autoencoder.md
     - Bitácora y ejercicios: practical-ml-hep/experiments.md
     - Entrega y comparación colectiva: practical-ml-hep/delivery.md
