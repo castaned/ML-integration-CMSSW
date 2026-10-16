@@ -38,3 +38,16 @@ python workshop/processing_jobs.py submit -f "$HOME/hep-workshop/configs/selecti
 ```
 
 Resource settings `processing.time` and `processing.memory` are fixed in the selection YAML by the course setup. Optional institutional `slurm_qos` is passed to both submissions. Run submission on the terminal; do not wrap this submission command in another `sbatch`. The old sequential `run_cpu.slurm extract` mode remains available for diagnostics.
+
+
+### Compare all MLP input observables
+
+New extractions also create `input_variables/input_variables.png` and `.pdf` (all twelve observables), plus individual PNG/PDF files named after each feature. Histograms use common bins and unit-area normalization for each process; these compare shapes, not physical rates. All selected events are shown for descriptive inspection, without training a model or changing the held-out split.
+
+To plot an existing extraction without reprocessing or retraining, use its archived training YAML, which fixes the exact input HDF5, dataset map and feature list:
+
+```bash
+python workshop/plot_inputs.py -f "$HOME/hep-workshop/results/higgs_zz_prueba02/config.yaml" --output "$HOME/hep-workshop/results/higgs_zz_prueba02/input_variables"
+```
+
+Use a new output directory to preserve existing plots.

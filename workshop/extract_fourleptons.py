@@ -139,6 +139,10 @@ def save_results(config, output, frame, flows, provenance, plots=True):
                 if len(values): ax.hist(values,bins=np.linspace(*interval,31),density=True,histtype='step',label=name)
             ax.set(xlabel=feature+' [GeV]',ylabel='Unit-area density'); ax.legend()
         fig.tight_layout();fig.savefig(output/'observables.pdf');fig.savefig(output/'observables.png',dpi=180);plt.close(fig)
+    if plots:
+        from plot_inputs import plot_variables
+        features = [name for name in frame.columns if name not in ('Dataset_ID', 'EventId')]
+        plot_variables(frame, dataset_map, features, output/'input_variables')
     write_events_h5(frame,output/'events.h5',dataset_map=dataset_map)
     print('Training input:',output/'events.h5')
     print(json.dumps(flows,indent=2))
