@@ -92,6 +92,25 @@ Mantener separada la comparación del curso:
 
 La primera versión del laboratorio no calcula la AMS privada. No inventar ese valor ni usar la AMS interna para asignarse una posición en la competición. Comparar con rigor incluye reconocer qué mediciones faltan.
 
+## De una mejor ROC a una pregunta de física
+
+Leer el [ejemplo físico](atlas-physics.md#ejemplo-para-completar-en-clase). Partimos de rendimientos **hipotéticos** de 100 señales y 10 000 fondos. Completar sin usar un entrenamiento:
+
+| Selección | Señal conservada | Fondo aceptado | s esperado | b esperado | s / √b aproximado |
+| --- | --- | --- | --- | --- | --- |
+| A | 60% | 10% | | | |
+| B | 60% | 5% | | | |
+
+**Preguntas:** ¿qué selección corresponde al punto más favorable de la ROC? ¿Cambió la sección eficaz del Higgs o nuestra capacidad de aislarlo? ¿Por qué no podemos calcular un límite real solo con la AUC?
+
+Después conectar con nuestros entrenamientos:
+
+| Corrida elegida | ¿En qué zona de la ROC nos interesa mejorar? | ¿Preferimos conservar señal o reducir fondo? ¿Por qué? | ¿Qué información falta para medir σ o calcular un límite? |
+| --- | --- | --- | --- |
+| | | | |
+
+La ROC del taller no tiene pesos. Para rendimientos físicos se suman los pesos de los eventos seleccionados; no basta con contar eventos simulados. La comparación final debe considerar incertidumbres y conservar una evaluación independiente.
+
 ## Cierre: tres frases por grupo
 
 1. **Probamos:** __________.

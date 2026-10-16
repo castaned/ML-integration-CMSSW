@@ -44,6 +44,12 @@ El archivo completo tiene **818 238 eventos**. Para practicar usamos los **250 0
 
     **En el taller ya están descargados en la carpeta compartida.** Tú no necesitas descargarlos. Este ejemplo empieza con una tabla de variables extraídas de simulaciones ATLAS. El autoencoder complementario muestra el recorrido desde NanoAOD de CMS.
 
+![Dos mecanismos de producción del Higgs](../assets/workshop/higgs_ggf_vbf.png){ width="700" }
+
+*Fusión de gluones y fusión de bosones vectoriales. Figura 1 de la [publicación conjunta ATLAS y CMS](https://arxiv.org/abs/1606.02266), usada como contexto físico; no procede del artículo del challenge.*
+
+**Antes del entrenamiento:** abre [la física y las 30 variables](atlas-physics.md), con los diagramas de producción y decaimiento, los fondos y la explicación de la ROC para mediciones y límites.
+
 ### ¿Qué le vamos a dar a la red?
 
 | Ejemplo de variable | Idea física |
@@ -54,6 +60,8 @@ El archivo completo tiene **818 238 eventos**. Para practicar usamos los **250 0
 | `PRI_met` | Energía transversal faltante, relacionada con partículas no detectadas |
 | `PRI_jet_num` | Número de jets registrado en el evento |
 | `DER_deltaeta_jet_jet` | Separación entre los dos jets en la dirección del haz |
+
+Esta tabla muestra **solo seis ejemplos**. La [lista completa de las 30 variables y su significado físico](atlas-physics.md#las-30-variables-organizadas-por-su-significado) está organizada en 17 primarias y 13 derivadas. Con `features: all_physics` entrenamos con las 30.
 
 La red recibe números de este tipo y aprende a combinarlos. Las etiquetas dicen qué eventos simulados son señal o fondo; los identificadores y pesos no se usan como entradas de la red.
 
@@ -138,6 +146,12 @@ hep-workshop/results/atlas_gpu_baseline01/training_summary.png
 | Puntuación de la red | ¿Señal y fondo reciben puntuaciones distintas? |
 
 Los números están en `metrics.json`, dentro de esa misma carpeta. **AUC:** separación global (mayor es mejor). **AMS interna:** indicador que combina señal y fondo seleccionados con sus pesos. Compara ambas; no tienen por qué mejorar juntas.
+
+### ¿Qué mejora física buscamos con la ROC?
+
+Al mismo fondo aceptado, una curva más alta conserva más Higgs; a la misma señal, una curva más a la izquierda deja pasar menos fondo. Eso puede ayudar a medir mejor una sección eficaz o a obtener límites esperados más sensibles. **La red no cambia la sección eficaz de la naturaleza ni calcula un límite por sí sola.** Importan también las tasas y sus incertidumbres.
+
+La AUC resume toda la curva; nuestro objetivo físico puede depender de un solo punto. Por eso nuestras corridas mejoraron ligeramente AUC sin mejorar necesariamente AMS. [Ejemplo con números y conexión con secciones eficaces y límites](atlas-physics.md#leer-una-roc-como-fisico).
 
 ## 5. Copia, cambia y vuelve a entrenar
 

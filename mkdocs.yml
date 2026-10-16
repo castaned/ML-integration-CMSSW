@@ -61,6 +61,7 @@ nav:
     - Repositorio y entorno de trabajo: yuca-course/01_entorno.md
     - Datos abiertos y NanoAOD: yuca-course/02_datos.md
     - ATLAS Higgs Challenge en GPU: practical-ml-hep/atlas-gpu.md
+    - Física, variables y significado de la ROC: practical-ml-hep/atlas-physics.md
     - Laboratorio ATLAS, tablas y preguntas: practical-ml-hep/atlas-experiments.md
     - Complemento CMS desde NanoAOD: practical-ml-hep/higgs.md
     - Autoencoder CMS: practical-ml-hep/autoencoder.md
