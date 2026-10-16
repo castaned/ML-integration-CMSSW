@@ -6,9 +6,9 @@
 
 Queremos separar **Higgs → ττ** de procesos de fondo que pueden producir objetos similares. La red recibe **30 variables físicas** y asigna una puntuación a cada evento.
 
-![Producción del Higgs por fusión de gluones y bosones vectoriales](../assets/workshop/higgs_ggf_vbf.png){ width="650" }
+![Higgs a dos taus: leptón, hadrones y tres neutrinos](../assets/workshop/higgs_tautau_final_state.svg)
 
-*Dos mecanismos de producción. Figura 1 de la [publicación conjunta ATLAS y CMS](https://arxiv.org/abs/1606.02266), utilizada como contexto; no procede del artículo del challenge.*
+*Cadena ilustrativa del taller: esperamos un electrón o muón, un tau hadrónico y momento transversal faltante por los tres neutrinos. También se considera el conjugado de carga. [Ver la explicación del diagrama](atlas-physics.md#el-estado-final-que-buscamos).*
 
 Antes de entrenar, conversamos: **¿qué distingue señal y fondo? ¿Por qué los neutrinos dificultan reconstruir el Higgs?** La [introducción física](atlas-physics.md) explica las muestras y las 30 variables, no solo las que aparecen en esta imagen:
 

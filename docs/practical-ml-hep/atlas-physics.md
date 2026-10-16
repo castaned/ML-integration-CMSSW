@@ -12,9 +12,15 @@ La señal del reto es **H → τ⁺τ⁻**. Un tau decae a electrón o muón y n
 
 *Producción: (a) fusión de gluones; (b) fusión de bosones vectoriales, con quarks salientes que pueden producir jets. Recorte de la figura 1 de la [publicación conjunta ATLAS y CMS, arXiv:1606.02266](https://arxiv.org/abs/1606.02266). Estos diagramas contextualizan la producción; no proceden del artículo del challenge.*
 
-![Decaimiento de Higgs a fermiones, incluido tau tau](../assets/workshop/higgs_fermion_decay.png){ width="350" }
+### El estado final que buscamos
 
-*Decaimiento a fermiones: para esta práctica nos interesa la opción ττ. El gráfico original también etiqueta b y μ. Recorte de la figura 5(b) de la misma publicación ATLAS y CMS; no se han cambiado sus etiquetas.*
+![Cadena completa del Higgs a dos taus y sus productos de decaimiento](../assets/workshop/higgs_tautau_final_state.svg)
+
+*Esquema elaborado para el taller. Un tau decae a electrón o muón y dos neutrinos; el otro a hadrones y un neutrino. Se muestra un ejemplo de corriente hadrónica con u y anti-d, que forman hadrones; no observamos quarks libres. Los W son virtuales. También se incluye el proceso con cargas opuestas.*
+
+**Lo visible:** un electrón o muón y un tau hadrónico reconstruido. **Lo invisible:** tres neutrinos, que contribuyen al momento transversal faltante. Por eso usamos variables del leptón, del tau y del MET. El estado completo no se reconstruye con la masa visible solamente.
+
+[Descargar diagrama PNG](../assets/workshop/higgs_tautau_final_state.png) · [SVG para ampliar o presentar](../assets/workshop/higgs_tautau_final_state.svg)
 
 Los fondos imitan esos objetos: **Z → ττ** produce taus reales; los pares de top pueden generar leptones, taus y jets; **W + jets** puede entrar cuando un objeto se identifica incorrectamente. Una misma apariencia final puede tener distintos orígenes.
 
@@ -142,7 +148,7 @@ En este taller medimos **clasificación y AMS de validación en simulación**. N
 ## Procedencia de las imágenes
 
 - `higgs_ggf_vbf.png`: figura 1 de ATLAS y CMS, [arXiv:1606.02266](https://arxiv.org/abs/1606.02266), recortada para mostrar los diagramas.
-- `higgs_fermion_decay.png`: panel 5(b) de la misma publicación, recortado sin cambiar etiquetas.
+- `higgs_tautau_final_state.svg/png`: esquema original del taller de la cadena leptónica–hadrónica de H → ττ; no es una figura extraída del artículo.
 - `challenge_visible_mass.png`: figura 1 de Adam-Bourdarios et al., [PMLR 42 (2015)](https://proceedings.mlr.press/v42/cowa14.html), con el crédito original a ATLAS-CONF-2013-108 preservado.
 
-Los diagramas de Feynman se obtuvieron de la publicación conjunta, porque el artículo y la documentación del challenge no contienen ese tipo de diagramas. No son figuras generadas por nuestros entrenamientos.
+Los diagramas de producción se obtuvieron de la publicación conjunta, porque el artículo y la documentación del challenge no contienen ese tipo de diagramas. La cadena completa H → ττ se elaboró como esquema didáctico para este curso. Ninguna de estas figuras es un resultado de nuestros entrenamientos.
