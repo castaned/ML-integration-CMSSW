@@ -120,8 +120,12 @@ def run(config):
     (out/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     print('Device:',device,torch.cuda.get_device_name(0) if device.type=='cuda' else 'CPU',flush=True)
     print('Train/validation:',len(train),len(val),'features:',len(features),flush=True)
+    if device.type=='cuda':
+        torch.cuda.synchronize()
+        torch.cuda.reset_peak_memory_stats(device)
     start=time.perf_counter()
     for epoch in range(1,int(training['epochs'])+1):
+        epoch_start=time.perf_counter()
         model.train();total=0.
         for xb,yb in loader:
             xb,yb=xb.to(device),yb.to(device)
@@ -136,7 +140,8 @@ def run(config):
             if not np.isfinite(validation_loss): raise ValueError('Nonfinite validation loss')
             scores=torch.sigmoid(logits).cpu().numpy()
         row={'epoch':epoch,'train_loss':total/len(train),'validation_loss':validation_loss,
-             'validation_auc':roc_auc_score(labels[val],scores)}
+             'validation_auc':roc_auc_score(labels[val],scores),
+             'epoch_seconds':time.perf_counter()-epoch_start}
         history.append(row);print(json.dumps(row),flush=True)
         if validation_loss<best:
             best=validation_loss;best_epoch=epoch;stale=0
@@ -150,7 +155,12 @@ def run(config):
     selected=scores>=threshold
     metrics={'evaluation_set':'internal_validation_from_KaggleSet_t','roc_auc_unweighted':roc_auc_score(labels[val],scores),
         'ams_validation_tuned':value,'threshold':threshold,'best_epoch':best_epoch,'epochs_run':len(history),
-        'fit_seconds':elapsed,'train_events':len(train),'validation_events':len(val),'features':features,
+        'fit_seconds':elapsed,
+        'parameters':sum(p.numel() for p in model.parameters()),
+        'batches_per_epoch':len(loader),
+        'mean_epoch_seconds':float(np.mean([r['epoch_seconds'] for r in history])),
+        'gpu_peak_allocated_mb':torch.cuda.max_memory_allocated(device)/1024**2 if device.type=='cuda' else None,
+        'train_events':len(train),'validation_events':len(val),'features':features,
         'signal_efficiency':float(selected[labels[val]==1].mean()),
         'background_acceptance':float(selected[labels[val]==0].mean()),
         'ams_weighting':'KaggleWeight from t, rescaled by class to full t yields; not private leaderboard',

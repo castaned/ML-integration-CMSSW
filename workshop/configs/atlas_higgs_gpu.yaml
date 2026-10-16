@@ -21,3 +21,7 @@ evaluation:
   ams_regularization: 10.0
 output:
   directory: $HOME/hep-workshop/results/atlas_gpu_baseline01
+plots:
+  directory: $HOME/hep-workshop/plots/atlas_inputs01
+  bins: 40
+  upper_quantile: 0.995

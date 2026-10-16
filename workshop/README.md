@@ -68,3 +68,18 @@ Yuca uses `ml-hep-gpu`, ROCm 6.4.3, PyTorch 2.8.0+rocm6.4 and MI210, with accoun
 Only KaggleSet=t is used (200k training/50k internal validation with seed 16). Median imputation (-999) and scaling fit training only. Features exclude labels/weights/IDs/partition. Training BCE is unweighted. AMS uses KaggleWeight rescaled per class for the held-out fraction; the threshold is selected on validation. This internal validation AMS is exploratory and **not the historical private leaderboard score**. Partitions b/v remain unused for fitting and threshold selection. A separate frozen-model private evaluation is required before comparison with the historical benchmark.
 
 Outputs: best_model.pt, preprocessing.joblib, archived YAML, metrics.json (including input checksum and GPU), history.csv, splits.csv, validation_scores.csv and training_summary.png/pdf. Existing experiment folders are protected. ATLAS is the main workshop practice; CMS NanoAOD classification and the autoencoder remain complementary examples.
+
+
+### YAML-first exploration and worksheets
+
+Before training, compare all 30 ATLAS physics inputs from the original training partition:
+
+```bash
+python workshop/plot_atlas.py -f "$HOME/hep-workshop/configs/atlas_baseline01.yaml"
+```
+
+`plots.directory`, `plots.bins` and `plots.upper_quantile` control the output folder and display. Five PNG panels and a multipage PDF are produced; missing fractions are saved in CSV. Density uses all finite/non-missing events per class, before visual upper-tail zoom (default 99.5th percentile). `upper_quantile: 1.0` shows full ranges. No private events are plotted. Existing folders are protected.
+
+For CPU comparisons use `run_atlas_cpu.slurm` with a copied YAML setting `training.device: cpu` and a new `output.directory`; no GPU is reserved. Both CPU and GPU scripts use the same environment. Training now also records parameter count, batches per epoch, mean epoch time and PyTorch peak GPU allocated memory. Memory allocation is not a GPU utilization measurement.
+
+The course guide `practical-ml-hep/atlas-gpu/` follows physics -> variables -> YAML -> runs -> comparison. `practical-ml-hep/atlas-experiments/` provides blank tables and discussion questions. Infrastructure and historical measured results are in an optional reference appendix. Students edit personal YAML files, preserve one folder per run and complete the tables during class.
