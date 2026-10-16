@@ -67,6 +67,18 @@ Este bloque es explicativo: las rutas se preparan automáticamente. **No se edit
 
 ## Miércoles, segunda hora: entrenar y modificar
 
+### Comparar las variables de entrada
+
+La extracción también genera `input_variables/input_variables.png` y `.pdf`, con las doce variables comparadas entre Higgs125 (señal) y ZZ4L (fondo), además de archivos individuales como `DER_m4l.png` y `PRI_met.png`. Cada proceso se normaliza a área uno y usa los mismos intervalos: se comparan formas, no tasas físicas. Son gráficas descriptivas de todos los eventos seleccionados.
+
+Para una extracción anterior, se pueden regenerar desde el HDF5 sin repetir procesamiento ni entrenamiento. Usar el YAML archivado del entrenamiento y una carpeta de salida nueva:
+
+```bash
+python workshop/plot_inputs.py -f "$HOME/hep-workshop/results/higgs_zz_prueba02/config.yaml" --output "$HOME/hep-workshop/results/higgs_zz_prueba02/input_variables"
+```
+
+Observar qué variables separan las clases y cuáles tienen formas parecidas. La masa de cuatro leptones permite identificar la resonancia del Higgs cerca de 125 GeV.
+
 ### 4. Entrenar la red de referencia (15 min)
 
 La preparación personal ya generó el YAML con las entradas extraídas y las salidas de tu cuenta. No cambiar rutas ni seleccionar otro modelo. Ejecutar:
