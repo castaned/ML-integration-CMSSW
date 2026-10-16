@@ -41,7 +41,7 @@ def prepare(settings_path,group,workspace=WORKSPACE):
     ae_path=configs/'ae_baseline.yaml'
     prepare_ae(settings['autoencoder_reference'],ae_path,workspace/'results/ae_reference')
     state={'group':group,'account':account,'conda_env':settings.get('conda_env','ml-open-data'),
-           'selection':str(selection_path),'selection_reference':selection,
+           'qos':settings.get('slurm_qos'),'selection':str(selection_path),'selection_reference':selection,
            'extraction':str(workspace/'extraction/baseline'),'configs':{},'expected':{}}
     for task,reference in [('higgs',classifier_path),('autoencoder',ae_path)]:
         folder=configs/f'groups_{task}_{workspace.parent.name}'
@@ -129,6 +129,10 @@ def main():
             mode='higgs-final';output=output+'_final'
     if Path(output).exists():raise FileExistsError('This experiment already has results; keep them for comparison')
     env=os.environ.copy();env['WORKSHOP_CONDA_ENV']=state['conda_env']
+    if mode=='extract':
+        from processing_jobs import submit
+        submit(config,output,state['account'],state.get('qos'),env=env)
+        return
     command=['sbatch',f'--account={state["account"]}',f'--output={WORKSPACE}/logs/%j.out',
              str(REPO/'workshop/run_cpu.slurm'),mode,config]
     if mode!='autoencoder':command.append(output)

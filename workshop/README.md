@@ -25,3 +25,16 @@ This is a simplified exercise, not the official CMS Higgs selection.
 The extraction command performs selection, observable plots and HDF5 export together. It writes `events.h5` (flat arrays via h5py). Higgs training reads HDF5 by default, as does the CMS autoencoder. CSV reading remains available for the optional ATLAS exercise and older results.
 
 The processing dataset_map uses the original framework ID-to-process convention. HDF5 stores Dataset_ID; dataset_map.json and data.class_id_map/data.label_mapping define binary MLP labels using ml_training.utilities.labels. Dataset_ID is never a feature.
+
+
+### Parallel NanoAOD processing
+
+`python workshop/student.py extract` submits one Slurm array task per ROOT file from the selection YAML. A dependent `afterok` job combines the selected events, sums cutflows and produces the final plots, `events.h5` and `dataset_map.json`. Empty selected files are valid; missing or failed tasks prevent the final merge. Intermediate results and per-file logs remain in the personal extraction directory with suffix `.parts`.
+
+For a standalone YAML test (from repository root):
+
+```bash
+python workshop/processing_jobs.py submit -f "$HOME/hep-workshop/configs/selection_higgs_zz_prueba01.yaml" --output "$HOME/hep-workshop/extraction/higgs_zz_prueba01" --account curso07 --qos qoscurso07
+```
+
+Resource settings `processing.time` and `processing.memory` are fixed in the selection YAML by the course setup. Optional institutional `slurm_qos` is passed to both submissions. Run submission on the terminal; do not wrap this submission command in another `sbatch`. The old sequential `run_cpu.slurm extract` mode remains available for diagnostics.

@@ -59,7 +59,7 @@ def candidate(leptons, cuts):
     return row, 'selected'
 
 
-def extract(config, output):
+def extract(config, output, allow_empty=False, plots=True):
     output = Path(output).expanduser()
     if output.exists(): raise FileExistsError('Use a new extraction directory')
     cuts = config['selection']
@@ -111,24 +111,34 @@ def extract(config, output):
                             rows.append(row)
                         entry += 1
         flows[sample['name']] = flow
-    if not rows: raise ValueError('No selected events; inspect selection and input statistics')
-    frame = pd.DataFrame(rows)
+    if not rows and not allow_empty: raise ValueError('No selected events; inspect selection and input statistics')
+    columns = ['DER_m4l','DER_mZ1','DER_mZ2','DER_pt4l','DER_ptZ1','DER_ptZ2','DER_sum_lepton_pt',
+               'PRI_lepton1_pt','PRI_lepton2_pt','PRI_lepton3_pt','PRI_lepton4_pt','PRI_met','Dataset_ID','EventId']
+    frame = pd.DataFrame(rows, columns=columns)
     if not frame.EventId.is_unique: raise ValueError('Duplicate event provenance IDs')
+    save_results(dict(config, dataset_map=dataset_map), output, frame, flows, provenance, plots=plots)
+    return frame
+
+
+def save_results(config, output, frame, flows, provenance, plots=True):
+    output = Path(output)
+    dataset_map = {int(k): str(v) for k,v in config['dataset_map'].items()}
     output.mkdir(parents=True)
     (output/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     (output/'cutflow.json').write_text(json.dumps(flows,indent=2))
     (output/'provenance.json').write_text(json.dumps(provenance,indent=2))
     (output/'dataset_map.json').write_text(json.dumps(dataset_map,indent=2))
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
-    fig,axes=plt.subplots(1,3,figsize=(12,4))
-    for ax,feature,interval in zip(axes,('DER_m4l','DER_mZ1','DER_mZ2'),((70,180),(40,120),(12,120))):
-        for identifier,name in dataset_map.items():
-            values=frame.loc[frame.Dataset_ID==identifier,feature]
-            if len(values): ax.hist(values,bins=np.linspace(*interval,31),density=True,histtype='step',label=name)
-        ax.set(xlabel=feature+' [GeV]',ylabel='Unit-area density'); ax.legend()
-    fig.tight_layout();fig.savefig(output/'observables.pdf');fig.savefig(output/'observables.png',dpi=180);plt.close(fig)
+    if plots:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        fig,axes=plt.subplots(1,3,figsize=(12,4))
+        for ax,feature,interval in zip(axes,('DER_m4l','DER_mZ1','DER_mZ2'),((70,180),(40,120),(12,120))):
+            for identifier,name in dataset_map.items():
+                values=frame.loc[frame.Dataset_ID==identifier,feature]
+                if len(values): ax.hist(values,bins=np.linspace(*interval,31),density=True,histtype='step',label=name)
+            ax.set(xlabel=feature+' [GeV]',ylabel='Unit-area density'); ax.legend()
+        fig.tight_layout();fig.savefig(output/'observables.pdf');fig.savefig(output/'observables.png',dpi=180);plt.close(fig)
     write_events_h5(frame,output/'events.h5',dataset_map=dataset_map)
     print('Training input:',output/'events.h5')
     print(json.dumps(flows,indent=2))

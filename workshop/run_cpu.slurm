@@ -12,6 +12,8 @@ export OMP_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 export OPENBLAS_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 export MKL_NUM_THREADS="$SLURM_CPUS_PER_TASK"
 case "$1" in
+    extract-file) python workshop/processing_jobs.py worker "$2" ;;
+    merge-extraction) python workshop/processing_jobs.py merge "$2" ;;
     extract) python workshop/extract_fourleptons.py -f "$2" --output "$3" ;;
     higgs) python workshop/train_higgs.py -f "$2" --output "$3" ;;
     higgs-final) python workshop/train_higgs.py -f "$2" --output "$3" --final ;;
