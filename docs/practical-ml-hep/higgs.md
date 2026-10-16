@@ -33,6 +33,8 @@ Esta selección omite correcciones, disparadores, identificación avanzada, FSR 
 python workshop/student.py extract
 ```
 
+Se envía un arreglo de Slurm con **una tarea por archivo NanoAOD**. Un trabajo final espera a que todas las tareas terminen correctamente y reúne sus resultados para generar las gráficas, el HDF5 y el mapa de datasets. En `squeue` el arreglo puede aparecer agrupado como un solo renglón; `squeue -r -u "$USER"` muestra las tareas por separado. Los registros y productos intermedios quedan en tu carpeta personal, junto a la extracción, con sufijo `.parts`. Un archivo sin eventos seleccionados es válido; si falla una tarea, no se genera el conjunto final incompleto.
+
 ### 3. Examinar los observables (15 min)
 
 El mismo comando realiza **procesamiento → gráficas → conversión a HDF5**, sin intervención adicional. Produce `observables.pdf/png`, `events.h5`, `cutflow.json`, `provenance.json`, `dataset_map.json` y la copia de configuración. No ejecutar una conversión aparte. El cutflow informa entradas, rechazos por etapa y seleccionados; no es una tabla acumulativa. Verificar cuántos eventos quedan en cada clase. El entrenador exige al menos 20 eventos de cada clase en validación y test; es un mínimo educativo, no garantía de precisión estadística.
