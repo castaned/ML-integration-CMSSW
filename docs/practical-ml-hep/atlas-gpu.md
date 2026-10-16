@@ -75,3 +75,69 @@ En Files abrir `hep-workshop/results/atlas_gpu_baseline01/training_summary.png`:
 Registrar AUC, AMS interna, mejor época, épocas ejecutadas, tiempo y GPU. Para un nuevo experimento, copiar el YAML, variar un solo parámetro y cambiar `output.directory` a una carpeta nueva. Los resultados existentes no se sobrescriben. Una red mayor no garantiza una mejora; conservar iguales los datos, particiones y semillas para comparar.
 
 El ejemplo CMS de [clasificación desde NanoAOD](higgs.md) permanece como material complementario; el [autoencoder](autoencoder.md) ilustra entrenamiento sin etiquetas de señal y error de reconstrucción.
+
+## Experimentos de referencia medidos en Yuca
+
+Estas corridas fueron realizadas con los mismos 200 000 eventos de entrenamiento y 50 000 de validación interna, semilla 16, lote 4096, aprendizaje 0.001 y dropout 0.1. La GPU fue una AMD Instinct MI210; CPU utilizó cuatro hilos. Son observaciones de una corrida por configuración, no promedios ni garantías de tiempo.
+
+| Red | Dispositivo | Épocas | Tiempo medido (s) | AUC validación | AMS interna |
+| --- | --- | ---: | ---: | ---: | ---: |
+| 128, 64, 32, 16 | CPU | 20 | 39.35 | 0.91048 | 3.5629 |
+| 128, 64, 32, 16 | GPU | 20 | 29.95 | 0.90999 | 3.5229 |
+| 512, 256, 128, 64 | CPU | 20 | 90.52 | 0.91184 | 3.5380 |
+| 512, 256, 128, 64 | GPU | 20 | 30.15 | 0.91112 | 3.4509 |
+| 1024, 1024, 512, 512, 256, 128, 64, 32 | GPU | 25 | 39.60 | 0.91140 | 3.5143 |
+
+La aceleración CPU/GPU pasó de 1.31× a 3.00× al ampliar la red de cuatro capas. Más cálculo puede aprovechar mejor la GPU, pero más parámetros no garantizan mejor clasificación: la AUC aumentó ligeramente mientras AMS no mejoró. AUC resume todos los umbrales; AMS usa una selección con pesos físicos.
+
+`fit_seconds` mide el bucle de entrenamiento y la evaluación final del mejor modelo; excluye la espera en cola, lectura inicial y preprocesamiento. No representa el tiempo total desde que se envía el trabajo. Para medir aceleración con más confianza, repetir al menos tres veces y comparar medianas con el mismo número de épocas. Registrar también nodo CPU, hilos, GPU, versión de PyTorch y arquitectura. Para estudiar estabilidad del modelo, variar las semillas de inicialización manteniendo las particiones fijas; el entrenador actual usa una misma semilla para ambas, por lo que cambiarla también cambia la partición y debe indicarse.
+
+### Profundidad y parada temprana
+
+La red de ocho capas se configuró con máximo 200 épocas y `patience: 15`. Su mínimo de pérdida de validación ocurrió en la época 10; se detuvo en la 25 y recuperó el modelo de la época 10. La curva de entrenamiento siguió bajando mientras validación subió: un patrón de sobreajuste.
+
+Para repetir ese ensayo, crear una copia completa del YAML personal y cambiar solo estos campos (sin eliminar los demás):
+
+```yaml
+model:
+  hidden_dims: [1024, 1024, 512, 512, 256, 128, 64, 32]
+  dropout: 0.1
+training:
+  epochs: 200
+  patience: 15
+output:
+  directory: $HOME/hep-workshop/results/atlas_gpu_deep_earlystop01
+```
+
+Guardar como `configs/atlas_gpu_deep_earlystop01.yaml` dentro de tu espacio personal y enviar desde la raíz del repositorio:
+
+```bash
+sbatch --time=01:00:00 --output="$HOME/hep-workshop/logs/atlas_deep_%j.out" \
+  workshop/run_atlas_gpu.slurm "$HOME/hep-workshop/configs/atlas_gpu_deep_earlystop01.yaml"
+```
+
+Si ya existe esa corrida, elegir un nombre nuevo. Un experimento posterior puede cambiar únicamente dropout de 0.1 a 0.3, conservando las capas y la parada temprana, para investigar regularización. No asumir una mejora antes de medirla.
+
+### Registro y conclusiones por equipo
+
+Copiar una fila por entrenamiento en la tabla compartida del curso:
+
+| Grupo/corrida | Capas | Dropout | Aprendizaje | Lote | Dispositivo/hilos | Mejor época | Épocas ejecutadas | Tiempo (s) | AUC | AMS interna | Conclusión |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| | | | | | | | | | | | |
+
+Compartir el YAML, `metrics.json`, `history.csv` y `training_summary.png`, junto con una conclusión breve: qué cambió, cuánto costó, si mejoró AUC/AMS y qué muestran las pérdidas. Conservar los resultados en carpetas personales distintas; compartir solo las entregas solicitadas. No afirmar mejoras significativas por diferencias pequeñas de una única corrida.
+
+## Benchmarks publicados del Higgs Challenge
+
+La referencia histórica usa **AMS en el conjunto privado del challenge**, no AUC. La [publicación del challenge, tabla 2](https://proceedings.mlr.press/v42/cowa14.pdf), informa:
+
+| Método | AMS privada histórica |
+| --- | ---: |
+| TMVA de referencia | 3.19956 |
+| MultiBoost de referencia | 3.40488 |
+| Solución ganadora, conjunto de redes profundas | 3.80581 |
+
+Usar aproximadamente **3.40** como referencia de partida histórica y **3.81** como referencia ganadora. El ganador combinaba modelos; no era simplemente una red individual más grande. Estos valores contextualizan el ejercicio, pero nuestra AMS interna de aproximadamente 3.45–3.56 no permite afirmar que superamos MultiBoost ni que estamos cerca del ganador: cambia el conjunto de evaluación y el umbral se optimizó sobre la propia validación.
+
+Para una comparación numérica externa, congelar arquitectura, modelo, preprocesamiento y regla de selección antes de evaluar `KaggleSet=v`. Reproducir la definición oficial de AMS, su regularización y los pesos `KaggleWeight` de esa partición, sin reutilizar el reescalado de validación `t`. Documentar también si se entrena con una fracción de `t` o con todo `t`, y cualquier diferencia respecto al protocolo histórico. Nunca buscar el mejor umbral mirando las etiquetas privadas. El entrenador inicial todavía no realiza esta evaluación privada: hasta añadir esa etapa, reportar los números históricos y las métricas internas en tablas separadas.
