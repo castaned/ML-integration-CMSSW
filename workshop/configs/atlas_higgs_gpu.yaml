@@ -1,0 +1,23 @@
+data:
+  input: /lustre/cursos/curso07/datos/ATLAS_HiggsChallenge/atlas-higgs-challenge-2014-v2.csv.gz
+  features: all_physics
+  missing_value: -999.0
+split:
+  seed: 16
+  validation_fraction: 0.2
+model:
+  hidden_dims: [128, 64, 32, 16]
+  dropout: 0.1
+training:
+  device: cuda
+  epochs: 20
+  batch_size: 4096
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  patience: 6
+  weighting: unweighted
+  cpu_threads: 4
+evaluation:
+  ams_regularization: 10.0
+output:
+  directory: $HOME/hep-workshop/results/atlas_gpu_baseline01

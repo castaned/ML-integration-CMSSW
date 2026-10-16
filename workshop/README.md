@@ -51,3 +51,20 @@ python workshop/plot_inputs.py -f "$HOME/hep-workshop/results/higgs_zz_prueba02/
 ```
 
 Use a new output directory to preserve existing plots.
+
+
+## Main exercise: ATLAS Higgs Challenge on AMD GPU
+
+See `configs/atlas_higgs_gpu.yaml`, `train_atlas.py` and `run_atlas_gpu.slurm`. The shared original CSV is read directly. Copy the YAML to your personal configs, then submit from repository root:
+
+```bash
+mkdir -p "$HOME/hep-workshop/configs" "$HOME/hep-workshop/logs"
+cp -n workshop/configs/atlas_higgs_gpu.yaml "$HOME/hep-workshop/configs/atlas_baseline01.yaml"
+sbatch --output="$HOME/hep-workshop/logs/atlas_%j.out" workshop/run_atlas_gpu.slurm "$HOME/hep-workshop/configs/atlas_baseline01.yaml"
+```
+
+Yuca uses `ml-hep-gpu`, ROCm 6.4.3, PyTorch 2.8.0+rocm6.4 and MI210, with account curso07/QOS qoscurso07. Default network: 128/64/32/16, dropout 0.1, 20 epochs, batch 4096, AdamW. Change model/training values and a new `output.directory` in personal YAML for each experiment. GPU jobs fail clearly if GPU is unavailable.
+
+Only KaggleSet=t is used (200k training/50k internal validation with seed 16). Median imputation (-999) and scaling fit training only. Features exclude labels/weights/IDs/partition. Training BCE is unweighted. AMS uses KaggleWeight rescaled per class for the held-out fraction; the threshold is selected on validation. This internal validation AMS is exploratory and **not the historical private leaderboard score**. Partitions b/v remain unused for fitting and threshold selection. A separate frozen-model private evaluation is required before comparison with the historical benchmark.
+
+Outputs: best_model.pt, preprocessing.joblib, archived YAML, metrics.json (including input checksum and GPU), history.csv, splits.csv, validation_scores.csv and training_summary.png/pdf. Existing experiment folders are protected. ATLAS is the main workshop practice; CMS NanoAOD classification and the autoencoder remain complementary examples.
