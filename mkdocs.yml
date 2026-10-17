@@ -55,21 +55,11 @@ nav:
     - framework/04_framework-setup.md
   - Example of usage:
     - usage/01_usage.md
-  - Practical Machine Learning in HEP (Yuca / Open Data):
-    - practical-ml-hep/index.md
-    - La física y las variables: practical-ml-hep/atlas-physics.md
-    - Laboratorio, diseña y entrena: practical-ml-hep/atlas-gpu.md
-    - Bitácora del grupo: practical-ml-hep/atlas-experiments.md
-    - Compartamos conclusiones: practical-ml-hep/delivery.md
-    - Preparación y ayuda:
-      - Primer acceso y 2FA: yuca-course/00_acceso.md
-      - Repositorio y entorno: yuca-course/01_entorno.md
-      - Comandos de apoyo ATLAS: practical-ml-hep/atlas-howto.md
-      - Problemas frecuentes: yuca-course/06_problemas.md
-    - Para seguir explorando:
-      - Autoencoder CMS: practical-ml-hep/autoencoder.md
-      - Datos abiertos y NanoAOD: yuca-course/02_datos.md
-      - Clasificación CMS desde NanoAOD: practical-ml-hep/higgs.md
-      - Ejercicios complementarios CMS: practical-ml-hep/experiments.md
-      - Más preguntas ATLAS: practical-ml-hep/atlas-experiments-reference.md
-      - Método y benchmarks históricos: practical-ml-hep/atlas-reference.md
+  - CERN Open Data:
+    - open-data/index.md
+    - Entorno y configuración: open-data/01_entorno.md
+    - Archivos NanoAOD: open-data/02_datos.md
+    - Procesamiento y HDF5: open-data/03_procesamiento.md
+    - Clasificador MLP: open-data/04_clasificador.md
+    - Autoencoder: open-data/05_autoencoder.md
+    - Problemas frecuentes: open-data/06_problemas.md

@@ -31,7 +31,7 @@ If you are new to CMS computing or ML, follow these steps:
 
 ## Critical Requirements
 
-For the [Practical Machine Learning in HEP course on Yuca with Open Data](practical-ml-hep/index.md), a CERN account is not required. Use the Yuca access and shared data supplied by your instructor. The requirements below apply to the CERN infrastructure workflow.
+The [CERN Open Data mode](open-data/index.md) processes public NanoAOD files accessible on a local or institutional cluster without requiring a CERN account or GRID proxy for local processing. The requirements below apply to the CERN infrastructure workflow.
 
 
 !!! warning "Before You Begin"
@@ -51,6 +51,8 @@ For the [Practical Machine Learning in HEP course on Yuca with Open Data](practi
 
 
 
-## Practical Machine Learning in HEP
+## CERN Open Data
 
-[Taller en Yuca: clasificación de Higgs y autoencoder CMS](practical-ml-hep/index.md). Miércoles tres horas y jueves una hora, con ejercicios y guía de preparación.
+See the [technical Open Data guide](open-data/index.md) for environment requirements, NanoAOD inputs, YAML configuration, processing, ROOT-to-HDF5 conversion and model training.
+
+The teaching material is hosted separately at [Practical Machine Learning for HEP Data Analysis](https://castaned.github.io/practical-ml-hep/).
