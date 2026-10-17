@@ -143,6 +143,10 @@ def run(config):
              'validation_auc':roc_auc_score(labels[val],scores),
              'epoch_seconds':time.perf_counter()-epoch_start}
         history.append(row);print(json.dumps(row),flush=True)
+        filled=min(24,int(24*epoch/int(training['epochs'])))
+        print(f"[{'#'*filled}{'-'*(24-filled)}] Epoca {epoch}/{training['epochs']} | "
+              f"train={row['train_loss']:.5f} val={validation_loss:.5f} "
+              f"AUC={row['validation_auc']:.5f}",flush=True)
         if validation_loss<best:
             best=validation_loss;best_epoch=epoch;stale=0
             best_state={k:v.detach().cpu().clone() for k,v in model.state_dict().items()}
