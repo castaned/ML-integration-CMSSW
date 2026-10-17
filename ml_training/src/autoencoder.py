@@ -407,7 +407,10 @@ def run_autoencoder(config, output_path):
         train_loss = sum(loss * count for loss, count in losses) / len(train)
         history["train_loss"].append(train_loss)
         history["val_loss"].append(val_loss)
-        print(f"Epoch {epoch + 1}: train={train_loss:.6f}, SM validation={val_loss:.6f}")
+        filled = min(24, int(24 * (epoch + 1) / int(settings['epochs'])))
+        print(f"[{'#' * filled}{'-' * (24 - filled)}] "
+              f"Epoch {epoch + 1}/{settings['epochs']}: train={train_loss:.6f}, "
+              f"SM validation={val_loss:.6f}", flush=True)
         if val_loss < best_loss:
             best_loss = val_loss
             best_state = copy.deepcopy(model.state_dict())

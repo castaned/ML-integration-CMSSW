@@ -17,6 +17,6 @@ case "$1" in
     extract) python workshop/extract_fourleptons.py -f "$2" --output "$3" ;;
     higgs) python workshop/train_higgs.py -f "$2" --output "$3" ;;
     higgs-final) python workshop/train_higgs.py -f "$2" --output "$3" --final ;;
-    autoencoder) python workshop/train_autoencoder.py -f "$2" ;;
+    autoencoder) python -u workshop/train_autoencoder.py -f "$2" ;;
     *) echo 'Expected higgs, higgs-final, or autoencoder' >&2; exit 2 ;;
 esac
