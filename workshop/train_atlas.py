@@ -179,19 +179,8 @@ def run(config):
     splits=np.full(len(develop),'train',dtype=object);splits[val]='validation'
     pd.DataFrame({'EventId':develop.EventId,'split':splits}).to_csv(out/'splits.csv',index=False)
     (out/'metrics.json').write_text(json.dumps(metrics,indent=2))
-    fig,axes=plt.subplots(1,3,figsize=(15,4))
-    h=pd.DataFrame(history)
-    axes[0].plot(h.epoch,h.train_loss,label='Train');axes[0].plot(h.epoch,h.validation_loss,label='Validation')
-    axes[0].set(xlabel='Epoch',ylabel='BCE loss');axes[0].legend()
-    fpr,tpr,_=roc_curve(labels[val],scores)
-    axes[1].plot(fpr,tpr,label=f'AUC {metrics["roc_auc_unweighted"]:.4f}')
-    axes[1].plot([0,1],[0,1],'--',color='gray');axes[1].set(xlabel='Background acceptance',ylabel='Signal efficiency');axes[1].legend()
-    for label,name in [(0,'Background'),(1,'Higgs')]:
-        axes[2].hist(scores[labels[val]==label],bins=np.linspace(0,1,41),density=True,histtype='step',label=name)
-    axes[2].set(xlabel='Classifier score',ylabel='Unit-area density');axes[2].legend()
-    fig.suptitle('ATLAS Higgs Challenge: internal validation (private set untouched)');fig.tight_layout()
-    for ext in ('png','pdf'):fig.savefig(out/f'training_summary.{ext}',dpi=180)
-    plt.close(fig)
+    from plot_atlas_training import plot_results
+    plot_results(out)
     print(json.dumps(metrics,indent=2),flush=True)
     return metrics
 
