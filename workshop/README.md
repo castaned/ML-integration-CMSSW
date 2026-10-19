@@ -107,3 +107,17 @@ https://castaned.github.io/practical-ml-hep/cms-procesamiento/
 These templates keep the current selection and autoencoder implementation unchanged.
 Matching the historical pilot metrics additionally requires the same input files
 and configuration; check the manifest and per-process counts before comparison.
+
+
+After HDF5 conversion completes, validate the inputs and create styled variable
+figures before training:
+
+```bash
+python scripts/check_dyjets_ht_pilot.py -f "$HOME/hep-workshop/configs/cms_autoencoder_baseline01.yaml" --plots "$HOME/hep-workshop/cms/baseline01/plots"
+```
+
+This writes four-variable and ten-variable panels, individual PNG/PDF/SVG figures,
+a config snapshot and process counts. SM uses the configured training split;
+Wprime is evaluation-only. Raw full-range histograms have common bins and unit
+area per process, with no luminosity interpretation. Existing plot folders are
+protected. Standalone plotting is also available via `workshop/plot_cms_inputs.py`.

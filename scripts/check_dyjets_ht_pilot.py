@@ -13,6 +13,7 @@ from src.autoencoder import _load_events, _split_by_process
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("-f", "--file", type=Path, required=True)
+    parser.add_argument("--plots", type=Path, help="Create input plots in a new directory after checks pass")
     args = parser.parse_args()
     config = yaml.safe_load(args.file.read_text())
     data = config["data"]
@@ -34,3 +35,8 @@ if __name__ == "__main__":
     if np.any(values < 0) or np.any(signal < 0):
         raise ValueError("Unexpected negative value in nonnegative pilot features")
     print("Wprime evaluation:", len(signal), "events; all features validated")
+
+    if args.plots:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from workshop.plot_cms_inputs import plot_results
+        plot_results(config, args.plots)
