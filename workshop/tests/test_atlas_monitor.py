@@ -4,7 +4,9 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from monitor_atlas import epoch_records, render
+from monitor_atlas import epoch_records, render, job_status
+from unittest.mock import patch
+from subprocess import CompletedProcess
 
 
 class MonitorTests(unittest.TestCase):
@@ -25,6 +27,29 @@ class MonitorTests(unittest.TestCase):
 
     def test_empty_log_is_waiting_not_completed(self):
         self.assertIn('Esperando', render([], 20))
+
+    def test_pending_and_failed_jobs_are_distinguished(self):
+        self.assertIn('EN COLA', render([], 20, state='PENDING', detail='Resources'))
+        failed = render([], 20, state='FAILED', log_text='RuntimeError: invalid input')
+        self.assertIn('FALLÓ', failed)
+        self.assertIn('RuntimeError: invalid input', failed)
+
+    def test_completed_metrics_without_epoch_log_are_shown(self):
+        metrics = {'best_epoch': 3, 'roc_auc_unweighted': .9, 'ams_validation_tuned': 2.5}
+        self.assertIn('Resultados disponibles', render([], 20, metrics))
+
+    def test_real_losses_appear_on_shared_chart(self):
+        row = {'epoch': 1, 'train_loss': .5, 'validation_loss': .4, 'validation_auc': .8}
+        text = render([row], 20)
+        self.assertIn('0.5000', text)
+        self.assertIn('0.4000', text)
+        self.assertIn('T: entrenamiento', text)
+
+    @patch('monitor_atlas.subprocess.run')
+    def test_accounting_used_after_job_leaves_queue(self, run):
+        run.side_effect = [CompletedProcess([], 0, '', ''),
+                           CompletedProcess([], 0, 'FAILED|1:0|\n', '')]
+        self.assertEqual(job_status('123'), ('FAILED', '1:0'))
 
 
 if __name__ == '__main__':
