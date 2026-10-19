@@ -3,3 +3,4 @@
 h5py
 onnx
 # Install CPU PyTorch separately, using the official PyTorch CPU package index.
+tables

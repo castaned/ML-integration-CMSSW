@@ -1,0 +1,30 @@
+# Template: generate personal paths with workshop/setup_cms.py.
+proxy:
+  generate: 0
+data_processing:
+  input_mode: open_data
+  conda_env: ml-open-data
+  scheduler: slurm
+  slurm_params:
+    executable_file: run_filter.sh
+    account: curso07
+    cpus: 1
+    gpus: 0
+    mem: 4000M
+    time: 01:00:00
+    partition: cpu
+  processing_script: example_files/main_process/filterNanoAOD.py
+  eos_output_dir: REPLACE_PERSONAL_ROOT_OUTPUT
+  datasets:
+  - name: DYJets
+    ID: 4
+    path: REPLACE_INPUT_DYJets
+  - name: WZ
+    ID: 5
+    path: REPLACE_INPUT_WZ
+  - name: ZZ
+    ID: 6
+    path: REPLACE_INPUT_ZZ
+  - name: Wprime
+    ID: 1
+    path: REPLACE_INPUT_Wprime

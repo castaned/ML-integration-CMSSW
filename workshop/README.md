@@ -83,3 +83,27 @@ python workshop/plot_atlas.py -f "$HOME/hep-workshop/configs/atlas_baseline01.ya
 For CPU comparisons use `run_atlas_cpu.slurm` with a copied YAML setting `training.device: cpu` and a new `output.directory`; no GPU is reserved. Both CPU and GPU scripts use the same environment. Training now also records parameter count, batches per epoch, mean epoch time and PyTorch peak GPU allocated memory. Memory allocation is not a GPU utilization measurement.
 
 The course guide `practical-ml-hep/atlas-gpu/` follows physics -> variables -> YAML -> runs -> comparison. `practical-ml-hep/atlas-experiments/` provides blank tables and discussion questions. Infrastructure and historical measured results are in an optional reference appendix. Students edit personal YAML files, preserve one folder per run and complete the tables during class.
+
+
+## Student CMS multilepton reproduction
+
+The three templates `configs/cms_processing.yaml`, `cms_root2h5.yaml` and
+`cms_autoencoder.yaml` describe the existing multilepton selection, ROOT/HDF5
+conversion and ten-feature SM autoencoder. Do not submit templates containing
+`REPLACE_` paths. From the repository root, with `ml-open-data` active:
+
+```bash
+python workshop/setup_cms.py --inputs /lustre/cursos/curso07/datos/autoencoder --tag baseline01
+```
+
+This creates personal `cms_processing_baseline01.yaml`, `cms_root2h5_baseline01.yaml`
+and `cms_autoencoder_baseline01.yaml` under `$HOME/hep-workshop/configs`, plus an
+explicit input-file manifest. The shared folder uses `DYjets` (lowercase j),
+`WZ`, `ZZ`, `Wprime`; process labels remain 4, 5, 6, 1. Each stage points to the
+personal output of the previous stage. Existing configurations/results are protected.
+Full submission, monitoring and result instructions:
+https://castaned.github.io/practical-ml-hep/cms-procesamiento/
+
+These templates keep the current selection and autoencoder implementation unchanged.
+Matching the historical pilot metrics additionally requires the same input files
+and configuration; check the manifest and per-process counts before comparison.

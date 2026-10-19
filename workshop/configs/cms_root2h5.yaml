@@ -1,0 +1,65 @@
+# Template: generate personal paths with workshop/setup_cms.py.
+convertion:
+  conda_env: ml-open-data
+  input_dirs:
+  - REPLACE_ROOT_DYJets
+  - REPLACE_ROOT_WZ
+  - REPLACE_ROOT_ZZ
+  - REPLACE_ROOT_Wprime
+  tree_name: Events
+  branches:
+  - MET_pt
+  - MET_phi
+  - Dataset_ID
+  - A_pass
+  - A_Sum_mass
+  - A_Dr_Z
+  - A_Zmass
+  - A_Sum_pt
+  - A_ptZ
+  - A_Lep1Z_pt
+  - A_Lep2Z_pt
+  - A_Lep3W_pt
+  - A_Lep3W_phi
+  - B_pass
+  - B_Sum_mass
+  - B_Dr_Z
+  - B_Zmass
+  - B_Sum_pt
+  - B_ptZ
+  - B_Lep1Z_pt
+  - B_Lep2Z_pt
+  - B_Lep3W_pt
+  - B_Lep3W_phi
+  - C_pass
+  - C_Sum_mass
+  - C_Dr_Z
+  - C_Zmass
+  - C_Sum_pt
+  - C_ptZ
+  - C_Lep1Z_pt
+  - C_Lep2Z_pt
+  - C_Lep3W_pt
+  - C_Lep3W_phi
+  - D_pass
+  - D_Sum_mass
+  - D_Dr_Z
+  - D_Zmass
+  - D_Sum_pt
+  - D_ptZ
+  - D_Lep1Z_pt
+  - D_Lep2Z_pt
+  - D_Lep3W_pt
+  - D_Lep3W_phi
+  max_jagged_len: null
+  skip_empty_trees: true
+  eos_output_dir: REPLACE_PERSONAL_H5_OUTPUT
+scheduler: slurm
+slurm_params:
+  executable_file: run_conversion.sh
+  account: curso07
+  cpus: 1
+  gpus: 0
+  mem: 4000M
+  time: 01:00:00
+  partition: cpu
