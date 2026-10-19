@@ -85,8 +85,11 @@ def run(config):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    out = expanded(config['output']['directory'])
-    if out.exists(): raise FileExistsError(f'Use a new output.directory: {out}')
+    from atlas_runs import reserve_run
+    out = reserve_run(expanded(config['output']['directory']))
+    print(json.dumps({'run_directory': str(out.resolve())}), flush=True)
+    print(f'Resultados de esta ejecución: {out}', flush=True)
+    (out/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     seed = int(config['split']['seed'])
     random.seed(seed);np.random.seed(seed);torch.manual_seed(seed)
     training,architecture = config['training'],config['model']
@@ -116,7 +119,6 @@ def run(config):
         batch_size=training['batch_size'],shuffle=True,generator=generator,num_workers=0)
     xv=torch.from_numpy(xval).to(device);yv=torch.from_numpy(labels[val].astype('float32')).to(device)
     best=float('inf');best_state=None;stale=0;history=[]
-    out.mkdir(parents=True)
     (out/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     print('Device:',device,torch.cuda.get_device_name(0) if device.type=='cuda' else 'CPU',flush=True)
     print('Train/validation:',len(train),len(val),'features:',len(features),flush=True)

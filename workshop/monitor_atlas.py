@@ -9,6 +9,7 @@ import time
 import subprocess
 
 import yaml
+from atlas_runs import run_from_log
 
 
 def epoch_records(text):
@@ -136,24 +137,29 @@ def main():
     expand = lambda value: Path(os.path.expandvars(os.path.expanduser(str(value))))
     config = yaml.safe_load(expand(args.config).read_text())
     log = expand(args.log)
-    metrics_path = expand(config['output']['directory']) / 'metrics.json'
+    base = expand(config['output']['directory'])
     state, detail, checked = '', '', 0
     try:
         while True:
             log_text = log.read_text(errors='replace') if log.exists() else ''
             rows = epoch_records(log_text)
+            run_directory = run_from_log(log_text)
+            # Legacy logs need actual epoch records before reading old flat results.
+            metrics_path = ((run_directory or base) / 'metrics.json') if (run_directory or rows) else None
             if time.monotonic()-checked >= 5:
                 state, detail = job_status(args.job_id)
                 checked = time.monotonic()
             metrics = None
             try:
-                metrics = json.loads(metrics_path.read_text())
+                metrics = json.loads(metrics_path.read_text()) if metrics_path else None
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
             if sys.stdout.isatty() and not args.once:
                 print('\033[2J\033[H', end='')
             print(render(rows, int(config['training']['epochs']), metrics, state, detail, log_text), flush=True)
             print(f'Log: {log}', flush=True)
+            if run_directory:
+                print(f'Resultados: {run_directory}', flush=True)
             if args.once or metrics is not None or state in ('FAILED', 'CANCELLED', 'TIMEOUT', 'OUT_OF_MEMORY', 'COMPLETED'):
                 break
             time.sleep(1)
