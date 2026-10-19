@@ -54,6 +54,8 @@ class FilterSelectionTests(unittest.TestCase):
             module.minLeptons = 3
             output = _Output()
             module.beginFile(None, None, _InputTree(), output)
+            # Simulate flags left by previous events in persistent ROOT buffers.
+            output.values.update({f"{c}_pass": 1 for c in "ABCD"})
             module.findBestZCandidate = lambda good: (
                 has_z, (good[0], good[1]) if has_z else None, 91.0 if has_z else None)
             module.findBestWCandidate = lambda remaining: (
@@ -73,6 +75,7 @@ class FilterSelectionTests(unittest.TestCase):
         self.assertTrue(passed)
         self.assertEqual([values[name] for name in
                           ("3Lep_pass", "Z_pass", "W_pass", "A_pass")], [1, 1, 1, 1])
+        self.assertEqual([values[f"{c}_pass"] for c in "ABCD"], [1, 0, 0, 0])
         self.assertEqual(cutflow["w"], 1)
         self.assertEqual(cutflow["A"], 1)
 

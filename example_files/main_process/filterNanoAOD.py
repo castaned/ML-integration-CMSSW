@@ -126,6 +126,9 @@ class LeptonFilter(Module):
     def analyze(self, event):
         self.cutflow["input"] += 1
         selected_wz = False
+        # Output buffers persist across events; clear selection flags explicitly.
+        for flag in ("3Lep_pass", "Z_pass", "W_pass", "A_pass", "B_pass", "C_pass", "D_pass"):
+            self.out.fillBranch(flag, 0)
 
         self.out.fillBranch("Dataset_ID", self.dataset_id)  # Store dataset as integer
 
