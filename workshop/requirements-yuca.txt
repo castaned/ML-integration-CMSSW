@@ -2,5 +2,7 @@
 -r requirements.txt
 h5py
 onnx
+# Keep the ROOT 6.24 / PyTables stack on the NumPy 1.x ABI.
+numpy<2
 # Install CPU PyTorch separately, using the official PyTorch CPU package index.
 tables
