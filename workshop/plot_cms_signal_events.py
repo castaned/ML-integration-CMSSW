@@ -14,14 +14,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results", type=Path)
     parser.add_argument("--name", default="cms_autoencoder")
+    parser.add_argument("--sample", choices=["Wprime", "WZ", "ZZ", "DYJets"], default="Wprime")
+    parser.add_argument("--ymax", type=float, help="Shared vertical limit for comparisons")
     args = parser.parse_args()
     folder = args.results.expanduser()
     threshold = float(json.loads((folder / f"metrics_{args.name}.json").read_text())["threshold"])
+    sample_key = "signal_example" if args.sample == "Wprime" else f"{args.sample}_test"
     with (folder / f"scores_{args.name}.csv").open(newline="", encoding="utf-8") as stream:
         scores = np.array([float(row["anomaly_score"]) for row in csv.DictReader(stream)
-                           if row["sample"] == "signal_example"])
+                           if row["sample"] == sample_key])
     if not len(scores):
-        raise ValueError("No Wprime evaluation scores found")
+        raise ValueError(f"No scores found for {sample_key}")
     selected = scores >= threshold
     fig, ax = plt.subplots(figsize=(10, 5), constrained_layout=True)
     indices = np.arange(len(scores))
@@ -31,10 +34,11 @@ def main():
                color="crimson", label="Seleccionados")
     ax.axhline(threshold, color="black", linestyle="--", label=f"Umbral = {threshold:.3f}")
     ax.set(xlabel="Indice del evento", ylabel="Error de reconstruccion",
-           title=f"Wprime: evaluacion | {len(scores)} eventos | {100*selected.mean():.2f}% seleccionados")
+           title=f"{args.sample}: {'evaluacion' if args.sample == 'Wprime' else 'prueba SM'} | {len(scores)} eventos | {100*selected.mean():.2f}% seleccionados")
+    ax.set_ylim(0, args.ymax if args.ymax is not None else max(float(scores.max()), threshold) * 1.08)
     ax.legend()
     for ext in ("png", "pdf", "svg"):
-        target = folder / f"events_Wprime_{args.name}.{ext}"
+        target = folder / f"events_{args.sample}_{args.name}.{ext}"
         fig.savefig(target, dpi=180)
         print(target)
     plt.close(fig)
