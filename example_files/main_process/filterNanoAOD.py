@@ -281,7 +281,6 @@ class LeptonFilter(Module):
                 if foundW:
 
                     self.cutflow["w"] += 1
-                    selected_wz = True
                     self.out.fillBranch("W_pass", 1)
 
                     ####### A channel (eeenu) ############
@@ -291,6 +290,7 @@ class LeptonFilter(Module):
                         and abs(lepW.pdgId) == 11
                     ):
 
+                        selected_wz = True
                         self.out.fillBranch("A_pass", 1)
                         self.cutflow["A"] += 1
                         self.out.fillBranch("A_nlep", len(good_leptons))
@@ -339,6 +339,7 @@ class LeptonFilter(Module):
                         and abs(lepW.pdgId) == 13
                     ):
 
+                        selected_wz = True
                         self.out.fillBranch("B_pass", 1)
                         self.cutflow["B"] += 1
                         self.out.fillBranch("B_nlep", len(good_leptons))
@@ -397,6 +398,7 @@ class LeptonFilter(Module):
                         )
                     ):
 
+                        selected_wz = True
                         self.out.fillBranch("C_pass", 1)
                         self.cutflow["C"] += 1
                         self.out.fillBranch("C_nlep", len(good_leptons))
@@ -455,6 +457,7 @@ class LeptonFilter(Module):
                         )
                     ):
 
+                        selected_wz = True
                         self.out.fillBranch("D_pass", 1)
                         self.cutflow["D"] += 1
                         self.out.fillBranch("D_nlep", len(good_leptons))

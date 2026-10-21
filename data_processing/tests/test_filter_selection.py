@@ -103,6 +103,11 @@ class FilterSelectionTests(unittest.TestCase):
         self.assertTrue(module.analyze(event))
         self.assertEqual([output.values[name] for name in
                           ("C_Dr_Z", "C_Dphi_Z", "C_Deta_Z")], [0.3, 0.2, 0.1])
+        # A W/Z candidate alone is insufficient: channel C requires a global muon.
+        for muon in muons:
+            muon.highPtId = 1
+        self.assertFalse(module.analyze(event))
+        self.assertEqual([output.values[f"{c}_pass"] for c in "ABCD"], [0, 0, 0, 0])
         energy = module.getLorentzVector(muons[0])[0]
         self.assertAlmostEqual(energy, math.sqrt(80**2 * math.cosh(0.2)**2 + 0.105**2))
 
