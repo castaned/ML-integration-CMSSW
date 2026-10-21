@@ -89,7 +89,7 @@ def render(rows, maximum, metrics=None, state='', detail='', log_text=''):
         if metrics is not None:
             return '\n'.join(title + ['Resultados disponibles.',
                 f"Modelo conservado: época {metrics['best_epoch']}",
-                f"AUC: {metrics['roc_auc_unweighted']:.5f} | AMS interna: {metrics['ams_validation_tuned']:.4f}",
+                f"AUC: {metrics['roc_auc_unweighted']:.5f}",
                 'No hay épocas en este log. Comprueba que corresponde a la misma ejecución.'])
         lines = title + [f"[{'-'*30}] Sin épocas registradas / máximo {maximum}"]
         if state == 'PENDING':
@@ -117,7 +117,7 @@ def render(rows, maximum, metrics=None, state='', detail='', log_text=''):
     lines += [''] + loss_chart(rows)
     if metrics is not None:
         lines += ['', f"Entrenamiento terminado. Modelo conservado: época {metrics['best_epoch']}.",
-                  f"AUC: {metrics['roc_auc_unweighted']:.5f} | AMS interna: {metrics['ams_validation_tuned']:.4f}",
+                  f"AUC: {metrics['roc_auc_unweighted']:.5f}",
                   'La parada temprana puede finalizar antes del máximo de épocas.']
     else:
         lines += ['', 'Ctrl+C cierra este visor; el entrenamiento sigue en Slurm.',

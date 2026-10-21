@@ -24,6 +24,7 @@ class MonitorTests(unittest.TestCase):
         self.assertIn('Época 2/20', text)
         self.assertIn('Modelo conservado: época 1', text)
         self.assertIn('Entrenamiento terminado', text)
+        self.assertNotIn('AMS', text)
 
     def test_empty_log_is_waiting_not_completed(self):
         self.assertIn('Esperando', render([], 20))
