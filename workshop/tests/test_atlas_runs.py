@@ -25,6 +25,15 @@ class RunFoldersTests(unittest.TestCase):
             self.assertEqual(len(set(paths)), 16)
             self.assertTrue(all(p.is_dir() for p in paths))
 
+    def test_named_variations_preserve_independent_repeats(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.assertEqual(reserve_run(temp, 'atlas_A_ancha').name, 'atlas_A_ancha_0001')
+            self.assertEqual(reserve_run(temp, 'atlas_A_ancha').name, 'atlas_A_ancha_0002')
+            self.assertEqual(reserve_run(temp, 'atlas_B_compacta').name, 'atlas_B_compacta_0001')
+            self.assertEqual(reserve_run(temp).name, 'run_0001')
+            with self.assertRaises(ValueError):
+                reserve_run(temp, '../outside')
+
     def test_monitor_uses_folder_recorded_by_this_job(self):
         self.assertIsNone(run_from_log('waiting\nTraceback\n'))
         self.assertEqual(run_from_log(json.dumps({'run_directory': '/results/run_0012'})),

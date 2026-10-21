@@ -86,9 +86,9 @@ def run(config):
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     from atlas_runs import reserve_run
-    out = reserve_run(expanded(config['output']['directory']))
+    out = reserve_run(expanded(config['output']['directory']), config['output'].get('run_name', 'run'))
     print(json.dumps({'run_directory': str(out.resolve())}), flush=True)
-    print(f'Resultados de esta ejecución: {out}', flush=True)
+    print(f'Resultados de esta ejecuciÃ³n: {out}', flush=True)
     (out/'config.yaml').write_text(yaml.safe_dump(config,sort_keys=False))
     seed = int(config['split']['seed'])
     random.seed(seed);np.random.seed(seed);torch.manual_seed(seed)
