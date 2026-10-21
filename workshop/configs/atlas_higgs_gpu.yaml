@@ -10,16 +10,17 @@ model:
   dropout: 0.1
 training:
   device: cuda
-  epochs: 40
+  epochs: 100
   batch_size: 4096
   learning_rate: 0.001
   weight_decay: 0.0001
-  patience: 10
+  patience: 20
   weighting: unweighted
   cpu_threads: 4
 evaluation:
   ams_regularization: 10.0
 output:
+  run_name: atlas_referencia
   directory: $HOME/hep-workshop/results/atlas_gpu_baseline01
 plots:
   directory: $HOME/hep-workshop/plots/atlas_inputs01
